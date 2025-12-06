@@ -1,0 +1,123 @@
+import Image from "next/image";
+import Link from "next/link";
+import heroImage from "~/assets/hero.webp";
+import { Button } from "~/components/ui/button";
+import { 
+  Stethoscope, 
+  Star, 
+  Crown, 
+  Activity, 
+  FlaskConical, 
+  ScanLine, 
+  ArrowRight
+} from "lucide-react";
+
+const HeroImage = () => {
+  return (
+    <div className="h-[600px] w-full absolute inset-0 -z-10">
+      <Image 
+        src={heroImage} 
+        alt="Hero Image" 
+        unoptimized 
+        fill 
+        className="object-cover opacity-90"
+      />
+      <div className="absolute inset-0 bg-linear-to-r from-20% from-secondary to-transparent w-full h-full"></div>
+    </div>
+  );
+};
+
+const ServiceCard = ({ 
+  icon: Icon, 
+  title, 
+  href,
+  color = "primary"
+}: { 
+  icon: any; 
+  title: string; 
+  href: string;
+  color?: string;
+}) => {
+  const colorClasses = {
+    primary: "bg-blue-500/10 group-hover:bg-blue-500/20 text-blue-600 dark:text-blue-400",
+    accent: "bg-amber-500/10 group-hover:bg-amber-500/20 text-amber-600 dark:text-amber-400",
+    success: "bg-green-500/10 group-hover:bg-green-500/20 text-green-600 dark:text-green-400",
+    purple: "bg-purple-500/10 group-hover:bg-purple-500/20 text-purple-600 dark:text-purple-400",
+    rose: "bg-rose-500/10 group-hover:bg-rose-500/20 text-rose-600 dark:text-rose-400",
+    cyan: "bg-cyan-500/10 group-hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400",
+  };
+
+  return (
+    <Link href={href}>
+      <div className="group bg-card/80 backdrop-blur-sm hover:bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer h-full min-h-[140px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className={`p-3 rounded-full transition-all duration-300 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.primary}`}>
+            <Icon className="h-7 w-7" />
+          </div>
+          <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors line-clamp-2">
+            {title}
+          </h3>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+export const HeroSection = () => {
+  const services = [
+    { icon: Stethoscope, title: "Cari Dokter", href: "/dokter", color: "primary" },
+    { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
+    { icon: Crown, title: "Poli Executive", href: "/poli-executive", color: "purple" },
+    { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
+    { icon: FlaskConical, title: "Laboratorium", href: "/layanan/laboratorium", color: "cyan" },
+    { icon: ScanLine, title: "Radiologi", href: "/layanan/radiologi", color: "success" },
+  ];
+
+  return (
+    <section className="w-full min-h-[600px] relative flex items-center">
+      <HeroImage />
+      
+      <div className="container mx-auto px-4 md:px-8 py-12">
+        
+        <div className="flex flex-col gap-20">
+          {/* Title & Description - Left Aligned */}
+          <div className="flex flex-col gap-6 max-w-3xl">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black leading-tight">
+              SELAMAT DATANG DI RUMAH SAKIT ISLAM <br /> {" "}
+              <span className="text-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl">SITI HAJAR MATARAM</span>
+            </h1>
+            
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
+              Memberikan pelayanan kesehatan terbaik dengan teknologi modern 
+              dan tenaga medis profesional di Mataram.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mt-4">
+              <Button size="lg" variant="default"  asChild>
+                <Link href="/tentang-kami">
+                  Tentang Kami
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Service Cards - Below, Centered */}
+          <div className="flex justify-center w-full">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl">
+              {services.map((service, index) => (
+                <ServiceCard
+                  key={index}
+                  icon={service.icon}
+                  title={service.title}
+                  href={service.href}
+                  color={service.color}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
