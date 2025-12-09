@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import heroImage from "~/assets/hero.webp";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { 
   Stethoscope, 
   Star, 
@@ -93,12 +93,10 @@ export const HeroSection = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <Button size="lg" variant="default"  asChild>
-                <Link href="/tentang-kami">
-                  Tentang Kami
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
+              <Link href="/tentang-kami" className={buttonVariants({variant: "default", size: "lg"})}>
+                Tentang Kami
+                <ArrowRight className="size-4" />
+              </Link>
             </div>
           </div>
 
