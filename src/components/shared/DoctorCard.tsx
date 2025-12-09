@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 
+const placeholderImageUrl =  "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2hpcnR8ZW58MHx8MHx8fDA%3D";
 // Definisikan tipe Props berdasarkan struktur data dokter (bisa import DoctorDto, tapi disini saya buat interface agar reusable)
 export interface DoctorCardProps {
   id: string;
@@ -26,7 +27,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardProps }) => {
       <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-800">
         {doctor.imageUrl ? (
           <Image
-            src={doctor.imageUrl}
+            src={doctor.imageUrl ?? placeholderImageUrl}
             alt={doctor.name}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
