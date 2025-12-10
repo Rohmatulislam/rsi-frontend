@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent } from "~/components/ui/card";
 import { formatCurrency } from "~/lib/utils";
+import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
 
 const DoctorDetailPage = () => {
   const params = useParams();
@@ -193,9 +194,14 @@ const DoctorDetailPage = () => {
                             </div>
                             
                             <div className="pt-2">
-                                <Button className="w-full rounded-xl py-6 font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" size="lg">
-                                    Buat Janji Temu
-                                </Button>
+                                <AppointmentBookingModal 
+                                    doctor={doctor} 
+                                    trigger={
+                                        <Button className="w-full rounded-xl py-6 font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" size="lg">
+                                            Buat Janji Temu
+                                        </Button>
+                                    }
+                                />
                                 <p className="text-xs text-center text-muted-foreground mt-3">
                                     Dijamin aman & terpercaya
                                 </p>
