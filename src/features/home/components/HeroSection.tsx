@@ -27,7 +27,6 @@ const HeroImage = () => {
   );
 };
 
-import { DoctorSearchModal } from "./DoctorSearchModal";
 
 const ServiceCard = ({
   icon: Icon,
@@ -80,7 +79,7 @@ const ServiceCard = ({
 
 export const HeroSection = () => {
   const services = [
-    { icon: Stethoscope, title: "Cari Dokter", href: "", color: "primary", isModal: true },
+    { icon: Stethoscope, title: "Cari Dokter", href: "/dokters", color: "primary" },
     { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
     { icon: Crown, title: "Poli Executive", href: "/poli-executive", color: "purple" },
     { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
@@ -119,23 +118,12 @@ export const HeroSection = () => {
           <div className="flex justify-center w-full">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl">
               {services.map((service, index) => {
-                if (service.isModal) {
-                  return (
-                    <DoctorSearchModal key={index}>
-                      <ServiceCard
-                        icon={service.icon}
-                        title={service.title}
-                        color={service.color}
-                      />
-                    </DoctorSearchModal>
-                  );
-                }
                 return (
                   <ServiceCard
                     key={index}
                     icon={service.icon}
                     title={service.title}
-                    href={service.href}
+                    href={service.href || "/dokters"}
                     color={service.color}
                   />
                 );

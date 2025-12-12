@@ -1,0 +1,315 @@
+import { useState, useEffect } from 'react';
+import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } from '../types/appointment';
+import { useCreateAppointment } from '../api/createAppointment';
+import { toast } from "sonner";
+
+export const useAppointmentForm = (doctor: any) => {
+  // Jika dokter hanya memiliki 1 poliklinik, kita langsung set dan lanjut ke langkah 2
+  const initialStep = (doctor.categories && doctor.categories.length === 1) ? 2 : 1;
+  const [step, setStep] = useState(initialStep);
+  const [bookingCode, setBookingCode] = useState('');
+  // Jika hanya ada 1 poliklinik, kita langsung set
+  const initialPoli = (doctor.categories && doctor.categories.length === 1)
+    ? {
+        poliId: doctor.categories[0].id || doctor.categories[0].slug || "1",
+        poliName: doctor.categories[0].name
+      }
+    : { poliId: '', poliName: '' };
+
+  const [formData, setFormData] = useState<AppointmentFormData>({
+    poliId: initialPoli.poliId,
+    poliName: initialPoli.poliName,
+    date: '',
+    time: '',
+    patientType: 'new',
+    mrNumber: '',
+    nik: '',
+    fullName: '',
+    phone: '',
+    email: '',
+    address: '',
+    birthDate: '',
+    gender: '' as 'L' | 'P' | '',
+    paymentType: 'umum',
+    bpjsNumber: '',
+    keluhan: '',
+    religion: '',
+    consentTerms: false,
+    consentPrivacy: false,
+    consentFee: false,
+    bpjsClass: '',
+    bpjsFaskes: '',
+    bpjsRujukan: '',
+  });
+
+  // Patient search state
+  const [patientSearch, setPatientSearch] = useState<PatientSearchState>({
+    loading: false,
+    found: false,
+    patientData: null,
+    error: '',
+  });
+
+  const createAppointmentMutation = useCreateAppointment();
+  const loading = createAppointmentMutation.isPending;
+
+  // Search patient by RM number
+  const searchPatient = async (mrNumber: string) => {
+    if (!mrNumber || mrNumber.length < 3) {
+      setPatientSearch({ loading: false, found: false, patientData: null, error: '' });
+      return;
+    }
+
+    console.log('🔍 [SEARCH] Starting patient search for RM:', mrNumber);
+    setPatientSearch({ loading: true, found: false, patientData: null, error: '' });
+
+    try {
+      const url = `http://localhost:2000/api/appointments/search-patient/${mrNumber}`;
+      console.log('🔍 [SEARCH] Fetching URL:', url);
+
+      const response = await fetch(url);
+      console.log('🔍 [SEARCH] Response status:', response.status);
+
+      const data = await response.json();
+      console.log('🔍 [SEARCH] Response data:', data);
+
+      if (data.found) {
+        console.log('✅ [SEARCH] Patient found:', data.patient.nm_pasien);
+        setPatientSearch({
+          loading: false,
+          found: true,
+          patientData: data.patient as PatientData,
+          error: '',
+        });
+      } else {
+        console.warn('⚠️ [SEARCH] Patient not found:', data.message);
+        setPatientSearch({
+          loading: false,
+          found: false,
+          patientData: null,
+          error: data.message || 'Pasien tidak ditemukan',
+        });
+      }
+    } catch (error) {
+      console.error('❌ [SEARCH] Error occurred:', error);
+      console.error('❌ [SEARCH] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      setPatientSearch({
+        loading: false,
+        found: false,
+        patientData: null,
+        error: 'Gagal mencari data pasien',
+      });
+    }
+  };
+
+  // Generate available dates based on doctor schedules
+  const getAvailableDates = (): AvailableDate[] => {
+    const dates: AvailableDate[] = [];
+    const today = new Date();
+    const daysMap: Record<number, string> = {
+      0: 'Minggu',
+      1: 'Senin',
+      2: 'Selasa',
+      3: 'Rabu',
+      4: 'Kamis',
+      5: 'Jumat',
+      6: 'Sabtu',
+    };
+
+    // Generate next 14 days
+    for (let i = 1; i <= 14; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+
+      // Check if doctor has schedule on this day
+      const dayOfWeek = date.getDay();
+      const hasSchedule = doctor.schedules?.some((s: any) => s.dayOfWeek === dayOfWeek);
+
+      if (hasSchedule) {
+        const schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayName = daysMap[dayOfWeek];
+        const dateDisplay = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        dates.push({
+          value: dateStr,
+          label: `${dayName}, ${dateDisplay} (${schedule?.startTime || '08:00'} - ${schedule?.endTime || '14:00'})`,
+        });
+      }
+    }
+
+    return dates;
+  };
+
+  // Generate available times for a selected date based on doctor's schedule
+  const getAvailableTimesForDate = (selectedDate: string): string[] => {
+    if (!selectedDate || !doctor.schedules) return [];
+
+    // Find the doctor's schedule for this day of week
+    const date = new Date(selectedDate);
+    const dayOfWeek = date.getDay();
+
+    // Get the schedule for this day
+    const schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+    if (!schedule) return [];
+
+    // Extract start and end times
+    const startTime = schedule.startTime || '08:00';
+    const endTime = schedule.endTime || '17:00';
+
+    // Generate time slots (30-min intervals)
+    const startHour = parseInt(startTime.split(':')[0]);
+    const startMinute = parseInt(startTime.split(':')[1]) || 0;
+    const endHour = parseInt(endTime.split(':')[0]);
+    const endMinute = parseInt(endTime.split(':')[1]) || 0;
+
+    const times: string[] = [];
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+
+    // Create time slots
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      times.push(timeString);
+
+      // Increment by 30 minutes
+      currentMinute += 30;
+      if (currentMinute >= 60) {
+        currentHour++;
+        currentMinute = 0;
+      }
+    }
+
+    return times;
+  };
+
+  const resetForm = (currentDoctor: any = doctor) => {
+    // Jika dokter hanya memiliki 1 poliklinik, kita langsung set dan lanjut ke langkah 2
+    const resetStep = (currentDoctor.categories && currentDoctor.categories.length === 1) ? 2 : 1;
+    const resetPoli = (currentDoctor.categories && currentDoctor.categories.length === 1)
+      ? {
+          poliId: currentDoctor.categories[0].id || currentDoctor.categories[0].slug || "1",
+          poliName: currentDoctor.categories[0].name
+        }
+      : { poliId: '', poliName: '' };
+
+    setStep(resetStep);
+    setBookingCode('');
+    setFormData({
+      poliId: resetPoli.poliId,
+      poliName: resetPoli.poliName,
+      date: '',
+      time: '',
+      patientType: 'new',
+      mrNumber: '',
+      nik: '',
+      fullName: '',
+      phone: '',
+      email: '',
+      address: '',
+      birthDate: '',
+      gender: '',
+      paymentType: 'umum',
+      bpjsNumber: '',
+      keluhan: '',
+      religion: '',
+      consentTerms: false,
+      consentPrivacy: false,
+      consentFee: false,
+      bpjsClass: '',
+      bpjsFaskes: '',
+      bpjsRujukan: '',
+    });
+    setPatientSearch({
+      loading: false,
+      found: false,
+      patientData: null,
+      error: '',
+    });
+  };
+
+  const handleSubmit = async () => {
+    console.log('Data yang dikirim ke backend:', {
+      doctorId: doctor.id,
+      poliId: formData.poliId,
+      poliName: formData.poliName,
+      bookingDate: formData.date,
+      bookingTime: formData.time,
+      patientType: formData.patientType,
+      paymentType: formData.paymentType,
+    });
+
+    // Build payload based on patient type
+    const payload: any = {
+      doctorId: doctor.id,
+      poliId: formData.poliId, // Include the selected poli
+      bookingDate: formData.date,
+      bookingTime: formData.time, // Include the selected time
+      patientType: formData.patientType,
+      paymentType: formData.paymentType,
+    };
+
+    // Add fields based on patient type
+    if (formData.patientType === 'old') {
+      // Old patient - only need mrNumber
+      payload.mrNumber = formData.mrNumber;
+    } else {
+      // New patient - need all registration fields
+      payload.nik = formData.nik;
+      payload.patientName = formData.fullName;
+      payload.patientPhone = formData.phone;
+      payload.birthDate = formData.birthDate;
+      payload.gender = formData.gender;
+
+      // Optional fields
+      if (formData.email) payload.patientEmail = formData.email;
+      if (formData.address) payload.patientAddress = formData.address;
+    }
+
+    // Add BPJS number if payment type is BPJS
+    if (formData.paymentType === 'bpjs' && formData.bpjsNumber) {
+      payload.bpjsNumber = formData.bpjsNumber;
+    }
+
+    // Add keluhan if provided
+    if (formData.keluhan) {
+      payload.keluhan = formData.keluhan;
+    }
+
+    createAppointmentMutation.mutate(payload, {
+      onSuccess: (data: any) => {
+        setBookingCode(data.bookingCode || "REG-XXXX");
+        setStep(4); // Updated to step 4 for success page
+        toast.success(data.message || "Janji temu berhasil dibuat!");
+        if (data.isNewPatient) {
+          toast.success(`No. RM Anda: ${data.noRM}`, { duration: 5000 });
+        }
+      },
+      onError: (error: any) => {
+        const errorMessage = error?.response?.data?.message || error?.message || "Gagal membuat janji temu";
+        toast.error(errorMessage);
+        console.error(error);
+      }
+    });
+  };
+
+  return {
+    step,
+    setStep,
+    bookingCode,
+    setBookingCode,
+    formData,
+    setFormData,
+    patientSearch,
+    setPatientSearch,
+    searchPatient,
+    getAvailableDates,
+    getAvailableTimesForDate,
+    resetForm,
+    handleSubmit,
+    loading
+  };
+};
