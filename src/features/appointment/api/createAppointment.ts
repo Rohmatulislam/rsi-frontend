@@ -7,10 +7,15 @@ export type CreateAppointmentDto = {
   patientType: "new" | "old";
   mrNumber?: string;
   nik?: string;
-  fullName?: string;
-  phone?: string;
+  patientName: string; // Changed from fullName to match backend
+  patientPhone: string; // Changed from phone to match backend
+  patientEmail?: string; // New field
+  patientAddress?: string; // New field
+  birthDate?: string; // New field - required for new patients
+  gender?: "L" | "P"; // New field - required for new patients
   paymentType: "umum" | "bpjs";
   bpjsNumber?: string;
+  keluhan?: string; // New field - complaint/reason
 };
 
 export const createAppointment = async (data: CreateAppointmentDto) => {
@@ -19,7 +24,7 @@ export const createAppointment = async (data: CreateAppointmentDto) => {
 };
 
 export const useCreateAppointment = () => {
-    return useMutation({
-        mutationFn: createAppointment,
-    });
+  return useMutation({
+    mutationFn: createAppointment,
+  });
 };

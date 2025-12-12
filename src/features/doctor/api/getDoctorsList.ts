@@ -1,37 +1,16 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
+import { DoctorDto, DoctorSortBy } from "~/features/home/api/getDoctors";
 
-export enum DoctorSortBy {
-    RECOMMENDED = "recommended",
-}
+export { DoctorSortBy };
+export type { DoctorDto };
 
 type GetDoctorsInput = {
     limit?: number;
     sort?: DoctorSortBy;
     isExecutive?: boolean;
-};
-
-export type DoctorDto = {
-    id: string;
-    name: string;
-    kd_dokter: string | null;
-    specialization: string | null;
-    consultation_fee: number | null;
-    imageUrl: string | null;
-    is_executive: boolean | null;
-    bpjs: boolean | null;
-    slug: string | null;
-    department: string | null;
-    schedules: {
-        id: string;
-        dayOfWeek: number;
-        startTime: string;
-        endTime: string;
-    }[];
-    categories: {
-        name: string;
-    }[];
+    search?: string;
 };
 
 type GetDoctorsResponse = DoctorDto[];
@@ -43,7 +22,7 @@ export const getDoctors = async (input?: GetDoctorsInput) => {
     return response.data;
 };
 
-export const getDoctorsQueryKey = (input?: GetDoctorsInput) => ["doctors", input];
+export const getDoctorsQueryKey = (input?: GetDoctorsInput) => ["doctors-list", input];
 
 export const getDoctorsQueryOptions = (input?: GetDoctorsInput) => {
     return queryOptions({
@@ -57,10 +36,9 @@ type UseGetDoctorsParams = {
     queryConfig?: QueryConfig<typeof getDoctors>;
 };
 
-export const useGetDoctors = ({ input, queryConfig }: UseGetDoctorsParams = {}) => {
+export const useGetDoctorsList = ({ input, queryConfig }: UseGetDoctorsParams = {}) => {
     return useQuery({
         ...getDoctorsQueryOptions(input),
         ...queryConfig,
     });
 };
-

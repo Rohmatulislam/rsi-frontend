@@ -2,24 +2,24 @@ import Image from "next/image";
 import Link from "next/link";
 import heroImage from "~/assets/hero.webp";
 import { Button, buttonVariants } from "~/components/ui/button";
-import { 
-  Stethoscope, 
-  Star, 
-  Crown, 
-  Activity, 
-  FlaskConical, 
-  ScanLine, 
+import {
+  Stethoscope,
+  Star,
+  Crown,
+  Activity,
+  FlaskConical,
+  ScanLine,
   ArrowRight
 } from "lucide-react";
 
 const HeroImage = () => {
   return (
     <div className=" h-full w-full absolute inset-0 -z-10">
-      <Image 
-        src={heroImage} 
-        alt="Hero Image" 
-        unoptimized 
-        fill 
+      <Image
+        src={heroImage}
+        alt="Hero Image"
+        unoptimized
+        fill
         className="object-cover "
       />
       <div className="absolute inset-0 bg-linear-to-r  from-secondary to-transparent w-full h-full"></div>
@@ -27,16 +27,20 @@ const HeroImage = () => {
   );
 };
 
-const ServiceCard = ({ 
-  icon: Icon, 
-  title, 
+import { DoctorSearchModal } from "./DoctorSearchModal";
+
+const ServiceCard = ({
+  icon: Icon,
+  title,
   href,
-  color = "primary"
-}: { 
-  icon: any; 
-  title: string; 
-  href: string;
+  color = "primary",
+  ...props
+}: {
+  icon: any;
+  title: string;
+  href?: string;
   color?: string;
+  [key: string]: any;
 }) => {
   const colorClasses = {
     primary: "bg-blue-500/10 group-hover:bg-blue-500/20 text-blue-600 dark:text-blue-400",
@@ -47,25 +51,36 @@ const ServiceCard = ({
     cyan: "bg-cyan-500/10 group-hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400",
   };
 
-  return (
-    <Link href={href}>
-      <div className="group bg-card/80 backdrop-blur-sm hover:bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer h-full min-h-[140px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className={`p-3 rounded-full transition-all duration-300 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.primary}`}>
-            <Icon className="h-7 w-7" />
-          </div>
-          <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors line-clamp-2">
-            {title}
-          </h3>
+  const CardContent = (
+    <div
+      className={`group bg-card/80 backdrop-blur-sm hover:bg-card border border-border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer h-full min-h-[140px] flex items-center justify-center ${!href ? 'cursor-pointer' : ''}`}
+      {...props}
+    >
+      <div className="flex flex-col items-center gap-3 text-center">
+        <div className={`p-3 rounded-full transition-all duration-300 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.primary}`}>
+          <Icon className="h-7 w-7" />
         </div>
+        <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors line-clamp-2">
+          {title}
+        </h3>
       </div>
-    </Link>
+    </div>
   );
+
+  if (href) {
+    return (
+      <Link href={href}>
+        {CardContent}
+      </Link>
+    );
+  }
+
+  return CardContent;
 };
 
 export const HeroSection = () => {
   const services = [
-    { icon: Stethoscope, title: "Cari Dokter", href: "/dokter", color: "primary" },
+    { icon: Stethoscope, title: "Cari Dokter", href: "", color: "primary", isModal: true },
     { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
     { icon: Crown, title: "Poli Executive", href: "/poli-executive", color: "purple" },
     { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
@@ -76,9 +91,9 @@ export const HeroSection = () => {
   return (
     <section className="w-full min-h-[650px] relative flex items-center">
       <HeroImage />
-      
+
       <div className="container mx-auto px-4 md:px-8 py-12">
-        
+
         <div className="flex flex-col gap-20">
           {/* Title & Description - Left Aligned */}
           <div className="flex flex-col gap-6 max-w-3xl">
@@ -86,14 +101,14 @@ export const HeroSection = () => {
               SELAMAT DATANG DI RUMAH SAKIT ISLAM <br /> {" "}
               <span className="text-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl">SITI HAJAR MATARAM</span>
             </h1>
-            
+
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
-              Memberikan pelayanan kesehatan terbaik dengan teknologi modern 
+              Memberikan pelayanan kesehatan terbaik dengan teknologi modern
               dan tenaga medis profesional di Mataram.
             </p>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <Link href="/tentang-kami" className={buttonVariants({variant: "default", size: "lg"})}>
+              <Link href="/tentang-kami" className={buttonVariants({ variant: "default", size: "lg" })}>
                 Tentang Kami
                 <ArrowRight className="size-4" />
               </Link>
@@ -103,15 +118,28 @@ export const HeroSection = () => {
           {/* Service Cards - Below, Centered */}
           <div className="flex justify-center w-full">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl">
-              {services.map((service, index) => (
-                <ServiceCard
-                  key={index}
-                  icon={service.icon}
-                  title={service.title}
-                  href={service.href}
-                  color={service.color}
-                />
-              ))}
+              {services.map((service, index) => {
+                if (service.isModal) {
+                  return (
+                    <DoctorSearchModal key={index}>
+                      <ServiceCard
+                        icon={service.icon}
+                        title={service.title}
+                        color={service.color}
+                      />
+                    </DoctorSearchModal>
+                  );
+                }
+                return (
+                  <ServiceCard
+                    key={index}
+                    icon={service.icon}
+                    title={service.title}
+                    href={service.href}
+                    color={service.color}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
