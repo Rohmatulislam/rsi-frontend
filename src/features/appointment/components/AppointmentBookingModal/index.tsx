@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -26,7 +27,10 @@ interface AppointmentModalProps {
   trigger?: React.ReactNode;
 }
 
-export const AppointmentBookingModal = ({ doctor, trigger }: AppointmentModalProps) => {
+export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: AppointmentModalProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [shouldResetAfterClose, setShouldResetAfterClose] = useState(false);
+
   const {
     step,
     setStep,
@@ -173,15 +177,49 @@ export const AppointmentBookingModal = ({ doctor, trigger }: AppointmentModalPro
           />
         );
       case 5:
-        return <SuccessStep bookingCode={bookingCode} />;
+        return <SuccessStep
+          bookingCode={bookingCode}
+          appointmentDate={formData.date}
+          appointmentTime={formData.time}
+          doctorName={doctor.name}
+          poliName={formData.poliName}
+          onClose={() => {
+            // Use setTimeout to prevent update during render
+            setTimeout(() => {
+              setShouldResetAfterClose(true);
+              setIsOpen(false);
+            }, 0);
+          }}
+        />;
       default:
         return null;
     }
   };
 
+  useEffect(() => {
+    // Reset form when modal is closed and reset flag is set
+    if (!isOpen && shouldResetAfterClose) {
+      resetForm(doctor);
+      setShouldResetAfterClose(false); // Reset the flag
+    }
+  }, [isOpen, shouldResetAfterClose, doctor, resetForm]);
+
   return (
-    <Dialog onOpenChange={(open) => !open && resetForm(doctor)}>
-      <DialogTrigger asChild>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        // Only set reset flag if modal is being closed (not opened)
+        if (!open) {
+          setShouldResetAfterClose(true);
+        }
+        onOpenChange?.(open);
+      }}
+    >
+      <DialogTrigger
+        asChild
+        onClick={() => setIsOpen(true)}
+      >
         {trigger}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -198,7 +236,7 @@ export const AppointmentBookingModal = ({ doctor, trigger }: AppointmentModalPro
           <DialogDescription>
             {step === 5
               ? "Pendaftaran Anda telah berhasil diproses ke SIMRS."
-              : `Langkah ${step} dari 5 - ${step === 1 ? "Pilih Poliklinik" : step === 2 ? "Pilih Jadwal" : step === 3 ? "Data Pasien" : "Konfirmasi"}`
+              : `Langkah ${step} dari 5 - ${step === 1 ? "Pilih Poliklinik" : step === 2 ? "Pilih Jadwal" : step === 3 ? "Data Pasien" : step === 4 ? "Konfirmasi Booking" : "Selesai"}`
             }
           </DialogDescription>
         </DialogHeader>
@@ -230,9 +268,9 @@ export const AppointmentBookingModal = ({ doctor, trigger }: AppointmentModalPro
               <Button onClick={() => {
                 console.log('Sebelum submit - formData:', formData);
                 handleSubmit();
-              }} disabled={loading} className="w-1/2 sm:w-auto min-w-[140px]">
+              }} disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee} className="w-1/2 sm:w-auto min-w-[140px]">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {loading ? "Memproses..." : "Konfirmasi Booking"}
+                {loading ? "Memproses Booking..." : "Konfirmasi Booking"}
               </Button>
             )}
           </DialogFooter>

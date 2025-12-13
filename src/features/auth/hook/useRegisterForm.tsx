@@ -1,27 +1,31 @@
 import { useForm } from "react-hook-form";
-import { LoginFormSchema, loginformSchema } from "../forms/login";
+import { RegisterFormSchema, registerFormSchema } from "../forms/register";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient, getErrorMessage } from "~/lib/auth-clent";
 import { toast } from "sonner";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
 
-export const useLoginForm = () => {
-  const form = useForm<LoginFormSchema>({
+export const useRegisterForm = () => {
+  const form = useForm<RegisterFormSchema>({
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
-    resolver: zodResolver(loginformSchema),
+    resolver: zodResolver(registerFormSchema),
   });
 
-  const onSubmit = async (data: LoginFormSchema) => {
+  const onSubmit = async (data: RegisterFormSchema) => {
     try {
-      const { error, data: authResponseData } = await authClient.signIn.email({
+      // Registrasi pengguna baru
+      const { error, data: authResponseData } = await authClient.signUp.email({
         email: data.email,
         password: data.password,
+        name: data.name,
       });
 
-      //handle auth errors
+      // Handle auth errors
       if (error?.code) {
         toast.error(getErrorMessage(error.code));
         return;
@@ -32,11 +36,12 @@ export const useLoginForm = () => {
           LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY,
           authResponseData.token
         );
-        //handle success
-        toast.success("Login successful");
+
+        // Handle success
+        toast.success("Registrasi berhasil! Anda telah masuk.");
       }
     } catch (error) {
-      // handle non-auth errors
+      // Handle non-auth errors
       toast.error((error as Error).message);
     }
   };

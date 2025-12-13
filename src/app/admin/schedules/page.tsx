@@ -5,6 +5,7 @@ import { useCreateSchedule, CreateScheduleDto } from "~/features/admin/api/sched
 import { useDeleteSchedule } from "~/features/admin/api/schedules/deleteSchedule";
 import { useState } from "react";
 import { Search, Clock, CalendarDays, Plus, Trash2, X, Save } from "lucide-react";
+import { Button } from "~/components/ui/button";
 
 export default function AdminSchedulesPage() {
     const { data: doctors, isLoading } = useGetDoctorsList({
@@ -167,28 +168,33 @@ export default function AdminSchedulesPage() {
                                         />
                                     </div>
                                     <div className="flex justify-end gap-2">
-                                        <button
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => setAddingToDocId(null)}
-                                            className="p-1 text-slate-500 hover:text-slate-700"
                                         >
                                             <X className="w-5 h-5" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => handleSaveSchedule(doc.id)}
-                                            className="p-1 text-blue-600 hover:text-blue-800"
                                         >
                                             <Save className="w-5 h-5" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             ) : (
-                                <button
+                                <Button
                                     onClick={() => handleAddClick(doc.id)}
-                                    className="mt-4 w-full py-2 flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary hover:bg-slate-50 rounded-lg border border-dashed border-slate-200 transition-colors"
+                                    variant="outline"
+                                    className="mt-4 w-full py-2 flex items-center justify-center gap-2 text-sm border-dashed"
                                 >
                                     <Plus className="w-4 h-4" />
                                     <span>Tambah Slot</span>
-                                </button>
+                                </Button>
                             )}
                         </div>
                     </div>

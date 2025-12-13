@@ -29,7 +29,22 @@ type ErrorTypes = Partial<
 
 const errorCodes = {
   USER_ALREADY_EXISTS: {
-    en: "user already registered",
+    en: "User already registered",
+  },
+  EMAIL_NOT_FOUND: {
+    en: "Email not found",
+  },
+  INVALID_CREDENTIALS: {
+    en: "Invalid credentials",
+  },
+  INVALID_PASSWORD: {
+    en: "Invalid password",
+  },
+  USER_NOT_FOUND: {
+    en: "User not found",
+  },
+  EMAIL_ALREADY_EXISTS: {
+    en: "Email already exists",
   },
 } satisfies ErrorTypes;
 
@@ -44,5 +59,5 @@ export const getErrorMessage = (code: string) => {
   if (code in errorCodes) {
     return errorCodes[code as keyof typeof errorCodes]["en"];
   }
-  return "";
+  return "An error occurred, please try again";
 };

@@ -15,14 +15,25 @@ type GetDoctorsInput = {
 export type DoctorDto = {
     id: string;
     name: string;
-    kd_dokter: string | null;
+    email: string | null;
+    licenseNumber: string | null;
+    phone: string | null;
     specialization: string | null;
-    consultation_fee: number | null;
+    department: string | null;
     imageUrl: string | null;
+    bio: string | null;
+    experience_years: number | null;
+    education: string | null;
+    certifications: string | null;
+    consultation_fee: number | null;
+    specialtyImage_url: string | null;
     is_executive: boolean | null;
+    sip_number: string | null;
     bpjs: boolean | null;
     slug: string | null;
-    department: string | null;
+    kd_dokter: string | null;
+    description: string | null;
+    isActive: boolean;
     schedules: {
         id: string;
         dayOfWeek: number;

@@ -3,7 +3,7 @@ import { axiosInstance } from "~/lib/axios";
 import { DoctorDto } from "~/features/home/api/getDoctors";
 
 export const updateDoctor = async ({ id, data }: { id: string; data: Partial<DoctorDto> }) => {
-    const response = await axiosInstance.patch<DoctorDto>(`/doctors/${id}`, data);
+    const response = await axiosInstance.put<DoctorDto>(`/admin/doctors/${id}`, data);
     return response.data;
 };
 

@@ -232,6 +232,12 @@ export const useAppointmentForm = (doctor: any) => {
   };
 
   const handleSubmit = async () => {
+    // Check if all consents are given
+    if (!formData.consentTerms || !formData.consentPrivacy || !formData.consentFee) {
+      toast.error("Mohon centang semua persetujuan sebelum melanjutkan booking.");
+      return;
+    }
+
     console.log('Data yang dikirim ke backend:', {
       doctorId: doctor.id,
       poliId: formData.poliId,
@@ -279,19 +285,50 @@ export const useAppointmentForm = (doctor: any) => {
       payload.keluhan = formData.keluhan;
     }
 
+    // Show loading toast
+    const loadingToast = toast.loading("Memproses booking Anda...");
+
     createAppointmentMutation.mutate(payload, {
+      onMutate: () => {
+        // Additional loading indicators can be set here if needed
+      },
       onSuccess: (data: any) => {
+        toast.dismiss(loadingToast); // Remove loading toast
         setBookingCode(data.bookingCode || "REG-XXXX");
-        setStep(4); // Updated to step 4 for success page
-        toast.success(data.message || "Janji temu berhasil dibuat!");
+        setStep(5); // Step 5 for success page after confirmation
+        toast.success(data.message || "Janji temu berhasil dibuat!", {
+          duration: 5000,
+        });
         if (data.isNewPatient) {
-          toast.success(`No. RM Anda: ${data.noRM}`, { duration: 5000 });
+          toast.success(`No. RM Anda: ${data.noRM}`, {
+            duration: 7000,
+            description: "Simpan nomor ini untuk kunjungan berikutnya"
+          });
         }
       },
       onError: (error: any) => {
-        const errorMessage = error?.response?.data?.message || error?.message || "Gagal membuat janji temu";
-        toast.error(errorMessage);
-        console.error(error);
+        toast.dismiss(loadingToast); // Remove loading toast
+        const errorMessage = error?.response?.data?.message ||
+                            error?.response?.data?.error ||
+                            error?.message ||
+                            "Gagal membuat janji temu. Mohon coba kembali.";
+
+        // More specific error handling
+        if (error?.response?.status === 429) {
+          toast.error("Terlalu banyak permintaan. Mohon tunggu sebentar sebelum mencoba kembali.", {
+            duration: 5000,
+          });
+        } else if (error?.response?.status === 400) {
+          toast.error(errorMessage, {
+            duration: 5000,
+          });
+        } else {
+          toast.error(errorMessage, {
+            duration: 7000,
+            description: "Pastikan data yang Anda masukkan sudah benar dan lengkap."
+          });
+        }
+        console.error('Booking error:', error);
       }
     });
   };

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 
 export const deleteDoctor = async (id: string) => {
-    const response = await axiosInstance.delete(`/doctors/${id}`);
+    const response = await axiosInstance.delete(`/admin/doctors/${id}`);
     return response.data;
 };
 
