@@ -21,93 +21,126 @@ export interface DoctorCardProps {
 
 export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: DoctorCardProps; hideExecutiveBadge?: boolean }) => {
   return (
-    <div className="group relative bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full">
+    <div className="group relative bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full">
+      
+      {/* Header Section - Image and Name */}
+      <div className="p-5 pb-3">
+        <div className="flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-md">
+              {doctor.imageUrl ? (
+                <Image
+                  src={doctor.imageUrl}
+                  alt={doctor.name}
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-700 dark:to-slate-800 text-slate-500 dark:text-slate-400">
+                  <Stethoscope className="h-6 w-6 opacity-70" />
+                </div>
+              )}
+            </div>
 
-      {/* Image Container */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-800">
-        {doctor.imageUrl ? (
-          <Image
-            src={doctor.imageUrl ?? placeholderImageUrl}
-            alt={doctor.name}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400">
-            <Stethoscope className="h-16 w-16 opacity-30" />
-          </div>
-        )}
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-
-        {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
-          {doctor.is_executive && !hideExecutiveBadge && (
-            <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-none shadow-lg backdrop-blur-md">
-              <span className="mr-1">👑</span> Executive
-            </Badge>
-          )}
-          {doctor.bpjs && (
-            <Badge className="bg-green-500 hover:bg-green-600 text-white border-none shadow-lg backdrop-blur-md">
-              BPJS
-            </Badge>
-          )}
-        </div>
-
-        {/* Quick Info Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-          <p className="text-white/80 text-sm font-medium mb-1 line-clamp-1">
-            {doctor.specialization || "Dokter Umum"}
-          </p>
-          <h3 className="text-xl font-bold leading-tight line-clamp-2 drop-shadow-md">
-            {doctor.name}
-          </h3>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-5 flex flex-col gap-4 flex-1">
-        {/* Categories/Tags */}
-        <div className="flex flex-wrap gap-2 min-h-[1.5rem]">
-          {doctor.categories?.slice(0, 3).map((cat: any, idx: number) => (
-            <span key={idx} className="text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 px-2 py-1 rounded-md">
-              {cat.name}
-            </span>
-          ))}
-        </div>
-
-        <div className="border-t border-slate-100 dark:border-slate-800 my-1 pt-2 space-y-2">
-
-          {/* Location */}
-          <div className="flex items-start gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-            <span className="text-slate-600 dark:text-slate-300 font-medium line-clamp-1">
-              {doctor.department || `Poli ${doctor.specialization || 'Umum'}`}
-            </span>
-          </div>
-
-          {/* Schedule */}
-          <div className="flex items-start gap-2 text-sm">
-            <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-            <div className="flex flex-col">
-              <span className="text-slate-600 dark:text-slate-300 font-medium">
-                Jadwal Praktek
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {doctor.schedules && doctor.schedules.length > 0
-                  ? `${doctor.schedules.length} Sesi tersedia`
-                  : "Senin - Jumat | 09:00 - 15:00"}
-              </span>
+            {/* Badges - Positioned outside image area */}
+            <div className="absolute -bottom-1 -left-1 flex flex-wrap gap-0.5">
+              {doctor.is_executive && !hideExecutiveBadge && (
+                <Badge className="bg-amber-500/90 hover:bg-amber-600 text-white border-none text-[9px] px-1.5 py-0.5 rounded-full shadow-sm">
+                  <span className="mr-0.5">👑</span>
+                </Badge>
+              )}
+              {doctor.bpjs && (
+                <Badge className="bg-green-500/90 hover:bg-green-600 text-white border-none text-[9px] px-1.5 py-0.5 rounded-full shadow-sm">
+                  BPJS
+                </Badge>
+              )}
             </div>
           </div>
 
+          <div className="min-w-0">
+            <h3 className="font-bold text-slate-800 dark:text-white line-clamp-1 text-base">
+              {doctor.name}
+            </h3>
+            <p className="text-sm text-primary font-medium line-clamp-1">
+              {doctor.specialization || "Dokter Umum"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="px-5">
+        <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
+      </div>
+
+      {/* Content Section - Information below divider */}
+      <div className="p-5 flex flex-col flex-1 pt-3">
+        <div className="flex-1 space-y-3">
+          {/* Categories/Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {doctor.categories?.slice(0, 3).map((cat: any, idx: number) => (
+              <span 
+                key={idx} 
+                className="text-[10px] uppercase font-bold tracking-wide bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full"
+              >
+                {cat.name}
+              </span>
+            ))}
+          </div>
+
+          <div className="space-y-2 pt-1">
+
+            {/* Location */}
+            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+              <MapPin className="h-4 w-4" />
+              <span className="line-clamp-1">
+                {doctor.department || `Poli ${doctor.specialization || 'Umum'}`}
+              </span>
+            </div>
+
+            {/* Schedule */}
+            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+              <Clock className="h-4 w-4" />
+              <span className="line-clamp-1">
+                {doctor.schedules && doctor.schedules.length > 0
+                  ? (() => {
+                      // Ambil jadwal pertama
+                      const schedule = doctor.schedules[0];
+
+                      // Fungsi untuk mendapatkan tanggal terdekat berdasarkan dayOfWeek
+                      const getNextDateForDay = (dayOfWeek: number): string => {
+                        const today = new Date();
+                        const currentDay = today.getDay();
+
+                        // Hitung selisih hari
+                        let daysToAdd = dayOfWeek - currentDay;
+                        if (daysToAdd <= 0) {
+                          daysToAdd += 7; // Jika hari ini atau kemarin, cari minggu depan
+                        }
+
+                        const date = new Date(today);
+                        date.setDate(today.getDate() + daysToAdd);
+
+                        // Format ke DD MMM (contoh: 14 Des)
+                        const day = date.getDate();
+                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                        const month = months[date.getMonth()];
+                        return `${day} ${month}`;
+                      };
+
+                      return `${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][schedule.dayOfWeek]} ${getNextDateForDay(schedule.dayOfWeek)} (${schedule.startTime})`;
+                    })()
+                  : "Tidak ada jadwal"}
+              </span>
+            </div>
+
+          </div>
         </div>
 
-        <Button className="w-full rounded-xl font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all mt-2" asChild>
+        <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all mt-3" asChild>
           <Link href={`/dokter/${doctor.slug}`}>
-            Buat Janji Temu
+            Lihat Jadwal
           </Link>
         </Button>
       </div>

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Card, CardContent } from "~/components/ui/card";
 import { formatCurrency } from "~/lib/utils";
 import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
+import { ScheduleSection } from "../components/ScheduleSection";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -43,7 +44,7 @@ const DoctorDetailPage = () => {
                 {/* Breadcrumb / Back Navigation */}
                 <div className="mb-8">
                     <Button variant="ghost" className="pl-0 hover:bg-transparent hover:text-primary transition-colors" asChild>
-                        <Link href="/dokter" className="flex items-center gap-2 text-muted-foreground">
+                        <Link href="/dokters" className="flex items-center gap-2 text-muted-foreground">
                             <ArrowLeft className="h-4 w-4" />
                             Kembali ke Daftar Dokter
                         </Link>
@@ -117,48 +118,14 @@ const DoctorDetailPage = () => {
                         </div>
 
                         {/* Schedules Section */}
-                        <section className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-primary">
-                                    <CalendarDays className="h-5 w-5" />
-                                </div>
-                                <h2 className="text-2xl font-bold">Jadwal Praktek</h2>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {doctor.schedules && doctor.schedules.length > 0 ? (
-                                    doctor.schedules.map((schedule: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                            <div className="h-10 w-10 flex flex-col items-center justify-center rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 font-bold text-slate-700 dark:text-slate-200">
-                                                <span className="text-[10px] uppercase text-muted-foreground">Hari</span>
-                                                <span>{schedule.dayOfWeek}</span>
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-slate-900 dark:text-white">
-                                                    {schedule.startTime} - {schedule.endTime}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">WIB</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    ["Senin", "Rabu", "Jumat"].map((day, idx) => (
-                                        <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                            <div className="h-10 w-10 flex flex-col items-center justify-center rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 font-bold text-slate-700 dark:text-slate-200">
-                                                <span className="text-[10px] uppercase text-muted-foreground">{day.substring(0, 3)}</span>
-                                                <Clock className="h-3 w-3" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-slate-900 dark:text-white">
-                                                    {day}
-                                                </p>
-                                                <p className="text-xs font-medium text-primary">09:00 - 14:00 WIB</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </section>
+                        <ScheduleSection
+                            schedules={doctor.schedules || []}
+                            fallbackSchedules={[
+                                { dayOfWeek: 1, startTime: "09:00", endTime: "14:00", isActive: true }, // Senin
+                                { dayOfWeek: 3, startTime: "09:00", endTime: "14:00", isActive: true }, // Rabu
+                                { dayOfWeek: 5, startTime: "09:00", endTime: "14:00", isActive: true }  // Jumat
+                            ]}
+                        />
                     </div>
 
                     {/* Right Column: Sticky Booking Card */}
