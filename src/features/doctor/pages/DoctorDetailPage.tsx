@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Card, CardContent } from "~/components/ui/card";
 import { formatCurrency } from "~/lib/utils";
 import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
-import { ScheduleSection } from "../components/ScheduleSection";
+import { DoctorScheduleByPoli } from "~/components/shared/DoctorScheduleByPoli";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -117,15 +117,8 @@ const DoctorDetailPage = () => {
                             </div>
                         </div>
 
-                        {/* Schedules Section */}
-                        <ScheduleSection
-                            schedules={doctor.schedules || []}
-                            fallbackSchedules={[
-                                { dayOfWeek: 1, startTime: "09:00", endTime: "14:00", isActive: true }, // Senin
-                                { dayOfWeek: 3, startTime: "09:00", endTime: "14:00", isActive: true }, // Rabu
-                                { dayOfWeek: 5, startTime: "09:00", endTime: "14:00", isActive: true }  // Jumat
-                            ]}
-                        />
+                        {/* Schedules Section Based on Polyclinic */}
+                        <DoctorScheduleByPoli doctor={doctor} />
                     </div>
 
                     {/* Right Column: Sticky Booking Card */}

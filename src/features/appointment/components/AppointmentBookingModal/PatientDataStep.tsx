@@ -3,6 +3,8 @@ import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { AppointmentFormData, PatientSearchState } from "../../types/appointment";
+import Image from "next/image";
+import { Stethoscope } from "lucide-react";
 
 interface PatientDataStepProps {
   formData: AppointmentFormData;
@@ -23,6 +25,36 @@ export const PatientDataStep = ({
 }: PatientDataStepProps) => {
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+        <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
+          {doctor.imageUrl ? (
+            <Image
+              src={doctor.imageUrl}
+              alt={doctor.name}
+              width={48}
+              height={48}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
+              <Stethoscope className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+            </div>
+          )}
+        </div>
+        <div>
+          <p className="font-bold text-slate-900 dark:text-white">{doctor.name}</p>
+          <p className="text-sm text-muted-foreground">{doctor.specialization || "Dokter"}</p>
+          {formData.poliName && (
+            <p className="text-sm font-medium text-primary mt-1">→ {formData.poliName}</p>
+          )}
+          {formData.date && formData.time && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {new Date(formData.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} | {formData.time}
+            </p>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
         <Label>Jenis Pasien</Label>
         <div className="grid grid-cols-2 gap-4">

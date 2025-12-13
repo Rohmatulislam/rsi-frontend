@@ -1,5 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { AppointmentFormData, PatientSearchState } from "../../types/appointment";
+import Image from "next/image";
+import { Stethoscope } from "lucide-react";
 
 interface ConfirmationStepProps {
   formData: AppointmentFormData;
@@ -24,8 +26,20 @@ export const ConfirmationStep = ({
       {/* Booking Details Summary */}
       <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800 space-y-4">
         <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
-          <div className="h-12 w-12 rounded-full overflow-hidden bg-slate-200 shrink-0 flex items-center justify-center text-xs font-bold">
-            DR
+          <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
+            {doctor.imageUrl ? (
+              <Image
+                src={doctor.imageUrl}
+                alt={doctor.name}
+                width={48}
+                height={48}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
+                <Stethoscope className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+              </div>
+            )}
           </div>
           <div>
             <p className="font-bold">{doctor.name}</p>

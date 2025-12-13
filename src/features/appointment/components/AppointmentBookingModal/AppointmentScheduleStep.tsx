@@ -2,6 +2,8 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { AppointmentFormData, AvailableDate } from "../../types/appointment";
+import Image from "next/image";
+import { Stethoscope } from "lucide-react";
 
 interface AppointmentScheduleStepProps {
   formData: AppointmentFormData;
@@ -24,8 +26,19 @@ export const AppointmentScheduleStep = ({
     <div className="space-y-6">
       <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
         <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-          {/* Simple Avatar Placeholder */}
-          <div className="w-full h-full bg-slate-200 flex items-center justify-center text-xs font-bold">DR</div>
+          {doctor.imageUrl ? (
+            <Image
+              src={doctor.imageUrl}
+              alt={doctor.name}
+              width={48}
+              height={48}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
+              <Stethoscope className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+            </div>
+          )}
         </div>
         <div>
           <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter"}</p>

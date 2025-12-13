@@ -43,6 +43,14 @@ export type DoctorDto = {
     categories: {
         name: string;
     }[];
+    scheduleDetails?: {
+        kd_poli: string;
+        nm_poli: string;
+        hari_kerja: string;
+        jam_mulai: string;
+        jam_selesai: string;
+        kuota: number | null;
+    }[];
 };
 
 type GetDoctorsResponse = DoctorDto[];

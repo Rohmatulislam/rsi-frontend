@@ -17,12 +17,46 @@ export interface DoctorCardProps {
   department: string | null;
   categories: { name: string }[];
   schedules: { dayOfWeek: number; startTime: string; endTime: string }[];
+  scheduleDetails?: {
+    kd_poli: string;
+    nm_poli: string;
+    hari_kerja: string;
+    jam_mulai: string;
+    jam_selesai: string;
+    kuota: number | null;
+  }[];
 }
 
 export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: DoctorCardProps; hideExecutiveBadge?: boolean }) => {
+  // Group schedule details by poli name for display, filtering out schedules with 00:00:00-00:00:00
+  const filteredScheduleDetails = doctor.scheduleDetails?.filter(schedule =>
+    schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+  );
+
+  const groupedSchedules = filteredScheduleDetails?.reduce((acc, schedule) => {
+    const poliName = schedule.nm_poli || `Poli ${doctor.specialization || 'Umum'}`;
+    if (!acc[poliName]) {
+      acc[poliName] = [];
+    }
+    acc[poliName].push(schedule);
+    return acc;
+  }, {} as Record<string, typeof filteredScheduleDetails>);
+
+  // Hari mapping untuk tampilan yang lebih rapi
+  const hariMapping: Record<string, string> = {
+    'MINGGU': 'Minggu',
+    'SENIN': 'Senin',
+    'SELASA': 'Selasa',
+    'RABU': 'Rabu',
+    'KAMIS': 'Kamis',
+    'JUMAT': 'Jumat',
+    'SABTU': 'Sabtu',
+    'AKHAD': 'Akhad'
+  };
+
   return (
     <div className="group relative bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full">
-      
+
       {/* Header Section - Image and Name */}
       <div className="p-5 pb-3">
         <div className="flex items-center gap-4">
@@ -77,34 +111,47 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
       {/* Content Section - Information below divider */}
       <div className="p-5 flex flex-col flex-1 pt-3">
         <div className="flex-1 space-y-3">
-          {/* Categories/Tags */}
-          <div className="flex flex-wrap gap-1.5">
-            {doctor.categories?.slice(0, 3).map((cat: any, idx: number) => (
-              <span 
-                key={idx} 
-                className="text-[10px] uppercase font-bold tracking-wide bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full"
-              >
-                {cat.name}
-              </span>
-            ))}
-          </div>
 
-          <div className="space-y-2 pt-1">
+
+          <div className="space-y-3 pt-1">
 
             {/* Location */}
             <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
               <MapPin className="h-4 w-4" />
-              <span className="line-clamp-1">
+              <span className="line-clamp-1 text-sm">
                 {doctor.department || `Poli ${doctor.specialization || 'Umum'}`}
               </span>
             </div>
 
-            {/* Schedule */}
-            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-              <Clock className="h-4 w-4" />
-              <span className="line-clamp-1">
-                {doctor.schedules && doctor.schedules.length > 0
-                  ? (() => {
+            {/* Schedule per Poli */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium text-sm">Jadwal:</span>
+              </div>
+
+              {groupedSchedules && Object.keys(groupedSchedules).length > 0 ? (
+                <div className="ml-6 space-y-1">
+                  {Object.entries(groupedSchedules).slice(0, 2).map(([poliName, schedules], idx) => {
+                    const schedule = schedules[0]; // Take the first schedule for this poli
+                    const hariIndo = hariMapping[schedule.hari_kerja] || schedule.hari_kerja;
+                    return (
+                      <div key={idx} className="flex flex-col text-xs text-slate-600 dark:text-slate-300">
+                        <span className="font-medium">{poliName}</span>
+                        <span className="ml-2">• {hariIndo} ({schedule.jam_mulai} - {schedule.jam_selesai})</span>
+                      </div>
+                    );
+                  })}
+                  {Object.keys(groupedSchedules).length > 2 && (
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      +{Object.keys(groupedSchedules).length - 2} kategori lainnya
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="ml-6 text-xs text-slate-600 dark:text-slate-300">
+                  {doctor.schedules && doctor.schedules.length > 0
+                    ? (() => {
                       // Ambil jadwal pertama
                       const schedule = doctor.schedules[0];
 
@@ -129,12 +176,14 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
                         return `${day} ${month}`;
                       };
 
-                      return `${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][schedule.dayOfWeek]} ${getNextDateForDay(schedule.dayOfWeek)} (${schedule.startTime})`;
+                      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek];
+                      const nextDate = getNextDateForDay(schedule.dayOfWeek);
+                      return `${hari}, ${nextDate} (${schedule.startTime})`;
                     })()
-                  : "Tidak ada jadwal"}
-              </span>
+                    : "Tidak ada jadwal"}
+                </div>
+              )}
             </div>
-
           </div>
         </div>
 

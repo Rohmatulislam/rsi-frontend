@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from "~/components/ui/button";
 import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin } from "lucide-react";
+import Image from "next/image";
+import { Stethoscope } from "lucide-react";
 // SuccessStep tidak memerlukan tipe dari appointment.ts karena tidak menggunakan prop yang kompleks
 
 interface SuccessStepProps {
@@ -63,9 +65,7 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
         <div className="grid grid-cols-1 gap-3 text-sm">
           {doctorName && (
             <div className="flex items-center gap-3">
-              <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
-                DR
-              </div>
+              <Stethoscope className="h-5 w-5 text-primary" />
               <div className="flex-1 text-left">
                 <p className="text-xs text-muted-foreground">Dokter</p>
                 <p className="font-medium">{doctorName}</p>
