@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from "~/components/ui/button";
-import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin } from "lucide-react";
+import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin, ClipboardList } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Stethoscope } from "lucide-react";
 // SuccessStep tidak memerlukan tipe dari appointment.ts karena tidak menggunakan prop yang kompleks
 
@@ -155,6 +156,20 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
         </Button>
         <Button
           variant="outline"
+          className="w-full rounded-xl"
+          asChild
+          onClick={() => {
+            setCountdown(0);
+            setIsClosing(true);
+          }}
+        >
+          <Link href="/riwayat-booking">
+            <ClipboardList className="h-4 w-4 mr-2" />
+            Lihat Riwayat Booking
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
           className="w-full rounded-xl"
           onClick={() => {
             setCountdown(0); // Stop countdown

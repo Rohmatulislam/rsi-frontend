@@ -30,17 +30,20 @@ import {
   CommandItem,
   CommandList,
 } from "~/components/ui/command";
-import { ChevronDown, LogIn, Menu, UserPlus, Search, ShoppingCart } from "lucide-react";
+import { ChevronDown, LogIn, Menu, UserPlus, Search, ShoppingCart, User, LogOut, Settings, ClipboardList } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { useAuth } from "~/features/auth/hook/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { user, isAuthenticated, isLoading, logout, canAccessAdmin } = useAuth();
 
   return (
-    <nav 
+    <nav
       className={cn(
         "bg-background/50 backdrop-blur-md",
         "w-full border-b h-16 py-2 px-4 md:px-8",
@@ -52,10 +55,10 @@ export const Navbar = () => {
       <div className="flex items-center gap-4 md:gap-6">
         {/* Logo & Hospital Name */}
         <Link href="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
-          <Image 
-            src="/icon.png" 
-            alt="RSI Siti Hajar Mataram Logo" 
-            width={32} 
+          <Image
+            src="/icon.png"
+            alt="RSI Siti Hajar Mataram Logo"
+            width={32}
             height={32}
             className="object-contain"
           />
@@ -164,7 +167,7 @@ export const Navbar = () => {
           <CommandInput placeholder="Cari dokter, layanan, atau informasi..." />
           <CommandList>
             <CommandEmpty>Tidak ada hasil ditemukan.</CommandEmpty>
-            
+
             <CommandGroup heading="Layanan Kesehatan">
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rawat-inap'; }}>
                 Rawat Inap
@@ -228,18 +231,65 @@ export const Navbar = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">
-              <LogIn className="h-4 w-4" />
-              <span className="hidden lg:inline">Sign In</span>
-            </Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/register">
-              <UserPlus className="h-4 w-4" />
-              <span className="hidden lg:inline">Sign Up</span>
-            </Link>
-          </Button>
+          {isLoading ? (
+            <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
+          ) : isAuthenticated && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-accent/50 transition-colors outline-none">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.image || undefined} alt={user.name} />
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    {user.name?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden lg:inline text-sm font-medium max-w-[120px] truncate">
+                  {user.name}
+                </span>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                {canAccessAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem asChild>
+                  <Link href="/profil">
+                    <User className="h-4 w-4 mr-2" />
+                    Profil Saya
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/riwayat-booking">
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    Riwayat Booking
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} className="text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden lg:inline">Sign In</span>
+                </Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/register">
+                  <UserPlus className="h-4 w-4" />
+                  <span className="hidden lg:inline">Sign Up</span>
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -255,7 +305,7 @@ export const Navbar = () => {
             </SheetHeader>
             <div className="flex flex-col gap-4 mt-6">
               {/* Mobile Navigation */}
-              
+
               {/* Layanan Kesehatan */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
@@ -333,18 +383,65 @@ export const Navbar = () => {
 
               {/* Mobile Auth Buttons */}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
-                <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
-                  <Link href="/login">
-                    <LogIn className="h-4 w-4" />
-                    Sign In
-                  </Link>
-                </Button>
-                <Button className="justify-start" asChild onClick={() => setIsOpen(false)}>
-                  <Link href="/register">
-                    <UserPlus className="h-4 w-4" />
-                    Sign Up
-                  </Link>
-                </Button>
+                {isAuthenticated && user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-3 py-2">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={user.image || undefined} alt={user.name} />
+                        <AvatarFallback className="bg-primary text-white">
+                          {user.name?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-sm">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                    {canAccessAdmin && (
+                      <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
+                        <Link href="/admin">
+                          <Settings className="h-4 w-4" />
+                          Admin Panel
+                        </Link>
+                      </Button>
+                    )}
+                    <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
+                      <Link href="/profil">
+                        <User className="h-4 w-4" />
+                        Profil Saya
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
+                      <Link href="/riwayat-booking">
+                        <ClipboardList className="h-4 w-4" />
+                        Riwayat Booking
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start text-red-600"
+                      onClick={() => { setIsOpen(false); logout(); }}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
+                      <Link href="/login">
+                        <LogIn className="h-4 w-4" />
+                        Sign In
+                      </Link>
+                    </Button>
+                    <Button className="justify-start" asChild onClick={() => setIsOpen(false)}>
+                      <Link href="/register">
+                        <UserPlus className="h-4 w-4" />
+                        Sign Up
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>

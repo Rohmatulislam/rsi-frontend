@@ -3,7 +3,7 @@ import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } f
 import { useCreateAppointment } from '../api/createAppointment';
 import { toast } from "sonner";
 
-export const useAppointmentForm = (doctor: any) => {
+export const useAppointmentForm = (doctor: any, userId?: string) => {
   // Jika dokter hanya memiliki 1 poliklinik, kita langsung set dan lanjut ke langkah 2
   const initialStep = (doctor.categories && doctor.categories.length === 1) ? 2 : 1;
   const [step, setStep] = useState(initialStep);
@@ -261,6 +261,7 @@ export const useAppointmentForm = (doctor: any) => {
       bookingTime: formData.time, // Include the selected time
       patientType: formData.patientType,
       paymentType: formData.paymentType,
+      createdByUserId: userId || null, // Track user yang membuat booking
     };
 
     // Add fields based on patient type

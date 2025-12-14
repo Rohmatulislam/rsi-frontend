@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminSidebar } from "~/features/admin/components/AdminSidebar";
+import { ProtectedRoute } from "~/features/auth/components/ProtectedRoute";
 
 export default function AdminLayout({
     children,
@@ -8,11 +9,13 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex bg-slate-50 min-h-screen">
-            <AdminSidebar />
-            <main className="flex-1 p-8 overflow-auto">
-                {children}
-            </main>
-        </div>
+        <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "NURSE", "STAFF"]}>
+            <div className="flex bg-slate-50 min-h-screen">
+                <AdminSidebar />
+                <main className="flex-1 p-8 overflow-auto">
+                    {children}
+                </main>
+            </div>
+        </ProtectedRoute>
     );
 }

@@ -19,6 +19,8 @@ import { PatientDataStep } from "./PatientDataStep";
 import { ConfirmationStep } from "./ConfirmationStep";
 import { SuccessStep } from "./SuccessStep";
 import { PoliSelectionStep } from "./PoliSelectionStep";
+import { useAuth } from "~/features/auth/hook/useAuth";
+import { LoginPromptModal } from "~/features/auth/components/LoginPromptModal";
 
 interface AppointmentModalProps {
   doctor: any;
@@ -29,7 +31,11 @@ interface AppointmentModalProps {
 
 export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: AppointmentModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [shouldResetAfterClose, setShouldResetAfterClose] = useState(false);
+
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+
 
   const {
     step,
@@ -46,7 +52,7 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
     resetForm,
     handleSubmit,
     loading
-  } = useAppointmentForm(doctor);
+  } = useAppointmentForm(doctor, user?.id);
 
   const handleNext = async () => {
     // Validation before moving to next step
@@ -213,78 +219,100 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
     }
   }, [isOpen, shouldResetAfterClose, doctor, resetForm]);
 
+  // Handler untuk trigger click - cek auth dulu
+  const handleTriggerClick = () => {
+    if (authLoading) return; // Tunggu auth selesai loading
+
+    if (!isAuthenticated) {
+      // Belum login, tampilkan prompt login
+      setShowLoginPrompt(true);
+    } else {
+      // Sudah login, buka booking modal
+      setIsOpen(true);
+    }
+  };
+
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        // Only set reset flag if modal is being closed (not opened)
-        if (!open) {
-          setShouldResetAfterClose(true);
-        }
-        onOpenChange?.(open);
-      }}
-    >
-      <DialogTrigger
-        asChild
-        onClick={() => setIsOpen(true)}
+    <>
+      {/* Login Prompt Modal */}
+      <LoginPromptModal
+        isOpen={showLoginPrompt}
+        onOpenChange={setShowLoginPrompt}
+        title="Login untuk Booking"
+        description={`Silakan login terlebih dahulu untuk membuat janji temu dengan ${doctor?.name || 'dokter'}.`}
+      />
+
+      {/* Booking Modal */}
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          // Only set reset flag if modal is being closed (not opened)
+          if (!open) {
+            setShouldResetAfterClose(true);
+          }
+          onOpenChange?.(open);
+        }}
       >
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            {step === 4 ? (
-              <span className="text-green-600 flex items-center gap-2">
-                <CheckCircle2 className="h-6 w-6" /> Booking Berhasil
-              </span>
-            ) : (
-              "Buat Janji Temu"
-            )}
-          </DialogTitle>
-          <DialogDescription>
-            {step === 5
-              ? "Pendaftaran Anda telah berhasil diproses ke SIMRS."
-              : `Langkah ${step} dari 5 - ${step === 1 ? "Pilih Poliklinik" : step === 2 ? "Pilih Jadwal" : step === 3 ? "Data Pasien" : step === 4 ? "Konfirmasi Booking" : "Selesai"}`
-            }
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-6">
-          {renderStepContent()}
+        {/* Custom trigger that checks auth first */}
+        <div onClick={handleTriggerClick} className="cursor-pointer">
+          {trigger}
         </div>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              {step === 4 ? (
+                <span className="text-green-600 flex items-center gap-2">
+                  <CheckCircle2 className="h-6 w-6" /> Booking Berhasil
+                </span>
+              ) : (
+                "Buat Janji Temu"
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {step === 5
+                ? "Pendaftaran Anda telah berhasil diproses ke SIMRS."
+                : `Langkah ${step} dari 5 - ${step === 1 ? "Pilih Poliklinik" : step === 2 ? "Pilih Jadwal" : step === 3 ? "Data Pasien" : step === 4 ? "Konfirmasi Booking" : "Selesai"}`
+              }
+            </DialogDescription>
+          </DialogHeader>
 
-        {/* FOOTER ACTIONS */}
-        {step < 5 && (
-          <DialogFooter className="flex flex-row justify-between gap-2 sm:justify-between">
-            {step > 1 ? (
-              <Button variant="outline" onClick={handleBack} disabled={loading} className="w-1/2 sm:w-auto">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Kembali
-              </Button>
-            ) : (
-              <div /> // Spacer
-            )}
+          <div className="py-6">
+            {renderStepContent()}
+          </div>
 
-            {step < 4 ? (
-              <Button onClick={handleNext} disabled={
-                step === 1 ? !formData.poliId :
-                  step === 2 ? !formData.date || !formData.time :
-                    false
-              } className="w-1/2 sm:w-auto">
-                Lanjut <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button onClick={() => {
-                console.log('Sebelum submit - formData:', formData);
-                handleSubmit();
-              }} disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee} className="w-1/2 sm:w-auto min-w-[140px]">
-                {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {loading ? "Memproses Booking..." : "Konfirmasi Booking"}
-              </Button>
-            )}
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
+          {/* FOOTER ACTIONS */}
+          {step < 5 && (
+            <DialogFooter className="flex flex-row justify-between gap-2 sm:justify-between">
+              {step > 1 ? (
+                <Button variant="outline" onClick={handleBack} disabled={loading} className="w-1/2 sm:w-auto">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Kembali
+                </Button>
+              ) : (
+                <div /> // Spacer
+              )}
+
+              {step < 4 ? (
+                <Button onClick={handleNext} disabled={
+                  step === 1 ? !formData.poliId :
+                    step === 2 ? !formData.date || !formData.time :
+                      false
+                } className="w-1/2 sm:w-auto">
+                  Lanjut <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button onClick={() => {
+                  console.log('Sebelum submit - formData:', formData);
+                  handleSubmit();
+                }} disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee} className="w-1/2 sm:w-auto min-w-[140px]">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  {loading ? "Memproses Booking..." : "Konfirmasi Booking"}
+                </Button>
+              )}
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

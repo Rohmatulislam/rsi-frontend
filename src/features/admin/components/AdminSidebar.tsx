@@ -2,18 +2,42 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Users, Settings, LogOut, Clock } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield } from "lucide-react";
+import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
+import { Badge } from "~/components/ui/badge";
+
+// Role display names in Indonesian
+const ROLE_LABELS: Record<UserRole, string> = {
+    ADMIN: "Administrator",
+    DOCTOR: "Dokter",
+    NURSE: "Perawat",
+    STAFF: "Staff",
+    PATIENT: "Pasien",
+};
+
+// Role badge colors
+const ROLE_COLORS: Record<UserRole, string> = {
+    ADMIN: "bg-red-500",
+    DOCTOR: "bg-blue-500",
+    NURSE: "bg-green-500",
+    STAFF: "bg-purple-500",
+    PATIENT: "bg-slate-500",
+};
 
 export const AdminSidebar = () => {
     const pathname = usePathname();
+    const { user, logout, isLoading, role, isAdmin } = useAuth();
 
-    const menuItems = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/appointments", label: "Appointments", icon: Calendar },
-        { href: "/admin/doctors", label: "Doctors", icon: Users },
-        { href: "/admin/schedules", label: "Schedules", icon: Clock },
-        // { href: "/admin/settings", label: "Settings", icon: Settings },
+    // Define menu items with role-based access
+    const allMenuItems = [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "DOCTOR", "NURSE", "STAFF"] as UserRole[] },
+        { href: "/admin/appointments", label: "Appointments", icon: Calendar, roles: ["ADMIN", "DOCTOR", "NURSE", "STAFF"] as UserRole[] },
+        { href: "/admin/doctors", label: "Doctors", icon: Users, roles: ["ADMIN"] as UserRole[] },
+        { href: "/admin/schedules", label: "Schedules", icon: Clock, roles: ["ADMIN", "DOCTOR"] as UserRole[] },
     ];
+
+    // Filter menu items based on user role
+    const menuItems = allMenuItems.filter((item) => item.roles.includes(role));
 
     return (
         <div className="w-64 bg-slate-900 min-h-screen text-white flex flex-col">
@@ -21,6 +45,27 @@ export const AdminSidebar = () => {
                 <h1 className="text-xl font-bold flex items-center gap-2">
                     <span className="text-primary">RSI</span> Admin
                 </h1>
+            </div>
+
+            {/* User Info with Role Badge */}
+            <div className="p-4 border-b border-slate-800">
+                <div className="flex items-center gap-3 px-2">
+                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                        {isAdmin ? (
+                            <Shield className="w-5 h-5 text-red-400" />
+                        ) : (
+                            <User className="w-5 h-5 text-slate-300" />
+                        )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                            {user?.name || "User"}
+                        </p>
+                        <Badge className={`${ROLE_COLORS[role]} text-white text-[10px] px-2 py-0`}>
+                            {ROLE_LABELS[role]}
+                        </Badge>
+                    </div>
+                </div>
             </div>
 
             <nav className="flex-1 p-4 space-y-2">
@@ -33,8 +78,8 @@ export const AdminSidebar = () => {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                ? "bg-primary text-white"
-                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                    ? "bg-primary text-white"
+                                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                 }`}
                         >
                             <Icon className="w-5 h-5" />
@@ -45,7 +90,11 @@ export const AdminSidebar = () => {
             </nav>
 
             <div className="p-4 border-t border-slate-800">
-                <button className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-400 hover:bg-slate-800 transition-colors">
+                <button
+                    onClick={logout}
+                    disabled={isLoading}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-400 hover:bg-slate-800 transition-colors disabled:opacity-50"
+                >
                     <LogOut className="w-5 h-5" />
                     <span>Logout</span>
                 </button>
