@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { useGetDoctors, DoctorSortBy } from "../api/getDoctors";
@@ -10,7 +10,7 @@ export const RecommendedDoctorsSection = () => {
   const { data: doctors, isLoading, error } = useGetDoctors({
     input: {
       sort: DoctorSortBy.RECOMMENDED,
-      limit: 4, 
+      limit: 4,
     },
   });
 
@@ -18,12 +18,12 @@ export const RecommendedDoctorsSection = () => {
     return (
       <section className="w-full py-16 bg-slate-50 dark:bg-slate-950/50">
         <div className="container mx-auto px-4 md:px-8">
-           <h2 className="text-3xl font-bold text-center mb-12">DOKTER PILIHAN</h2>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse bg-white dark:bg-gray-800 rounded-3xl h-[500px]" />
-              ))}
-           </div>
+          <h2 className="text-3xl font-bold text-center mb-12">DOKTER PILIHAN</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-white dark:bg-gray-800 rounded-3xl h-[500px]" />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -42,7 +42,7 @@ export const RecommendedDoctorsSection = () => {
       slug: "dr-sarah-wilson",
       categories: [{ name: "Jantung" }, { name: "Executive" }],
       department: "Poli Jantung",
-      schedules: [ { dayOfWeek: 1, startTime: "09:00", endTime: "14:00" }, { dayOfWeek: 3, startTime: "09:00", endTime: "14:00" } ]
+      schedules: [{ dayOfWeek: 1, startTime: "09:00", endTime: "14:00" }, { dayOfWeek: 3, startTime: "09:00", endTime: "14:00" }]
     },
     {
       id: "mock-2",
@@ -101,7 +101,7 @@ export const RecommendedDoctorsSection = () => {
             </p>
           </div>
           <Button variant="outline" size="lg" asChild className="hidden md:flex rounded-full px-6 hover:bg-primary hover:text-white transition-all duration-300">
-            <Link href="/dokter">
+            <Link href="/dokters">
               Lihat Semua Dokter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -114,14 +114,14 @@ export const RecommendedDoctorsSection = () => {
           ))}
         </div>
 
-        
+
         <div className="mt-12 flex justify-center md:hidden">
-            <Button variant="outline" size="lg" className="rounded-full w-full" asChild>
-                <Link href="/dokter">
-                  Lihat Semua Dokter
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-            </Button>
+          <Button variant="outline" size="lg" className="rounded-full w-full" asChild>
+            <Link href="/dokter">
+              Lihat Semua Dokter
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
