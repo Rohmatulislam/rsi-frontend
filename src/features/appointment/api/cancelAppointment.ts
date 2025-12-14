@@ -14,6 +14,7 @@ export const useCancelAppointment = () => {
         onSuccess: () => {
             // Invalidate patient history queries to refresh the list
             queryClient.invalidateQueries({ queryKey: ["patientHistory"] });
+            queryClient.invalidateQueries({ queryKey: ["myPatients"] });
         },
     });
 };
