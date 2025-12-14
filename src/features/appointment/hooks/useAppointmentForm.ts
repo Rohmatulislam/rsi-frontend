@@ -11,9 +11,9 @@ export const useAppointmentForm = (doctor: any) => {
   // Jika hanya ada 1 poliklinik, kita langsung set
   const initialPoli = (doctor.categories && doctor.categories.length === 1)
     ? {
-        poliId: doctor.categories[0].id || doctor.categories[0].slug || "1",
-        poliName: doctor.categories[0].name
-      }
+      poliId: doctor.categories[0].id || doctor.categories[0].slug || "1",
+      poliName: doctor.categories[0].name
+    }
     : { poliId: '', poliName: '' };
 
   const [formData, setFormData] = useState<AppointmentFormData>({
@@ -30,7 +30,8 @@ export const useAppointmentForm = (doctor: any) => {
     address: '',
     birthDate: '',
     gender: '' as 'L' | 'P' | '',
-    paymentType: 'umum',
+    paymentType: '', // kd_pj dari Khanza
+    paymentName: '', // png_jawab dari Khanza
     bpjsNumber: '',
     keluhan: '',
     religion: '',
@@ -40,6 +41,7 @@ export const useAppointmentForm = (doctor: any) => {
     bpjsClass: '',
     bpjsFaskes: '',
     bpjsRujukan: '',
+    penanggungJawab: 'DIRI SENDIRI',  // Tambahkan penanggung jawab dengan nilai default
   });
 
   // Patient search state
@@ -191,9 +193,9 @@ export const useAppointmentForm = (doctor: any) => {
     const resetStep = (currentDoctor.categories && currentDoctor.categories.length === 1) ? 2 : 1;
     const resetPoli = (currentDoctor.categories && currentDoctor.categories.length === 1)
       ? {
-          poliId: currentDoctor.categories[0].id || currentDoctor.categories[0].slug || "1",
-          poliName: currentDoctor.categories[0].name
-        }
+        poliId: currentDoctor.categories[0].id || currentDoctor.categories[0].slug || "1",
+        poliName: currentDoctor.categories[0].name
+      }
       : { poliId: '', poliName: '' };
 
     setStep(resetStep);
@@ -212,7 +214,8 @@ export const useAppointmentForm = (doctor: any) => {
       address: '',
       birthDate: '',
       gender: '',
-      paymentType: 'umum',
+      paymentType: '', // kd_pj dari Khanza
+      paymentName: '', // png_jawab dari Khanza
       bpjsNumber: '',
       keluhan: '',
       religion: '',
@@ -222,6 +225,7 @@ export const useAppointmentForm = (doctor: any) => {
       bpjsClass: '',
       bpjsFaskes: '',
       bpjsRujukan: '',
+      penanggungJawab: 'DIRI SENDIRI',
     });
     setPatientSearch({
       loading: false,
@@ -246,6 +250,7 @@ export const useAppointmentForm = (doctor: any) => {
       bookingTime: formData.time,
       patientType: formData.patientType,
       paymentType: formData.paymentType,
+      penanggungJawab: formData.penanggungJawab,
     });
 
     // Build payload based on patient type
@@ -275,8 +280,11 @@ export const useAppointmentForm = (doctor: any) => {
       if (formData.address) payload.patientAddress = formData.address;
     }
 
-    // Add BPJS number if payment type is BPJS
-    if (formData.paymentType === 'bpjs' && formData.bpjsNumber) {
+    // Add BPJS number if payment type is BPJS-related
+    const isBpjsPayment = formData.paymentName?.toLowerCase().includes('bpjs') ||
+      formData.paymentName?.toLowerCase().includes('jkn') ||
+      formData.paymentName?.toLowerCase().includes('kis');
+    if (isBpjsPayment && formData.bpjsNumber) {
       payload.bpjsNumber = formData.bpjsNumber;
     }
 
@@ -285,13 +293,15 @@ export const useAppointmentForm = (doctor: any) => {
       payload.keluhan = formData.keluhan;
     }
 
+    // Add penanggung jawab
+    if (formData.penanggungJawab) {
+      payload.penanggungJawab = formData.penanggungJawab;
+    }
+
     // Show loading toast
     const loadingToast = toast.loading("Memproses booking Anda...");
 
     createAppointmentMutation.mutate(payload, {
-      onMutate: () => {
-        // Additional loading indicators can be set here if needed
-      },
       onSuccess: (data: any) => {
         toast.dismiss(loadingToast); // Remove loading toast
         setBookingCode(data.bookingCode || "REG-XXXX");
@@ -309,9 +319,9 @@ export const useAppointmentForm = (doctor: any) => {
       onError: (error: any) => {
         toast.dismiss(loadingToast); // Remove loading toast
         const errorMessage = error?.response?.data?.message ||
-                            error?.response?.data?.error ||
-                            error?.message ||
-                            "Gagal membuat janji temu. Mohon coba kembali.";
+          error?.response?.data?.error ||
+          error?.message ||
+          "Gagal membuat janji temu. Mohon coba kembali.";
 
         // More specific error handling
         if (error?.response?.status === 429) {

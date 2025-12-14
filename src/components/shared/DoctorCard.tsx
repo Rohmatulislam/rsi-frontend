@@ -1,11 +1,11 @@
-import { Clock, MapPin, Stethoscope } from "lucide-react";
+import { Clock, MapPin, Stethoscope, Star, User, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 
 const placeholderImageUrl = "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2hpcnR8ZW58MHx8MHx8fDA%3D";
-// Definisikan tipe Props berdasarkan struktur data dokter (bisa import DoctorDto, tapi disini saya buat interface agar reusable)
+
 export interface DoctorCardProps {
   id: string;
   name: string;
@@ -25,6 +25,9 @@ export interface DoctorCardProps {
     jam_selesai: string;
     kuota: number | null;
   }[];
+  consultation_fee?: number | null;
+  rating?: number | null;
+  review_count?: number | null;
 }
 
 export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: DoctorCardProps; hideExecutiveBadge?: boolean }) => {
@@ -54,6 +57,50 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
     'AKHAD': 'Akhad'
   };
 
+  // Fungsi untuk mendapatkan tanggal terdekat berdasarkan dayOfWeek
+  const getNextDateForDay = (dayOfWeek: number): string => {
+    const today = new Date();
+    const currentDay = today.getDay();
+
+    // Hitung selisih hari
+    let daysToAdd = dayOfWeek - currentDay;
+    if (daysToAdd <= 0) {
+      daysToAdd += 7; // Jika hari ini atau kemarin, cari minggu depan
+    }
+
+    const date = new Date(today);
+    date.setDate(today.getDate() + daysToAdd);
+
+    // Format ke DD MMM (contoh: 14 Des)
+    const day = date.getDate();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const month = months[date.getMonth()];
+    return `${day} ${month}`;
+  };
+
+  // Format nomor telepon jika ada
+  const formatPhoneNumber = (phone: string) => {
+    if (!phone) return '';
+    // Hanya tampilkan 4 digit terakhir
+    return `...${phone.slice(-4)}`;
+  };
+
+  // Ambil jadwal terdekat untuk ditampilkan (hanya dari schedule yang valid)
+  let nearestSchedule = null;
+  if (doctor.schedules && doctor.schedules.length > 0) {
+    // Ambil jadwal pertama yang bukan jam 00:00:00 dari array schedules
+    const validSchedules = doctor.schedules.filter(schedule =>
+      schedule.startTime !== '00:00:00' && schedule.endTime !== '00:00:00'
+    );
+
+    if (validSchedules.length > 0) {
+      const schedule = validSchedules[0];
+      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek];
+      const nextDate = getNextDateForDay(schedule.dayOfWeek);
+      nearestSchedule = `${hari}, ${nextDate} (${schedule.startTime})`;
+    }
+  }
+
   return (
     <div className="group relative bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full">
 
@@ -80,25 +127,36 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
             {/* Badges - Positioned outside image area */}
             <div className="absolute -bottom-1 -left-1 flex flex-wrap gap-0.5">
               {doctor.is_executive && !hideExecutiveBadge && (
-                <Badge className="bg-amber-500/90 hover:bg-amber-600 text-white border-none text-[9px] px-1.5 py-0.5 rounded-full shadow-sm">
-                  <span className="mr-0.5">👑</span>
-                </Badge>
-              )}
-              {doctor.bpjs && (
-                <Badge className="bg-green-500/90 hover:bg-green-600 text-white border-none text-[9px] px-1.5 py-0.5 rounded-full shadow-sm">
-                  BPJS
-                </Badge>
+                // Hanya tampilkan badge eksekutif jika dokter memiliki jadwal aktif
+                ((doctor.scheduleDetails && doctor.scheduleDetails.some(schedule =>
+                  schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+                )) || (doctor.schedules && doctor.schedules.length > 0))
+                && (
+                  <Badge className="bg-amber-500/90 hover:bg-amber-600 text-white border-none text-[9px] px-1.5 py-0.5 rounded-full shadow-sm">
+                    <span className="mr-0.5">👑</span> Eksekutif
+                  </Badge>
+                )
               )}
             </div>
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="font-bold text-slate-800 dark:text-white line-clamp-1 text-base">
               {doctor.name}
             </h3>
             <p className="text-sm text-primary font-medium line-clamp-1">
               {doctor.specialization || "Dokter Umum"}
             </p>
+
+            {/* Rating and review info - hanya tampilkan jika ada */}
+            {doctor.rating !== undefined && doctor.rating !== null && (
+              <div className="flex items-center gap-1 mt-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  {doctor.rating} {doctor.review_count !== undefined && doctor.review_count !== null ? `(${doctor.review_count})` : ''}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -111,10 +169,7 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
       {/* Content Section - Information below divider */}
       <div className="p-5 flex flex-col flex-1 pt-3">
         <div className="flex-1 space-y-3">
-
-
           <div className="space-y-3 pt-1">
-
             {/* Location */}
             <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
               <MapPin className="h-4 w-4" />
@@ -123,75 +178,72 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
               </span>
             </div>
 
-            {/* Schedule per Poli */}
-            <div className="space-y-1">
+            {/* Jadwal terdekat */}
+            {nearestSchedule ? (
               <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                 <Clock className="h-4 w-4" />
-                <span className="font-medium text-sm">Jadwal:</span>
+                <span className="text-sm">Jadwal: {nearestSchedule}</span>
               </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <Clock className="h-4 w-4" />
+                <span className="text-sm">Sementara tidak menerima pasien</span>
+              </div>
+            )}
 
-              {groupedSchedules && Object.keys(groupedSchedules).length > 0 ? (
-                <div className="ml-6 space-y-1">
+            {/* Jika ada schedule details (dari SIMRS) */}
+            {groupedSchedules && Object.keys(groupedSchedules).length > 0 ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                  <User className="h-3 w-3" />
+                  <span className="font-medium text-xs">Kategori:</span>
+                </div>
+                <div className="ml-5 space-y-1">
                   {Object.entries(groupedSchedules).slice(0, 2).map(([poliName, schedules], idx) => {
                     const schedule = schedules[0]; // Take the first schedule for this poli
-                    const hariIndo = hariMapping[schedule.hari_kerja] || schedule.hari_kerja;
                     return (
-                      <div key={idx} className="flex flex-col text-xs text-slate-600 dark:text-slate-300">
-                        <span className="font-medium">{poliName}</span>
-                        <span className="ml-2">• {hariIndo} ({schedule.jam_mulai} - {schedule.jam_selesai})</span>
+                      <div key={idx} className="text-xs text-slate-600 dark:text-slate-300">
+                        {poliName}
                       </div>
                     );
                   })}
                   {Object.keys(groupedSchedules).length > 2 && (
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                       +{Object.keys(groupedSchedules).length - 2} kategori lainnya
                     </div>
                   )}
                 </div>
-              ) : (
-                <div className="ml-6 text-xs text-slate-600 dark:text-slate-300">
-                  {doctor.schedules && doctor.schedules.length > 0
-                    ? (() => {
-                      // Ambil jadwal pertama
-                      const schedule = doctor.schedules[0];
+              </div>
+            ) : null}
 
-                      // Fungsi untuk mendapatkan tanggal terdekat berdasarkan dayOfWeek
-                      const getNextDateForDay = (dayOfWeek: number): string => {
-                        const today = new Date();
-                        const currentDay = today.getDay();
-
-                        // Hitung selisih hari
-                        let daysToAdd = dayOfWeek - currentDay;
-                        if (daysToAdd <= 0) {
-                          daysToAdd += 7; // Jika hari ini atau kemarin, cari minggu depan
-                        }
-
-                        const date = new Date(today);
-                        date.setDate(today.getDate() + daysToAdd);
-
-                        // Format ke DD MMM (contoh: 14 Des)
-                        const day = date.getDate();
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                        const month = months[date.getMonth()];
-                        return `${day} ${month}`;
-                      };
-
-                      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek];
-                      const nextDate = getNextDateForDay(schedule.dayOfWeek);
-                      return `${hari}, ${nextDate} (${schedule.startTime})`;
-                    })()
-                    : "Tidak ada jadwal"}
-                </div>
-              )}
-            </div>
+            {/* Biaya konsultasi */}
+            {doctor.consultation_fee !== undefined && doctor.consultation_fee !== null && (
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <Wallet className="h-4 w-4" />
+                <span className="text-sm">
+                  {doctor.consultation_fee === 0
+                    ? "Gratis"
+                    : `Rp ${doctor.consultation_fee.toLocaleString('id-ID')}`}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-        <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all mt-3" asChild>
-          <Link href={`/dokter/${doctor.slug}`}>
-            Lihat Jadwal
-          </Link>
-        </Button>
+        {/* Cek apakah dokter memiliki jadwal aktif */}
+        {((doctor.scheduleDetails && doctor.scheduleDetails.some(schedule =>
+          schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+        )) || (doctor.schedules && doctor.schedules.length > 0)) ? (
+          <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all mt-3" asChild>
+            <Link href={`/dokter/${doctor.slug}`}>
+              Lihat Jadwal & Booking
+            </Link>
+          </Button>
+        ) : (
+          <Button className="w-full rounded-lg font-semibold text-sm shadow-sm transition-all mt-3 opacity-50 cursor-not-allowed" disabled>
+            Jadwal Belum Tersedia
+          </Button>
+        )}
       </div>
     </div>
   );

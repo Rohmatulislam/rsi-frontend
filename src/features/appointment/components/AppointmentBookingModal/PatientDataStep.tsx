@@ -5,6 +5,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { AppointmentFormData, PatientSearchState } from "../../types/appointment";
 import Image from "next/image";
 import { Stethoscope } from "lucide-react";
+import { useGetPaymentMethods } from "~/features/doctor/api/getPaymentMethods";
 
 interface PatientDataStepProps {
   formData: AppointmentFormData;
@@ -23,6 +24,15 @@ export const PatientDataStep = ({
   searchPatient,
   doctor
 }: PatientDataStepProps) => {
+  // Fetch payment methods from Khanza
+  const { data: paymentMethods, isLoading: isLoadingPayments } = useGetPaymentMethods();
+
+  // Helper function to check if selected payment is BPJS-related
+  const isBpjsPayment = (paymentName: string) => {
+    const bpjsKeywords = ['bpjs', 'jkn', 'kis'];
+    return bpjsKeywords.some(keyword => paymentName.toLowerCase().includes(keyword));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -215,19 +225,43 @@ export const PatientDataStep = ({
       </div>
 
       <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-        <Label>Metode Pembayaran</Label>
-        <Select onValueChange={(val: 'umum' | 'bpjs') => setFormData({ ...formData, paymentType: val })}>
-          <SelectTrigger className="w-full h-12 rounded-xl">
-            <SelectValue placeholder="Pilih Metode Bayar" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="umum">Umum / Tunai / Asuransi Lain</SelectItem>
-            <SelectItem value="bpjs">BPJS Kesehatan</SelectItem>
-          </SelectContent>
-        </Select>
+        <Label>Metode Pembayaran <span className="text-red-500">*</span></Label>
+        {isLoadingPayments ? (
+          <div className="h-12 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">Memuat metode pembayaran...</span>
+          </div>
+        ) : (
+          <Select
+            value={formData.paymentType}
+            onValueChange={(val: string) => {
+              const selectedPayment = paymentMethods?.find(pm => pm.kd_pj === val);
+              setFormData({
+                ...formData,
+                paymentType: val,
+                paymentName: selectedPayment?.png_jawab || val
+              });
+            }}
+          >
+            <SelectTrigger className="w-full h-12 rounded-xl">
+              <SelectValue placeholder="Pilih Metode Bayar" />
+            </SelectTrigger>
+            <SelectContent>
+              {paymentMethods?.map((pm) => (
+                <SelectItem key={pm.kd_pj} value={pm.kd_pj}>
+                  {pm.png_jawab}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {formData.paymentName && (
+          <p className="text-xs text-muted-foreground">
+            Kode: {formData.paymentType}
+          </p>
+        )}
       </div>
 
-      {formData.paymentType === 'bpjs' && (
+      {formData.paymentName && isBpjsPayment(formData.paymentName) && (
         <div className="space-y-4 p-4 border-2 border-green-200 bg-green-50 dark:bg-green-900/20 rounded-xl">
           <h4 className="font-semibold text-green-900 dark:text-green-100">Data BPJS</h4>
 

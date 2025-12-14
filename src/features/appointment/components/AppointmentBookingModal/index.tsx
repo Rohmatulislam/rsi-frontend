@@ -105,6 +105,12 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
         return;
       }
 
+      // Validate payment method selection
+      if (!formData.paymentType) {
+        toast.error("Pilih metode pembayaran terlebih dahulu");
+        return;
+      }
+
       // Search patient data when moving to step 4 (verification)
       if (formData.patientType === "old") {
         await searchPatient(formData.mrNumber);
@@ -118,8 +124,11 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
         return;
       }
 
-      // Validate BPJS if selected
-      if (formData.paymentType === 'bpjs') {
+      // Validate BPJS if selected (check if paymentName contains BPJS-related keywords)
+      const isBpjsPayment = formData.paymentName?.toLowerCase().includes('bpjs') ||
+        formData.paymentName?.toLowerCase().includes('jkn') ||
+        formData.paymentName?.toLowerCase().includes('kis');
+      if (isBpjsPayment) {
         if (!formData.bpjsNumber || !formData.bpjsClass) {
           toast.error("Data BPJS tidak lengkap (Nomor dan Kelas wajib diisi)");
           return;
@@ -259,8 +268,8 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
             {step < 4 ? (
               <Button onClick={handleNext} disabled={
                 step === 1 ? !formData.poliId :
-                step === 2 ? !formData.date || !formData.time :
-                false
+                  step === 2 ? !formData.date || !formData.time :
+                    false
               } className="w-1/2 sm:w-auto">
                 Lanjut <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

@@ -67,7 +67,7 @@ export const ConfirmationStep = ({
           </div>
           <div>
             <p className="text-muted-foreground mb-1">Jenis Pembayaran</p>
-            <p className="font-semibold uppercase">{formData.paymentType}</p>
+            <p className="font-semibold uppercase">{formData.paymentName || formData.paymentType}</p>
           </div>
           <div className="col-span-2">
             <p className="text-muted-foreground mb-1">Keluhan Utama</p>
@@ -278,7 +278,7 @@ export const ConfirmationStep = ({
               <span className="font-bold">
                 Rp {doctor.consultation_fee?.toLocaleString('id-ID') || '0'}
               </span>
-              {formData.paymentType === 'bpjs' && ' (ditanggung BPJS)'}
+              {formData.paymentName?.toLowerCase().includes('bpjs') && ' (ditanggung BPJS)'}
             </label>
           </div>
         </div>

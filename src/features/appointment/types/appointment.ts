@@ -12,7 +12,8 @@ export interface AppointmentFormData {
   address: string;
   birthDate: string;
   gender: 'L' | 'P' | '';
-  paymentType: 'umum' | 'bpjs';
+  paymentType: string; // kd_pj dari Khanza (contoh: "A01", "BPJ", dll)
+  paymentName?: string; // png_jawab dari Khanza (contoh: "UMUM/TUNAI", "BPJS KESEHATAN", dll)
   bpjsNumber: string;
   keluhan: string;
   religion: string;
@@ -22,6 +23,7 @@ export interface AppointmentFormData {
   bpjsClass: string;
   bpjsFaskes: string;
   bpjsRujukan: string;
+  penanggungJawab: string;
 }
 
 export interface PatientData {
