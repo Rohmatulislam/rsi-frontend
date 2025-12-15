@@ -32,9 +32,11 @@ export const getMyPatients = async (userId: string): Promise<MyPatientsResponse>
     return response.data;
 };
 
+export const getMyPatientsQueryKey = (userId?: string) => ["myPatients", userId];
+
 export const useMyPatients = (userId: string | undefined) => {
     return useQuery({
-        queryKey: ["myPatients", userId],
+        queryKey: getMyPatientsQueryKey(userId),
         queryFn: () => getMyPatients(userId!),
         staleTime: 5 * 60 * 1000, // 5 minutes
         enabled: !!userId, // Only run query if userId exists

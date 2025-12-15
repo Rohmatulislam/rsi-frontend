@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 
 export type CreateAppointmentDto = {
@@ -24,7 +24,14 @@ export const createAppointment = async (data: CreateAppointmentDto) => {
 };
 
 export const useCreateAppointment = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: createAppointment,
+    onSuccess: () => {
+      // Invalidate myPatients query to refresh data on history page
+      // Using partial key match to invalidate all users
+      queryClient.invalidateQueries({ queryKey: ["myPatients"] });
+    },
   });
 };

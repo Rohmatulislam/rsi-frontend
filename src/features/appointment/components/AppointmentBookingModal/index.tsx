@@ -84,9 +84,14 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
 
     // Step 3 (data pasien) to Step 4 (konfirmasi)
     if (step === 3) {
-      if (formData.patientType === "old" && !formData.mrNumber) {
-        toast.error("Nomor RM wajib diisi untuk pasien lama");
-        return;
+      if (formData.patientType === "old") {
+        if (!formData.mrNumber) {
+          toast.error("Nomor RM wajib diisi untuk pasien lama");
+          return;
+        }
+        // Search patient data saat lanjut ke step 4 dari step 3
+        // Ini akan mengisi patientSearch.patientData yang dibutuhkan untuk auto-fill No. BPJS
+        await searchPatient(formData.mrNumber);
       }
       if (formData.patientType === "new") {
         if (!formData.nik || !formData.fullName || !formData.phone || !formData.birthDate || !formData.gender || !formData.religion) {
@@ -135,8 +140,10 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
         formData.paymentName?.toLowerCase().includes('jkn') ||
         formData.paymentName?.toLowerCase().includes('kis');
       if (isBpjsPayment) {
-        if (!formData.bpjsNumber || !formData.bpjsClass) {
-          toast.error("Data BPJS tidak lengkap (Nomor dan Kelas wajib diisi)");
+        // Cek apakah bpjsNumber sudah diisi (bisa dari input manual atau dari patientData.no_peserta)
+        const bpjsNumber = formData.bpjsNumber || patientSearch.patientData?.no_peserta;
+        if (!bpjsNumber) {
+          toast.error("Nomor BPJS wajib diisi");
           return;
         }
       }
@@ -198,6 +205,8 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
           appointmentTime={formData.time}
           doctorName={doctor.name}
           poliName={formData.poliName}
+          patientName={patientSearch.patientData?.nm_pasien || formData.fullName}
+          noRM={patientSearch.patientData?.no_rkm_medis || formData.mrNumber}
           onClose={() => {
             // Use setTimeout to prevent update during render
             setTimeout(() => {

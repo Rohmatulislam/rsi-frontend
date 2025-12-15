@@ -41,7 +41,8 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
     bpjsClass: '',
     bpjsFaskes: '',
     bpjsRujukan: '',
-    penanggungJawab: 'DIRI SENDIRI',  // Tambahkan penanggung jawab dengan nilai default
+    penanggungJawab: '',
+    hubunganPenanggungJawab: '',  // Hubungan dengan pasien
   });
 
   // Patient search state
@@ -66,7 +67,8 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
     setPatientSearch({ loading: true, found: false, patientData: null, error: '' });
 
     try {
-      const url = `http://localhost:2000/api/appointments/search-patient/${mrNumber}`;
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2000/api';
+      const url = `${baseUrl}/appointments/search-patient/${mrNumber}`;
       console.log('🔍 [SEARCH] Fetching URL:', url);
 
       const response = await fetch(url);
@@ -225,7 +227,8 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
       bpjsClass: '',
       bpjsFaskes: '',
       bpjsRujukan: '',
-      penanggungJawab: 'DIRI SENDIRI',
+      penanggungJawab: '',
+      hubunganPenanggungJawab: '',
     });
     setPatientSearch({
       loading: false,

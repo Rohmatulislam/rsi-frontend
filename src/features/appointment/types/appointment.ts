@@ -24,6 +24,7 @@ export interface AppointmentFormData {
   bpjsFaskes: string;
   bpjsRujukan: string;
   penanggungJawab: string;
+  hubunganPenanggungJawab: string;
 }
 
 export interface PatientData {
@@ -35,6 +36,7 @@ export interface PatientData {
   no_tlp: string;
   alamat: string;
   email: string;
+  no_peserta?: string; // No. BPJS dari data pasien
 }
 
 export interface PatientSearchState {

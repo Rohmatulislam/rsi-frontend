@@ -1,31 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
 import {
     Calendar,
     Clock,
     User,
     ChevronDown,
-    ChevronUp,
     FileText,
     Loader2,
     Users,
     XCircle,
     CalendarClock,
     Stethoscope,
-    Phone,
-    Mail,
-    MapPin,
     Activity,
     CheckCircle2,
     AlertCircle,
     CalendarDays,
     ArrowRight
 } from "lucide-react";
-import { useMyPatients, MyPatient } from "../api/getMyPatients";
+import { useMyPatients } from "../api/getMyPatients";
 import { useCancelAppointment } from "../api/cancelAppointment";
 import { useAuth } from "~/features/auth/hook/useAuth";
 import { toast } from "sonner";
@@ -84,45 +78,45 @@ export const MyPatientsComponent = () => {
             scheduled: {
                 label: "Terjadwal",
                 icon: CalendarDays,
-                bgClass: "bg-emerald-50",
-                textClass: "text-emerald-700",
-                borderClass: "border-emerald-200"
+                bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
+                textClass: "text-emerald-700 dark:text-emerald-300",
+                borderClass: "border-emerald-300 dark:border-emerald-700"
             },
             CONFIRMED: {
                 label: "Terjadwal",
                 icon: CalendarDays,
-                bgClass: "bg-emerald-50",
-                textClass: "text-emerald-700",
-                borderClass: "border-emerald-200"
+                bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
+                textClass: "text-emerald-700 dark:text-emerald-300",
+                borderClass: "border-emerald-300 dark:border-emerald-700"
             },
             completed: {
                 label: "Selesai",
                 icon: CheckCircle2,
-                bgClass: "bg-blue-50",
-                textClass: "text-blue-700",
-                borderClass: "border-blue-200"
+                bgClass: "bg-blue-100 dark:bg-blue-900/30",
+                textClass: "text-blue-700 dark:text-blue-300",
+                borderClass: "border-blue-300 dark:border-blue-700"
             },
             cancelled: {
                 label: "Dibatalkan",
                 icon: XCircle,
-                bgClass: "bg-red-50",
-                textClass: "text-red-700",
-                borderClass: "border-red-200"
+                bgClass: "bg-red-100 dark:bg-red-900/30",
+                textClass: "text-red-700 dark:text-red-300",
+                borderClass: "border-red-300 dark:border-red-700"
             },
             CANCELLED: {
                 label: "Dibatalkan",
                 icon: XCircle,
-                bgClass: "bg-red-50",
-                textClass: "text-red-700",
-                borderClass: "border-red-200"
+                bgClass: "bg-red-100 dark:bg-red-900/30",
+                textClass: "text-red-700 dark:text-red-300",
+                borderClass: "border-red-300 dark:border-red-700"
             },
         };
         return statusMap[status] || {
             label: status,
             icon: AlertCircle,
-            bgClass: "bg-gray-50",
-            textClass: "text-gray-700",
-            borderClass: "border-gray-200"
+            bgClass: "bg-muted",
+            textClass: "text-muted-foreground",
+            borderClass: "border-border"
         };
     };
 
@@ -153,11 +147,11 @@ export const MyPatientsComponent = () => {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 animate-pulse" />
-                    <Loader2 className="absolute inset-0 m-auto h-8 w-8 animate-spin text-white" />
+                    <div className="w-16 h-16 rounded-full bg-primary animate-pulse" />
+                    <Loader2 className="absolute inset-0 m-auto h-8 w-8 animate-spin text-primary-foreground" />
                 </div>
-                <p className="mt-4 text-lg font-medium text-slate-600">Memuat riwayat booking...</p>
-                <p className="text-sm text-slate-400">Mohon tunggu sebentar</p>
+                <p className="mt-4 text-lg font-medium text-foreground">Memuat riwayat booking...</p>
+                <p className="text-sm text-muted-foreground">Mohon tunggu sebentar</p>
             </div>
         );
     }
@@ -165,15 +159,15 @@ export const MyPatientsComponent = () => {
     // Not Authenticated
     if (!isAuthenticated) {
         return (
-            <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                    <User className="h-10 w-10 text-slate-400" />
+            <div className="text-center py-16 px-4 bg-card rounded-2xl border border-border shadow-sm">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+                    <User className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Silakan Login</h3>
-                <p className="text-slate-500 mb-6 max-w-md mx-auto">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Silakan Login</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                     Untuk melihat riwayat booking dan pasien yang telah Anda daftarkan, silakan login terlebih dahulu.
                 </p>
-                <Button asChild size="lg" className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700">
+                <Button asChild size="lg">
                     <Link href="/login" className="gap-2">
                         Login Sekarang
                         <ArrowRight className="h-4 w-4" />
@@ -186,12 +180,12 @@ export const MyPatientsComponent = () => {
     // Error State
     if (error) {
         return (
-            <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
-                    <AlertCircle className="h-10 w-10 text-red-400" />
+            <div className="text-center py-16 px-4 bg-card rounded-2xl border border-border shadow-sm">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
+                    <AlertCircle className="h-10 w-10 text-destructive" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Gagal Memuat Data</h3>
-                <p className="text-slate-500 mb-6">Terjadi kesalahan saat memuat riwayat booking Anda.</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">Gagal Memuat Data</h3>
+                <p className="text-muted-foreground mb-6">Terjadi kesalahan saat memuat riwayat booking Anda.</p>
                 <Button variant="outline" onClick={() => refetch()} className="gap-2">
                     <Activity className="h-4 w-4" />
                     Coba Lagi
@@ -203,15 +197,15 @@ export const MyPatientsComponent = () => {
     // Empty State
     if (!data || data.patients.length === 0) {
         return (
-            <div className="text-center py-16 px-4">
-                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-50 to-teal-50 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-cyan-400" />
+            <div className="text-center py-16 px-4 bg-card rounded-2xl border border-border shadow-sm">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+                    <FileText className="h-12 w-12 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Belum Ada Riwayat</h3>
-                <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Belum Ada Riwayat</h3>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                     Anda belum memiliki riwayat booking. Mulai dengan mencari dokter dan membuat janji temu.
                 </p>
-                <Button asChild size="lg" className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700">
+                <Button asChild size="lg">
                     <Link href="/dokters" className="gap-2">
                         <Stethoscope className="h-5 w-5" />
                         Cari Dokter
@@ -230,82 +224,70 @@ export const MyPatientsComponent = () => {
     }, 0);
 
     return (
-        <div className="space-y-8">
-            {/* Dashboard Stats - Modern Cards */}
+        <div className="space-y-6">
+            {/* Dashboard Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Total Patients */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 p-5 text-white shadow-lg shadow-cyan-500/25">
-                    <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10" />
-                    <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-16 w-16 rounded-full bg-white/10" />
-                    <div className="relative">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-cyan-100 text-sm font-medium">Total Pasien</p>
-                                <p className="text-3xl font-bold mt-1">{data.totalPatients}</p>
-                            </div>
-                            <div className="p-3 rounded-xl bg-white/20">
-                                <Users className="h-6 w-6" />
-                            </div>
+                <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-muted-foreground text-sm font-medium">Total Pasien</p>
+                            <p className="text-3xl font-bold text-foreground mt-1">{data.totalPatients}</p>
                         </div>
-                        <p className="text-cyan-100 text-xs mt-2">Pasien yang Anda daftarkan</p>
+                        <div className="p-3 rounded-xl bg-primary/10">
+                            <Users className="h-6 w-6 text-primary" />
+                        </div>
                     </div>
+                    <p className="text-muted-foreground text-xs mt-2">Pasien yang Anda daftarkan</p>
                 </div>
 
                 {/* Total Bookings */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 p-5 text-white shadow-lg shadow-teal-500/25">
-                    <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10" />
-                    <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-16 w-16 rounded-full bg-white/10" />
-                    <div className="relative">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-teal-100 text-sm font-medium">Total Booking</p>
-                                <p className="text-3xl font-bold mt-1">{data.totalAppointments}</p>
-                            </div>
-                            <div className="p-3 rounded-xl bg-white/20">
-                                <Calendar className="h-6 w-6" />
-                            </div>
+                <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-muted-foreground text-sm font-medium">Total Booking</p>
+                            <p className="text-3xl font-bold text-foreground mt-1">{data.totalAppointments}</p>
                         </div>
-                        <p className="text-teal-100 text-xs mt-2">Semua janji temu</p>
+                        <div className="p-3 rounded-xl bg-emerald-500/10">
+                            <Calendar className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                        </div>
                     </div>
+                    <p className="text-muted-foreground text-xs mt-2">Semua janji temu</p>
                 </div>
 
                 {/* Upcoming */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-5 text-white shadow-lg shadow-amber-500/25">
-                    <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10" />
-                    <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-16 w-16 rounded-full bg-white/10" />
-                    <div className="relative">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-amber-100 text-sm font-medium">Akan Datang</p>
-                                <p className="text-3xl font-bold mt-1">{upcomingAppointments}</p>
-                            </div>
-                            <div className="p-3 rounded-xl bg-white/20">
-                                <CalendarClock className="h-6 w-6" />
-                            </div>
+                <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-muted-foreground text-sm font-medium">Akan Datang</p>
+                            <p className="text-3xl font-bold text-foreground mt-1">{upcomingAppointments}</p>
                         </div>
-                        <p className="text-amber-100 text-xs mt-2">Jadwal yang belum berlangsung</p>
+                        <div className="p-3 rounded-xl bg-accent/20">
+                            <CalendarClock className="h-6 w-6 text-accent" />
+                        </div>
                     </div>
+                    <p className="text-muted-foreground text-xs mt-2">Jadwal yang belum berlangsung</p>
                 </div>
             </div>
 
             {/* Section Title */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-800">Daftar Pasien</h2>
-                    <p className="text-sm text-slate-500">Klik untuk melihat detail janji temu</p>
+                    <h2 className="text-xl font-bold text-foreground">Daftar Pasien</h2>
+                    <p className="text-sm text-muted-foreground">Klik untuk melihat detail janji temu</p>
                 </div>
             </div>
 
-            {/* Patient List - Modern Design */}
+            {/* Patient List */}
             <div className="space-y-4">
                 {data.patients.map((patient) => (
                     <div
                         key={patient.patientId}
-                        className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
+                        className="rounded-xl border border-border bg-card overflow-hidden shadow-sm"
                     >
                         {/* Patient Header */}
                         <div
-                            className="p-5 cursor-pointer hover:bg-slate-50/80 transition-colors"
+                            className="p-5 cursor-pointer hover:bg-muted/50 transition-colors"
                             onClick={() => setExpandedPatient(
                                 expandedPatient === patient.patientId ? null : patient.patientId
                             )}
@@ -313,33 +295,33 @@ export const MyPatientsComponent = () => {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     {/* Avatar */}
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/25">
+                                    <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
                                         {patient.patientName.charAt(0).toUpperCase()}
                                     </div>
                                     {/* Info */}
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-800">{patient.patientName}</h3>
+                                        <h3 className="font-bold text-lg text-foreground">{patient.patientName}</h3>
                                         <div className="flex items-center gap-3 mt-1">
-                                            <span className="inline-flex items-center gap-1 text-sm text-slate-500">
+                                            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
                                                 <FileText className="h-3.5 w-3.5" />
                                                 No. RM: {patient.patientId}
                                             </span>
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 text-xs font-medium">
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
                                                 {patient.appointmentsCount} booking
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 {/* Expand Icon */}
-                                <div className={`p-2 rounded-full transition-all duration-200 ${expandedPatient === patient.patientId ? 'bg-cyan-100 rotate-180' : 'bg-slate-100'}`}>
-                                    <ChevronDown className={`h-5 w-5 ${expandedPatient === patient.patientId ? 'text-cyan-600' : 'text-slate-400'}`} />
+                                <div className={`p-2 rounded-full transition-all duration-200 ${expandedPatient === patient.patientId ? 'bg-primary/10 rotate-180' : 'bg-muted'}`}>
+                                    <ChevronDown className={`h-5 w-5 ${expandedPatient === patient.patientId ? 'text-primary' : 'text-muted-foreground'}`} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Expanded Appointments */}
                         {expandedPatient === patient.patientId && (
-                            <div className="border-t border-slate-100 bg-slate-50/50 p-5">
+                            <div className="border-t border-border bg-muted/30 p-5">
                                 <div className="space-y-4">
                                     {patient.appointments.map((appointment) => {
                                         const statusConfig = getStatusConfig(appointment.status);
@@ -349,54 +331,54 @@ export const MyPatientsComponent = () => {
                                         return (
                                             <div
                                                 key={appointment.id}
-                                                className={`rounded-xl bg-white border ${statusConfig.borderClass} p-4 shadow-sm`}
+                                                className={`rounded-xl bg-card border-2 ${statusConfig.borderClass} p-4 shadow-sm`}
                                             >
                                                 {/* Appointment Header */}
                                                 <div className="flex items-start justify-between mb-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                                                            <Stethoscope className="h-6 w-6 text-slate-600" />
+                                                        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+                                                            <Stethoscope className="h-6 w-6 text-foreground" />
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-semibold text-slate-800">{appointment.doctor.name}</h4>
-                                                            <p className="text-sm text-slate-500">{appointment.doctor.specialization || 'Dokter Umum'}</p>
+                                                            <h4 className="font-semibold text-foreground">{appointment.doctor.name}</h4>
+                                                            <p className="text-sm text-muted-foreground">{appointment.doctor.specialization || 'Dokter Umum'}</p>
                                                         </div>
                                                     </div>
                                                     {/* Status Badge */}
-                                                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgClass} ${statusConfig.textClass} text-sm font-medium`}>
+                                                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgClass} ${statusConfig.textClass} text-sm font-semibold`}>
                                                         <StatusIcon className="h-4 w-4" />
                                                         {statusConfig.label}
                                                     </div>
                                                 </div>
 
                                                 {/* Date & Time Info */}
-                                                <div className="grid grid-cols-2 gap-3 mb-4">
-                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-                                                        <Calendar className="h-5 w-5 text-cyan-600" />
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                                                        <Calendar className="h-5 w-5 text-primary" />
                                                         <div>
-                                                            <p className="text-xs text-slate-500">Tanggal</p>
-                                                            <p className="font-medium text-slate-800">{dateInfo.date}</p>
-                                                            <p className="text-xs text-slate-400">{dateInfo.day}</p>
+                                                            <p className="text-xs text-muted-foreground font-medium">Tanggal</p>
+                                                            <p className="font-semibold text-foreground">{dateInfo.date}</p>
+                                                            <p className="text-xs text-muted-foreground">{dateInfo.day}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50">
-                                                        <Clock className="h-5 w-5 text-teal-600" />
+                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                                                        <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                                         <div>
-                                                            <p className="text-xs text-slate-500">Waktu</p>
-                                                            <p className="font-medium text-slate-800">{dateInfo.time} WIB</p>
-                                                            <p className="text-xs text-amber-600 font-medium">{dateInfo.relative}</p>
+                                                            <p className="text-xs text-muted-foreground font-medium">Waktu</p>
+                                                            <p className="font-semibold text-foreground">{dateInfo.time} WIB</p>
+                                                            <p className="text-xs text-accent font-semibold">{dateInfo.relative}</p>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 {/* Action Buttons */}
                                                 {canCancel(appointment.appointmentDate, appointment.status) && (
-                                                    <div className="flex gap-2 pt-3 border-t border-slate-100">
+                                                    <div className="flex gap-2 pt-3 border-t border-border">
                                                         {/* Reschedule Button */}
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            className="flex-1 text-cyan-700 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300"
+                                                            className="flex-1"
                                                             onClick={() => setRescheduleData({
                                                                 appointmentId: appointment.id,
                                                                 doctorName: appointment.doctor.name,
@@ -413,7 +395,7 @@ export const MyPatientsComponent = () => {
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                                                                    className="flex-1 text-destructive border-destructive/50 hover:bg-destructive/10"
                                                                     disabled={cancellingId === appointment.id}
                                                                 >
                                                                     {cancellingId === appointment.id ? (
@@ -431,12 +413,12 @@ export const MyPatientsComponent = () => {
                                                             </DialogTrigger>
                                                             <DialogContent className="sm:max-w-md">
                                                                 <DialogHeader>
-                                                                    <DialogTitle className="flex items-center gap-2 text-red-600">
+                                                                    <DialogTitle className="flex items-center gap-2 text-destructive">
                                                                         <AlertCircle className="h-5 w-5" />
                                                                         Batalkan Booking?
                                                                     </DialogTitle>
                                                                     <DialogDescription className="pt-2">
-                                                                        Apakah Anda yakin ingin membatalkan janji temu dengan <strong>{appointment.doctor.name}</strong> pada <strong>{dateInfo.date}</strong>?
+                                                                        Apakah Anda yakin ingin membatalkan janji temu dengan <strong className="text-foreground">{appointment.doctor.name}</strong> pada <strong className="text-foreground">{dateInfo.date}</strong>?
                                                                     </DialogDescription>
                                                                 </DialogHeader>
                                                                 <DialogFooter className="gap-2 sm:gap-0">
@@ -446,7 +428,7 @@ export const MyPatientsComponent = () => {
                                                                     <DialogClose asChild>
                                                                         <Button
                                                                             onClick={() => handleCancelBooking(appointment.id, appointment.doctor.name)}
-                                                                            className="bg-red-600 hover:bg-red-700"
+                                                                            variant="destructive"
                                                                         >
                                                                             Ya, Batalkan
                                                                         </Button>

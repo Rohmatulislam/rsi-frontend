@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+"use client";
+
+import { useEffect, useState, useRef } from 'react';
 import { Button } from "~/components/ui/button";
-import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin, ClipboardList } from "lucide-react";
-import Image from "next/image";
+import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin, ClipboardList, Download, Printer } from "lucide-react";
 import Link from "next/link";
 import { Stethoscope } from "lucide-react";
-// SuccessStep tidak memerlukan tipe dari appointment.ts karena tidak menggunakan prop yang kompleks
+import { QRCodeSVG } from 'qrcode.react';
 
 interface SuccessStepProps {
   bookingCode: string;
@@ -12,12 +13,36 @@ interface SuccessStepProps {
   appointmentTime?: string; // Format: HH:MM
   doctorName?: string;
   poliName?: string;
+  patientName?: string;
+  noRM?: string;
   onClose?: () => void; // Optional callback to close modal
 }
 
-export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doctorName, poliName, onClose }: SuccessStepProps) => {
-  const [countdown, setCountdown] = useState(10); // Countdown from 10 seconds
+export const SuccessStep = ({
+  bookingCode,
+  appointmentDate,
+  appointmentTime,
+  doctorName,
+  poliName,
+  patientName,
+  noRM,
+  onClose
+}: SuccessStepProps) => {
+  const [countdown, setCountdown] = useState(30); // Countdown from 30 seconds
   const [isClosing, setIsClosing] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  // Generate QR data with all booking info
+  const qrData = JSON.stringify({
+    code: bookingCode,
+    date: appointmentDate,
+    time: appointmentTime,
+    doctor: doctorName,
+    poli: poliName,
+    patient: patientName,
+    rm: noRM,
+    hospital: "RSI Hospital"
+  });
 
   useEffect(() => {
     if (!onClose) return; // Only run if onClose is provided
@@ -39,34 +64,123 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
     return () => clearInterval(timer);
   }, [onClose]);
 
+  const handleDownloadQR = () => {
+    const svg = document.getElementById('booking-qr-code');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+
+      const pngFile = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `bukti-booking-${bookingCode}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
   if (isClosing) {
     return null; // Don't render anything when closing
   }
 
   return (
-    <div className="flex flex-col items-center text-center space-y-6 py-4">
-      <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
-        <CheckCircle2 className="h-10 w-10" />
+    <div className="flex flex-col items-center text-center space-y-5 py-4" ref={printRef}>
+      {/* Success Header */}
+      <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
+        <CheckCircle2 className="h-8 w-8" />
       </div>
       <div>
         <h3 className="text-xl font-bold text-green-700 dark:text-green-400">Booking Berhasil!</h3>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground text-sm mt-1">
           Pendaftaran janji temu Anda telah berhasil diproses
         </p>
       </div>
 
-      {/* Booking Code Section */}
-      <div className="w-full bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Kode Booking</p>
-        <p className="text-3xl font-black font-mono tracking-wider">{bookingCode}</p>
+      {/* QR Code Section */}
+      <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
+        <div className="flex flex-col items-center gap-4">
+          {/* QR Code */}
+          <div className="bg-white p-4 rounded-xl shadow-md">
+            <QRCodeSVG
+              id="booking-qr-code"
+              value={qrData}
+              size={160}
+              level="H"
+              includeMargin={true}
+              imageSettings={{
+                src: "/logo.png",
+                x: undefined,
+                y: undefined,
+                height: 30,
+                width: 30,
+                excavate: true,
+              }}
+            />
+          </div>
+
+          {/* Booking Code */}
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Kode Booking</p>
+            <p className="text-2xl font-black font-mono tracking-wider text-primary">{bookingCode}</p>
+          </div>
+
+          {/* Download QR Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadQR}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Simpan QR Code
+          </Button>
+        </div>
       </div>
 
-      {/* Booking Details Preview */}
+      {/* Booking Details */}
       <div className="w-full bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-        <div className="grid grid-cols-1 gap-3 text-sm">
+        <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">Detail Booking</p>
+        <div className="grid grid-cols-1 gap-2.5 text-sm">
+          {patientName && (
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+              <div className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center">
+                <span className="text-cyan-600 dark:text-cyan-400 font-bold text-sm">
+                  {patientName.charAt(0)}
+                </span>
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-xs text-muted-foreground">Pasien</p>
+                <p className="font-medium">{patientName}</p>
+              </div>
+            </div>
+          )}
+
+          {noRM && (
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+              <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
+                <ClipboardList className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-xs text-muted-foreground">No. Rekam Medis</p>
+                <p className="font-medium font-mono">{noRM}</p>
+              </div>
+            </div>
+          )}
+
           {doctorName && (
-            <div className="flex items-center gap-3">
-              <Stethoscope className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+              <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center">
+                <Stethoscope className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+              </div>
               <div className="flex-1 text-left">
                 <p className="text-xs text-muted-foreground">Dokter</p>
                 <p className="font-medium">{doctorName}</p>
@@ -75,8 +189,10 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
           )}
 
           {poliName && (
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-blue-500" />
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
               <div className="flex-1 text-left">
                 <p className="text-xs text-muted-foreground">Poliklinik</p>
                 <p className="font-medium">{poliName}</p>
@@ -84,74 +200,62 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
             </div>
           )}
 
-          {appointmentDate && (
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              <div className="flex-1 text-left">
-                <p className="text-xs text-muted-foreground">Tanggal Kunjungan</p>
-                <p className="font-medium">
-                  {new Date(appointmentDate).toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
-                </p>
+          <div className="grid grid-cols-2 gap-2">
+            {appointmentDate && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <div className="text-left">
+                  <p className="text-xs text-muted-foreground">Tanggal</p>
+                  <p className="font-medium text-xs">
+                    {new Date(appointmentDate).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {appointmentTime && (
-            <div className="flex items-center gap-3">
-              <Clock4 className="h-5 w-5 text-blue-500" />
-              <div className="flex-1 text-left">
-                <p className="text-xs text-muted-foreground">Waktu Kunjungan</p>
-                <p className="font-medium">
-                  {appointmentTime} WIB
-                </p>
+            {appointmentTime && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
+                <Clock4 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="text-left">
+                  <p className="text-xs text-muted-foreground">Jam</p>
+                  <p className="font-medium text-xs">{appointmentTime} WIB</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="w-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-sm">
-        <p className="font-medium text-blue-800 dark:text-blue-200 mb-2">Petunjuk Kedatangan:</p>
-        <ul className="space-y-1 text-blue-700 dark:text-blue-300 text-left">
-          <li className="flex items-start gap-2">
-            <span className="mt-1">•</span>
-            <span>Datang <span className="font-semibold">15 menit sebelum</span> jadwal praktek</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1">•</span>
-            <span>Bawa <span className="font-semibold">KTP dan kartu BPJS</span> (jika ada)</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1">•</span>
-            <span>Tunjukkan <span className="font-semibold">kode booking</span> di loket pendaftaran</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1">•</span>
-            <span>Berikan <span className="font-semibold">keluhan utama</span> Anda saat mendaftar</span>
-          </li>
+      <div className="w-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-sm">
+        <p className="font-medium text-blue-800 dark:text-blue-200 mb-2 text-xs">📌 Petunjuk Kedatangan:</p>
+        <ul className="space-y-1 text-blue-700 dark:text-blue-300 text-left text-xs">
+          <li>• Datang <b>15 menit sebelum</b> jadwal praktek</li>
+          <li>• Bawa <b>KTP dan kartu BPJS</b> (jika ada)</li>
+          <li>• Tunjukkan <b>QR code</b> ini di loket pendaftaran</li>
         </ul>
       </div>
 
-      <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <Clock className="h-4 w-4" />
-        Modal akan otomatis menutup dalam {countdown} detik
+      {/* Countdown */}
+      <div className="text-xs text-muted-foreground flex items-center gap-2">
+        <Clock className="h-3 w-3" />
+        Menutup dalam {countdown} detik
       </div>
 
+      {/* Action Buttons */}
       <div className="flex flex-col w-full gap-2">
         <Button
-          className="w-full rounded-xl"
+          className="w-full rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700"
           onClick={() => {
             window.print();
-            // Prevent auto-close when printing
             setCountdown(9999);
           }}
         >
+          <Printer className="h-4 w-4 mr-2" />
           Cetak Bukti Booking
         </Button>
         <Button
@@ -170,16 +274,16 @@ export const SuccessStep = ({ bookingCode, appointmentDate, appointmentTime, doc
         </Button>
         <Button
           variant="ghost"
-          className="w-full rounded-xl"
+          size="sm"
+          className="w-full rounded-xl text-muted-foreground"
           onClick={() => {
-            setCountdown(0); // Stop countdown
-            setIsClosing(true); // Set flag to prevent further updates
-            // Use setTimeout to prevent state update during render
+            setCountdown(0);
+            setIsClosing(true);
             setTimeout(() => onClose?.(), 0);
           }}
         >
           <X className="h-4 w-4 mr-2" />
-          Tutup & Lanjutkan
+          Tutup
         </Button>
       </div>
     </div>

@@ -98,14 +98,38 @@ export const PatientDataStep = ({
               value={formData.mrNumber}
               onChange={(e) => {
                 setFormData({ ...formData, mrNumber: e.target.value });
-                // Reset search state
-                setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
+                // Reset search state saat nilai berubah
+                if (patientSearch.found || patientSearch.error) {
+                  setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
+                }
+              }}
+              onBlur={() => {
+                // Auto-search saat input kehilangan focus (jika sudah ada minimal 3 karakter)
+                if (formData.mrNumber && formData.mrNumber.length >= 3 && !patientSearch.found && !patientSearch.loading) {
+                  searchPatient(formData.mrNumber);
+                }
               }}
               className="h-12 rounded-xl"
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              Masukkan nomor rekam medis Anda, lalu klik "Lanjut" untuk verifikasi
-            </p>
+            {patientSearch.loading && (
+              <p className="text-sm text-muted-foreground">🔍 Mencari data pasien...</p>
+            )}
+            {patientSearch.found && patientSearch.patientData && (
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <p className="text-sm font-medium text-green-800 dark:text-green-200">✓ Pasien ditemukan: {patientSearch.patientData.nm_pasien}</p>
+                {patientSearch.patientData.no_peserta && (
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">No. BPJS: {patientSearch.patientData.no_peserta}</p>
+                )}
+              </div>
+            )}
+            {patientSearch.error && (
+              <p className="text-sm text-red-500">⚠️ {patientSearch.error}</p>
+            )}
+            {!patientSearch.loading && !patientSearch.found && !patientSearch.error && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Masukkan nomor rekam medis Anda untuk mencari data
+              </p>
+            )}
           </div>
         </div>
       ) : (
@@ -205,6 +229,38 @@ export const PatientDataStep = ({
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Penanggung Jawab <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="Nama penanggung jawab"
+                value={formData.penanggungJawab}
+                onChange={(e) => setFormData({ ...formData, penanggungJawab: e.target.value })}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Hubungan <span className="text-red-500">*</span></Label>
+              <Select
+                value={formData.hubunganPenanggungJawab}
+                onValueChange={(val: string) => setFormData({ ...formData, hubunganPenanggungJawab: val })}
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Pilih hubungan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DIRI SENDIRI">Diri Sendiri</SelectItem>
+                  <SelectItem value="ORANG TUA">Orang Tua</SelectItem>
+                  <SelectItem value="SUAMI">Suami</SelectItem>
+                  <SelectItem value="ISTRI">Istri</SelectItem>
+                  <SelectItem value="ANAK">Anak</SelectItem>
+                  <SelectItem value="SAUDARA">Saudara</SelectItem>
+                  <SelectItem value="LAINNYA">Lainnya</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -235,10 +291,19 @@ export const PatientDataStep = ({
             value={formData.paymentType}
             onValueChange={(val: string) => {
               const selectedPayment = paymentMethods?.find(pm => pm.kd_pj === val);
+              const paymentName = selectedPayment?.png_jawab || val;
+
+              // Auto-fill No. BPJS jika pasien lama, memilih BPJS, dan punya no_peserta
+              let bpjsNumber = formData.bpjsNumber;
+              if (isBpjsPayment(paymentName) && formData.patientType === 'old' && patientSearch.patientData?.no_peserta) {
+                bpjsNumber = patientSearch.patientData.no_peserta;
+              }
+
               setFormData({
                 ...formData,
                 paymentType: val,
-                paymentName: selectedPayment?.png_jawab || val
+                paymentName,
+                bpjsNumber
               });
             }}
           >
@@ -261,61 +326,49 @@ export const PatientDataStep = ({
         )}
       </div>
 
-      {formData.paymentName && isBpjsPayment(formData.paymentName) && (
-        <div className="space-y-4 p-4 border-2 border-green-200 bg-green-50 dark:bg-green-900/20 rounded-xl">
-          <h4 className="font-semibold text-green-900 dark:text-green-100">Data BPJS</h4>
+      {formData.paymentName && isBpjsPayment(formData.paymentName) && (() => {
+        // Dapatkan No. BPJS - prioritas: formData.bpjsNumber, lalu dari patientData jika pasien lama
+        const noPesertaDariPasien = formData.patientType === 'old' && patientSearch.patientData?.no_peserta
+          ? patientSearch.patientData.no_peserta
+          : '';
+        const displayValue = formData.bpjsNumber || noPesertaDariPasien;
+        const isAutoFilled = !formData.bpjsNumber && noPesertaDariPasien;
 
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label>No. Kartu BPJS <span className="text-red-500">*</span></Label>
-              <Input
-                placeholder="0001234567890"
-                value={formData.bpjsNumber}
-                onChange={(e) => setFormData({ ...formData, bpjsNumber: e.target.value })}
-                className="h-12 rounded-xl"
-                maxLength={13}
-              />
-            </div>
+        return (
+          <div className="space-y-4 p-4 border-2 border-green-200 bg-green-50 dark:bg-green-900/20 rounded-xl">
+            <h4 className="font-semibold text-green-900 dark:text-green-100">Data BPJS</h4>
 
-            <div className="space-y-2">
-              <Label>Kelas Perawatan <span className="text-red-500">*</span></Label>
-              <Select
-                value={formData.bpjsClass}
-                onValueChange={(val: string) => setFormData({ ...formData, bpjsClass: val })}
-              >
-                <SelectTrigger className="h-12 rounded-xl">
-                  <SelectValue placeholder="Pilih kelas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Kelas 1</SelectItem>
-                  <SelectItem value="2">Kelas 2</SelectItem>
-                  <SelectItem value="3">Kelas 3</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label>No. Kartu BPJS <span className="text-red-500">*</span></Label>
+                <Input
+                  placeholder="0001234567890"
+                  value={displayValue}
+                  onChange={(e) => setFormData({ ...formData, bpjsNumber: e.target.value })}
+                  className="h-12 rounded-xl"
+                  maxLength={13}
+                />
+                {isAutoFilled ? (
+                  <p className="text-xs text-green-600 dark:text-green-400">✓ Diambil dari data pasien ({noPesertaDariPasien})</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">13 digit nomor kartu BPJS Kesehatan</p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label>Faskes Tingkat 1</Label>
-              <Input
-                placeholder="Nama Puskesmas/Klinik"
-                value={formData.bpjsFaskes}
-                onChange={(e) => setFormData({ ...formData, bpjsFaskes: e.target.value })}
-                className="h-12 rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>No. Rujukan (jika ada)</Label>
-              <Input
-                placeholder="Nomor surat rujukan"
-                value={formData.bpjsRujukan}
-                onChange={(e) => setFormData({ ...formData, bpjsRujukan: e.target.value })}
-                className="h-12 rounded-xl"
-              />
+              <div className="space-y-2">
+                <Label>No. Rujukan (Opsional)</Label>
+                <Input
+                  placeholder="Nomor surat rujukan dari faskes tingkat 1"
+                  value={formData.bpjsRujukan}
+                  onChange={(e) => setFormData({ ...formData, bpjsRujukan: e.target.value })}
+                  className="h-12 rounded-xl"
+                />
+                <p className="text-xs text-muted-foreground">Nomor rujukan dari Puskesmas/Klinik</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
