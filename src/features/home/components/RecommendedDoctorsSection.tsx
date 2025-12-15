@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { useGetDoctors, DoctorSortBy } from "../api/getDoctors";
-import { DoctorCard } from "~/components/shared/DoctorCard";
+import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 
 export const RecommendedDoctorsSection = () => {
   const { data: doctors, isLoading, error } = useGetDoctors({
@@ -21,7 +21,7 @@ export const RecommendedDoctorsSection = () => {
           <h2 className="text-3xl font-bold text-center mb-12">DOKTER PILIHAN</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-white dark:bg-gray-800 rounded-3xl h-[500px]" />
+              <DoctorCardSkeleton key={i} />
             ))}
           </div>
         </div>
@@ -101,7 +101,7 @@ export const RecommendedDoctorsSection = () => {
             </p>
           </div>
           <Button variant="outline" size="lg" asChild className="hidden md:flex rounded-full px-6 hover:bg-primary hover:text-white transition-all duration-300">
-            <Link href="/dokters">
+            <Link href="/doctors">
               Lihat Semua Dokter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -117,7 +117,7 @@ export const RecommendedDoctorsSection = () => {
 
         <div className="mt-12 flex justify-center md:hidden">
           <Button variant="outline" size="lg" className="rounded-full w-full" asChild>
-            <Link href="/dokter">
+            <Link href="/doctor">
               Lihat Semua Dokter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

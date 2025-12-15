@@ -235,7 +235,7 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
           schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
         )) || (doctor.schedules && doctor.schedules.length > 0)) ? (
           <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all mt-3" asChild>
-            <Link href={`/dokter/${doctor.slug}`}>
+            <Link href={`/doctor/${doctor.slug}`}>
               Lihat Jadwal & Booking
             </Link>
           </Button>
@@ -244,6 +244,67 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
             Jadwal Belum Tersedia
           </Button>
         )}
+      </div>
+    </div>
+  );
+};
+
+// Skeleton Loading Component
+export const DoctorCardSkeleton = () => {
+  return (
+    <div className="relative bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full animate-pulse">
+      {/* Header Section - Image and Name */}
+      <div className="p-5 pb-3">
+        <div className="flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-700" />
+          </div>
+
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4" />
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="px-5">
+        <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-5 flex flex-col flex-1 pt-3">
+        <div className="flex-1 space-y-3">
+          <div className="space-y-3 pt-1">
+            {/* Location skeleton */}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+            </div>
+
+            {/* Schedule skeleton */}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+            </div>
+
+            {/* Category skeleton */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-slate-200 dark:bg-slate-700 rounded" />
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4" />
+              </div>
+              <div className="ml-5 space-y-1">
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Button skeleton */}
+        <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-lg mt-3" />
       </div>
     </div>
   );

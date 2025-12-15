@@ -26,7 +26,7 @@ export const AppointmentHistoryPage = () => {
           {/* Quick Action */}
           <div className="flex justify-center mt-6">
             <Button asChild className="shadow-md">
-              <Link href="/dokters" className="gap-2">
+              <Link href="/doctors" className="gap-2">
                 <Stethoscope className="h-4 w-4" />
                 Buat Booking Baru
               </Link>

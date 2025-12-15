@@ -44,7 +44,7 @@ const DoctorDetailPage = () => {
                 {/* Breadcrumb / Back Navigation */}
                 <div className="mb-8">
                     <Button variant="ghost" className="pl-0 hover:bg-transparent hover:text-primary transition-colors" asChild>
-                        <Link href="/dokters" className="flex items-center gap-2 text-muted-foreground">
+                        <Link href="/doctors" className="flex items-center gap-2 text-muted-foreground">
                             <ArrowLeft className="h-4 w-4" />
                             Kembali ke Daftar Dokter
                         </Link>

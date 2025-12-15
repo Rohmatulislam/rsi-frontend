@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { DoctorCard } from "~/components/shared/DoctorCard";
+import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { Stethoscope, Search, Filter, Clock } from "lucide-react";
 
@@ -90,8 +90,8 @@ export const DoctorListPage = () => {
                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
                             <button
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${typeFilter === 'all'
-                                        ? 'bg-primary text-white'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    ? 'bg-primary text-white'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                     }`}
                                 onClick={() => setTypeFilter('all')}
                             >
@@ -99,8 +99,8 @@ export const DoctorListPage = () => {
                             </button>
                             <button
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${typeFilter === 'executive'
-                                        ? 'bg-primary text-white'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    ? 'bg-primary text-white'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                     }`}
                                 onClick={() => setTypeFilter('executive')}
                             >
@@ -109,8 +109,8 @@ export const DoctorListPage = () => {
                             </button>
                             <button
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${typeFilter === 'reguler'
-                                        ? 'bg-primary text-white'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    ? 'bg-primary text-white'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                     }`}
                                 onClick={() => setTypeFilter('reguler')}
                             >
@@ -140,7 +140,7 @@ export const DoctorListPage = () => {
                 {isLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[...Array(8)].map((_, i) => (
-                            <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-3xl h-[400px]" />
+                            <DoctorCardSkeleton key={i} />
                         ))}
                     </div>
                 ) : (

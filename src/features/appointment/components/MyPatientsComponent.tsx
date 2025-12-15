@@ -206,7 +206,7 @@ export const MyPatientsComponent = () => {
                     Anda belum memiliki riwayat booking. Mulai dengan mencari dokter dan membuat janji temu.
                 </p>
                 <Button asChild size="lg">
-                    <Link href="/dokters" className="gap-2">
+                    <Link href="/doctors" className="gap-2">
                         <Stethoscope className="h-5 w-5" />
                         Cari Dokter
                     </Link>

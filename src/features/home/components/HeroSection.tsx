@@ -79,7 +79,7 @@ const ServiceCard = ({
 
 export const HeroSection = () => {
   const services = [
-    { icon: Stethoscope, title: "Cari Dokter", href: "/dokters", color: "primary" },
+    { icon: Stethoscope, title: "Cari Dokter", href: "/doctors", color: "primary" },
     { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
     { icon: Crown, title: "Poli Executive", href: "/poli-executive", color: "purple" },
     { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
@@ -123,7 +123,7 @@ export const HeroSection = () => {
                     key={index}
                     icon={service.icon}
                     title={service.title}
-                    href={service.href || "/dokters"}
+                    href={service.href || "/doctors"}
                     color={service.color}
                   />
                 );
