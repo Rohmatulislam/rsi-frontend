@@ -117,7 +117,7 @@ export const RecommendedDoctorsSection = () => {
 
         <div className="mt-12 flex justify-center md:hidden">
           <Button variant="outline" size="lg" className="rounded-full w-full" asChild>
-            <Link href="/doctor">
+            <Link href="/doctors">
               Lihat Semua Dokter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

@@ -81,7 +81,7 @@ export const HeroSection = () => {
   const services = [
     { icon: Stethoscope, title: "Cari Dokter", href: "/doctors", color: "primary" },
     { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
-    { icon: Crown, title: "Poli Executive", href: "/poli-executive", color: "purple" },
+    { icon: Crown, title: "Poli Executive", href: "/layanan-unggulan/executive", color: "purple" },
     { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
     { icon: FlaskConical, title: "Laboratorium", href: "/layanan/laboratorium", color: "cyan" },
     { icon: ScanLine, title: "Radiologi", href: "/layanan/radiologi", color: "success" },
