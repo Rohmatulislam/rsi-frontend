@@ -12,3 +12,16 @@ export const formatCurrency = (number: number) => {
     minimumFractionDigits: 0,
   }).format(number);
 };
+
+export function getImageSrc(src: string | null | undefined): string {
+  if (!src) return '/images/placeholder-article.jpg'; // Ensure this exists or use a generic online placeholder if preferred
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+
+  // Assume relative path from backend (e.g., /uploads/...)
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:2000';
+
+  // Ensure strict slash handling
+  const cleanPath = src.startsWith('/') ? src : `/${src}`;
+
+  return `${baseUrl}${cleanPath}`;
+}

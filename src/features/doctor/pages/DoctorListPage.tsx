@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { Stethoscope, Search, Filter, Clock } from "lucide-react";
+import { ServiceHero } from "~/features/services";
 
 export const DoctorListPage = () => {
     const searchParams = useSearchParams();
@@ -47,27 +48,23 @@ export const DoctorListPage = () => {
     const specializations = allDoctors ? [...new Set(allDoctors.map(doctor => doctor.specialization).filter(spec => spec !== null && spec !== undefined))] : [];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col items-center mb-12 text-center space-y-4">
-                    <div className="p-3 bg-primary/10 rounded-full text-primary">
-                        <Stethoscope className="w-8 h-8" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
-                            Daftar Dokter
-                        </h1>
-                        <p className="text-muted-foreground mt-2 max-w-2xl">
-                            Pilih kategori poli untuk menampilkan dokter yang sesuai kebutuhan Anda
-                        </p>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-12">
+            <ServiceHero
+                badge="TIM MEDIS KAMI"
+                title="Dokter Spesialis"
+                highlightText="Profesional & Ahli"
+                subtitle="Temukan dokter spesialis terbaik kami yang siap melayani kebutuhan kesehatan Anda dengan sepenuh hati."
+            />
 
-                        {/* Doctor Count */}
-                        {!isLoading && allDoctors && (
-                            <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                {allDoctors.length} Dokter Tersedia
-                            </div>
-                        )}
-                    </div>
+            <div className="container mx-auto px-4 py-12">
+                <div className="flex flex-col items-center mb-8 text-center space-y-4">
+                    {/* Doctor Count */}
+                    {!isLoading && allDoctors && (
+                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-400">
+                            <Stethoscope className="w-4 h-4 mr-2" />
+                            {allDoctors.length} Dokter Tersedia
+                        </div>
+                    )}
                 </div>
 
                 {/* Search and Filter Section */}

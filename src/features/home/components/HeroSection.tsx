@@ -22,7 +22,7 @@ const HeroImage = () => {
         fill
         className="object-cover "
       />
-      <div className="absolute inset-0 bg-linear-to-r  from-secondary to-transparent w-full h-full"></div>
+      <div className="absolute inset-0 bg-slate-900/20 w-full h-full"></div>
     </div>
   );
 };
@@ -88,7 +88,7 @@ export const HeroSection = () => {
   ];
 
   return (
-    <section className="w-full min-h-[650px] relative flex items-center">
+    <section className="w-full min-h-screen relative flex items-center">
       <HeroImage />
 
       <div className="container mx-auto px-4 md:px-8 py-12">
@@ -101,7 +101,7 @@ export const HeroSection = () => {
               <span className="text-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl">SITI HAJAR MATARAM</span>
             </h1>
 
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
+            <p className="text-base md:text-lg text-slate-100 font-medium max-w-2xl">
               Memberikan pelayanan kesehatan terbaik dengan teknologi modern
               dan tenaga medis profesional di Mataram.
             </p>

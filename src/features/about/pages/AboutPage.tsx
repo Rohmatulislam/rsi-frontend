@@ -3,6 +3,7 @@
 import { AboutHero } from "../components/AboutHero";
 import { AboutStats } from "../components/AboutStats";
 import { AboutHistory } from "../components/AboutHistory";
+import { AboutTimeline } from "../components/AboutTimeline";
 import { AboutVisionMission } from "../components/AboutVisionMission";
 import { AboutValues } from "../components/AboutValues";
 
@@ -12,6 +13,7 @@ export const AboutPage = () => {
             <AboutHero />
             <AboutStats />
             <AboutHistory />
+            <AboutTimeline />
             <AboutVisionMission />
             <AboutValues />
         </div>

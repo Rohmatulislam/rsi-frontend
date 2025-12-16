@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield, FileText, Info } from "lucide-react";
 import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
 import { Badge } from "~/components/ui/badge";
 
@@ -34,6 +34,8 @@ export const AdminSidebar = () => {
         { href: "/admin/appointments", label: "Appointments", icon: Calendar, roles: ["ADMIN", "DOCTOR", "NURSE", "STAFF"] as UserRole[] },
         { href: "/admin/doctors", label: "Doctors", icon: Users, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/schedules", label: "Schedules", icon: Clock, roles: ["ADMIN", "DOCTOR"] as UserRole[] },
+        { href: "/admin/articles", label: "Articles", icon: FileText, roles: ["ADMIN"] as UserRole[] },
+        { href: "/admin/about", label: "About Page", icon: Info, roles: ["ADMIN"] as UserRole[] },
     ];
 
     // Filter menu items based on user role
@@ -78,8 +80,8 @@ export const AdminSidebar = () => {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                    ? "bg-primary text-white"
-                                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                ? "bg-primary text-white"
+                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                 }`}
                         >
                             <Icon className="w-5 h-5" />

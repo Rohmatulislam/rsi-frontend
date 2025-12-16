@@ -142,6 +142,12 @@ export const Navbar = () => {
               <DropdownMenuItem asChild>
                 <Link href="/lokasi">Peta Lokasi</Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/kontak">Hubungi Kami</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/faq">FAQ (Tanya Jawab)</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -219,6 +225,12 @@ export const Navbar = () => {
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/lokasi'; }}>
                 Peta Lokasi
+              </CommandItem>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/kontak'; }}>
+                Hubungi Kami
+              </CommandItem>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/faq'; }}>
+                FAQ (Tanya Jawab)
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -377,6 +389,12 @@ export const Navbar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
                     <Link href="/lokasi">Peta Lokasi</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/kontak">Hubungi Kami</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/faq">FAQ (Tanya Jawab)</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

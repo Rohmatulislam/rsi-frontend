@@ -2,10 +2,11 @@
 
 import { Card, CardContent } from "~/components/ui/card";
 import { Target, Award } from "lucide-react";
+import { useGetVision, useGetMission } from "../api/getAboutContent";
 
-const visi = "Menjadi Rumah Sakit Syariah Pilihan Utama Masyarakat dengan Pelayanan Profesional dan Islami di Nusa Tenggara Barat.";
+const defaultVision = "Menjadi Rumah Sakit Syariah Pilihan Utama Masyarakat dengan Pelayanan Profesional dan Islami di Nusa Tenggara Barat.";
 
-const misi = [
+const defaultMission = [
     "Menyelenggarakan pelayanan kesehatan yang paripurna, bermutu, dan terjangkau.",
     "Mewujudkan sumber daya manusia yang profesional, amanah, dan berkarakter Islami.",
     "Menyediakan sarana dan prasarana yang modern, nyaman, dan ramah lingkungan.",
@@ -14,6 +15,21 @@ const misi = [
 ];
 
 export const AboutVisionMission = () => {
+    const { data: visionData } = useGetVision();
+    const { data: missionData } = useGetMission();
+
+    const visi = visionData?.value || defaultVision;
+
+    // Parse mission JSON or use default
+    let misi = defaultMission;
+    if (missionData?.value) {
+        try {
+            misi = JSON.parse(missionData.value);
+        } catch {
+            misi = defaultMission;
+        }
+    }
+
     return (
         <section className="py-20 bg-white dark:bg-slate-900">
             <div className="container mx-auto px-4">
@@ -30,7 +46,7 @@ export const AboutVisionMission = () => {
                         <Card className="bg-slate-50 dark:bg-slate-950 border-none shadow-lg">
                             <CardContent className="p-8">
                                 <p className="text-xl font-medium text-slate-700 dark:text-slate-200 leading-relaxed italic">
-                                    "{visi}"
+                                    &quot;{visi}&quot;
                                 </p>
                             </CardContent>
                         </Card>

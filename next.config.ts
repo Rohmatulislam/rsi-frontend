@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
       {
+        protocol: "https",
+        hostname: "upload.wikimedia.org",
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '',

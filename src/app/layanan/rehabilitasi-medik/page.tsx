@@ -1,0 +1,11 @@
+import { Metadata } from "next";
+import { RehabilitasiMedikPage } from "./RehabilitasiMedikPage";
+
+export const metadata: Metadata = {
+    title: "Rehabilitasi Medik - RSI Siti Hajar Mataram",
+    description: "Layanan fisioterapi dan rehabilitasi medik untuk pemulihan fungsi tubuh. Ditangani oleh dokter spesialis dan fisioterapis profesional.",
+};
+
+export default function Page() {
+    return <RehabilitasiMedikPage />;
+}
