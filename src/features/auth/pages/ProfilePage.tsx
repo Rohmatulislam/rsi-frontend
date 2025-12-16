@@ -14,7 +14,11 @@ import {
     Shield,
     Stethoscope,
     Users,
-    Briefcase
+    Briefcase,
+    Edit,
+    Lock,
+    FileText,
+    UserPlus
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
@@ -146,6 +150,34 @@ const ProfilePage = () => {
                                     <CardTitle className="text-lg">Aksi Cepat</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
+                                    <Button variant="outline" className="w-full justify-start" asChild>
+                                        <Link href="/profil/edit">
+                                            <Edit className="h-4 w-4 mr-2" />
+                                            Edit Profil
+                                        </Link>
+                                    </Button>
+
+                                    <Button variant="outline" className="w-full justify-start" asChild>
+                                        <Link href="/profil/ubah-password">
+                                            <Lock className="h-4 w-4 mr-2" />
+                                            Ubah Password
+                                        </Link>
+                                    </Button>
+
+                                    <Button variant="outline" className="w-full justify-start" asChild>
+                                        <Link href="/profil/keluarga">
+                                            <UserPlus className="h-4 w-4 mr-2" />
+                                            Data Keluarga
+                                        </Link>
+                                    </Button>
+
+                                    <Button variant="outline" className="w-full justify-start" asChild>
+                                        <Link href="/profil/riwayat-kesehatan">
+                                            <FileText className="h-4 w-4 mr-2" />
+                                            Riwayat Kesehatan
+                                        </Link>
+                                    </Button>
+
                                     <Button variant="outline" className="w-full justify-start" asChild>
                                         <Link href="/riwayat-booking">
                                             <History className="h-4 w-4 mr-2" />
