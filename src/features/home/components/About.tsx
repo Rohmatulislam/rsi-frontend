@@ -4,37 +4,36 @@ import Image from "next/image";
 import Link from "next/link";
 import heroImage from "~/assets/baner.webp";
 import { Button } from "~/components/ui/button";
-import { 
-  Award, 
-  Users, 
-  Building2, 
-  Clock,
+import {
+  Award,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
-
-const StatCard = ({ 
-  icon: Icon, 
-  value, 
-  label 
-}: { 
-  icon: any; 
-  value: string; 
-  label: string;
-}) => {
-  return (
-    <div className="flex flex-col items-center gap-2 p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-border hover:shadow-lg transition-all duration-300">
-      <Icon className="h-8 w-8 text-primary mb-2" />
-      <h3 className="text-3xl md:text-4xl font-black text-primary">{value}</h3>
-      <p className="text-sm text-muted-foreground text-center">{label}</p>
-    </div>
-  );
-};
+import { useGetAboutContent } from "~/features/about/api/getAboutContent";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export const About = () => {
+  // Fetch dynamic content from API
+  const { data: descriptionData, isLoading: isLoadingDesc } = useGetAboutContent({
+    key: "description"
+  });
 
+  const { data: featuresData, isLoading: isLoadingFeatures } = useGetAboutContent({
+    key: "features"
+  });
 
-  const features = [
+  // Parse features from API (stored as comma/line separated string)
+  const features = featuresData?.value
+    ? featuresData.value.split(/[,\n]/).map(f => f.trim()).filter(f => f)
+    : [];
+
+  // Default description fallback
+  const description = descriptionData?.value ||
+    "RSI Siti Hajar Mataram adalah rumah sakit Islam yang berkomitmen memberikan pelayanan kesehatan terbaik dengan mengedepankan nilai-nilai Islami. Kami dilengkapi dengan fasilitas medis modern dan tenaga profesional yang siap melayani dengan sepenuh hati.";
+
+  // Default features fallback
+  const defaultFeatures = [
     "Tenaga medis profesional dan berpengalaman",
     "Peralatan medis modern dan canggih",
     "Pelayanan berbasis syariah",
@@ -43,9 +42,11 @@ export const About = () => {
     "Layanan ambulance 24 jam",
   ];
 
+  const displayFeatures = features.length > 0 ? features : defaultFeatures;
+
   return (
     <section className="w-full container mx-auto px-4 space-y-16 md:py-24">
-             <h2 className="text-3xl font-bold text-center">TENTANG KAMI</h2>
+      <h2 className="text-3xl font-bold text-center">TENTANG KAMI</h2>
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Image */}
@@ -53,17 +54,16 @@ export const About = () => {
             <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src={heroImage}
-                alt="Hero Image"
+                alt="RSI Siti Hajar Mataram"
                 fill
                 className="object-cover"
                 onError={(e) => {
-                  // Fallback to gradient if image not found
                   e.currentTarget.style.display = 'none';
                 }}
               />
-              {/* Gradient overlay as fallback */}
+              {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20" />
-              
+
               {/* Floating badge */}
               <div className="absolute bottom-6 left-6 bg-card/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-border">
                 <div className="flex items-center gap-3">
@@ -86,22 +86,39 @@ export const About = () => {
                 Rumah Sakit Islam <br />{" "}
                 <span className="text-primary">Siti Hajar Mataram</span>
               </h2>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                RSI Siti Hajar Mataram adalah rumah sakit Islam yang berkomitmen memberikan 
-                pelayanan kesehatan terbaik dengan mengedepankan nilai-nilai Islami. 
-                Kami dilengkapi dengan fasilitas medis modern dan tenaga profesional 
-                yang siap melayani dengan sepenuh hati.
-              </p>
+
+              {/* Description */}
+              {isLoadingDesc ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              ) : (
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                  {description}
+                </p>
+              )}
             </div>
 
             {/* Features List */}
             <div className="grid sm:grid-cols-2 gap-3">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-sm md:text-base">{feature}</p>
-                </div>
-              ))}
+              {isLoadingFeatures ? (
+                // Skeleton for features
+                [...Array(6)].map((_, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <Skeleton className="h-5 w-5 rounded-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                ))
+              ) : (
+                displayFeatures.map((feature, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <p className="text-sm md:text-base">{feature}</p>
+                  </div>
+                ))
+              )}
             </div>
 
             {/* CTA Button */}
@@ -115,8 +132,6 @@ export const About = () => {
             </div>
           </div>
         </div>
-
- 
       </div>
     </section>
   );
