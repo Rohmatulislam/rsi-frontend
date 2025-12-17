@@ -42,7 +42,7 @@ const FounderCard = ({ founder }: { founder: Founder }) => (
     <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-cyan-400/40 rounded-2xl blur-xl opacity-0 group-hover:opacity-60 transition-all duration-500 -z-10"></div>
         <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg group-hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
-            <div className="relative h-72 overflow-hidden">
+            <div className="relative w-full aspect-[2/3] overflow-hidden">
                 {founder.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -55,7 +55,7 @@ const FounderCard = ({ founder }: { founder: Founder }) => (
                         <User className="w-24 h-24 opacity-40" />
                     </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute top-3 left-3 z-20">
                     <Badge className="bg-primary text-primary-foreground border-none shadow-lg px-2.5 py-1 text-[10px] font-bold tracking-wider">
                         {founder.badge || "PENDIRI"}
