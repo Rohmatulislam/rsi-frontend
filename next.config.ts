@@ -15,10 +15,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'rfbsyhpuuptvfeumxnra.supabase.co',
-      },
-      {
-        protocol: 'https',
         hostname: 'images.unsplash.com',
       },
       {
@@ -30,6 +26,13 @@ const nextConfig: NextConfig = {
         hostname: 'localhost',
         port: '',
         pathname: '**',
+      },
+      {
+        // Backend server for uploaded doctor images
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '2000',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'http',
@@ -63,6 +66,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Webpack config for HMR issues on cross-network access
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // Use polling for file watching (more reliable on network shares)
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+    }
+    return config;
+  },
+  // Empty turbopack config to silence Next.js 16 warning
+  // (Turbopack is default in Next.js 16, but we need webpack config for HMR polling)
+  turbopack: {},
 };
 
 export default nextConfig;

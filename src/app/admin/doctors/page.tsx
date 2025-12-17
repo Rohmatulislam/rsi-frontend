@@ -44,8 +44,36 @@ export default function AdminDoctorsPage() {
     const handleSave = (data: CreateDoctorDto | UpdateDoctorDto, isEdit: boolean) => {
         if (isEdit) {
             // Update existing doctor
-            const updateData = { ...data } as UpdateDoctorDto;
-            updateDoctor({ id: currentDoctor!.id, data: updateData }, {
+            // Clean up the payload: remove empty strings and undefined values
+            const cleanedData: any = {};
+            Object.entries(data).forEach(([key, value]) => {
+                // Skip base64 imageUrl (should use separate upload endpoint)
+                if (key === "imageUrl" && typeof value === "string" && value.startsWith("data:image")) {
+                    console.log('⚠️ Skipping base64 imageUrl - use upload endpoint');
+                    return;
+                }
+
+                // Skip email if it contains invalid characters (double dots, etc.)
+                if (key === "email" && typeof value === "string" && value.includes("..")) {
+                    console.log('⚠️ Skipping invalid email format:', value);
+                    return;
+                }
+
+                // Skip empty strings (except for optional fields that can be empty)
+                if (value !== "" && value !== undefined && value !== null) {
+                    cleanedData[key] = value;
+                } else if (value === "" && (key === "phone" || key === "bio" || key === "education" ||
+                    key === "certifications" || key === "description" || key === "imageUrl" ||
+                    key === "department" || key === "specialtyImage_url" || key === "sip_number" ||
+                    key === "kd_dokter" || key === "slug")) {
+                    // Keep empty string for optional text fields
+                    cleanedData[key] = value;
+                }
+            });
+
+            console.log('🚀 Update Doctor Payload:', cleanedData);
+
+            updateDoctor({ id: currentDoctor!.id, data: cleanedData }, {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     setCurrentDoctor(null);
@@ -53,6 +81,7 @@ export default function AdminDoctorsPage() {
             });
         } else {
             // Create new doctor
+            console.log('🚀 Create Doctor Payload:', data);
             createDoctor(data as CreateDoctorDto, {
                 onSuccess: () => {
                     setIsModalOpen(false);

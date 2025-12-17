@@ -48,7 +48,7 @@ export default function EditArticlePage({ params }: { params: Promise<{ slug: st
         try {
             await updateArticle.mutateAsync({
                 slug: originalSlug,
-                ...formData
+                data: formData
             });
             router.push("/admin/articles");
         } catch (error) {

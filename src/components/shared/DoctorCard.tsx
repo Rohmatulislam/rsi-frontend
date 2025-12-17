@@ -1,5 +1,4 @@
 import { Clock, MapPin, Stethoscope, Star, User, Wallet } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -110,12 +109,15 @@ export const DoctorCard = ({ doctor, hideExecutiveBadge = false }: { doctor: Doc
           <div className="relative flex-shrink-0">
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-md">
               {doctor.imageUrl ? (
-                <Image
+                // Use native img tag to avoid Next.js private IP restriction for localhost
+                <img
                   src={doctor.imageUrl}
                   alt={doctor.name}
-                  width={64}
-                  height={64}
                   className="object-cover w-full h-full"
+                  onError={(e) => {
+                    // Fallback to placeholder on error
+                    (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(doctor.name);
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-700 dark:to-slate-800 text-slate-500 dark:text-slate-400">

@@ -232,56 +232,11 @@ export const ConfirmationStep = ({
         </div>
       )}
 
-      {/* Consent Section */}
-      <div className="space-y-4 p-4 border-2 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl mt-6">
-        <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">
-          Persetujuan <span className="text-red-500">*</span>
-        </h4>
-
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="consent-terms"
-              checked={formData.consentTerms}
-              onChange={(e) => setFormData({ ...formData, consentTerms: e.target.checked })}
-              className="mt-1 h-4 w-4 rounded border-gray-300"
-            />
-            <label htmlFor="consent-terms" className="text-sm text-yellow-900 dark:text-yellow-100">
-              Saya menyetujui Syarat & Ketentuan yang berlaku
-            </label>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="consent-privacy"
-              checked={formData.consentPrivacy}
-              onChange={(e) => setFormData({ ...formData, consentPrivacy: e.target.checked })}
-              className="mt-1 h-4 w-4 rounded border-gray-300"
-            />
-            <label htmlFor="consent-privacy" className="text-sm text-yellow-900 dark:text-yellow-100">
-              Saya menyetujui Kebijakan Privasi rumah sakit
-            </label>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="consent-fee"
-              checked={formData.consentFee}
-              onChange={(e) => setFormData({ ...formData, consentFee: e.target.checked })}
-              className="mt-1 h-4 w-4 rounded border-gray-300"
-            />
-            <label htmlFor="consent-fee" className="text-sm text-yellow-900 dark:text-yellow-100">
-              Saya bersedia membayar biaya konsultasi sebesar{' '}
-              <span className="font-bold">
-                Rp {doctor.consultation_fee?.toLocaleString('id-ID') || '0'}
-              </span>
-              {formData.paymentName?.toLowerCase().includes('bpjs') && ' (ditanggung BPJS)'}
-            </label>
-          </div>
-        </div>
+      {/* Info Note */}
+      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+        <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">
+          ℹ️ Silakan periksa kembali detail booking Anda sebelum melanjutkan
+        </p>
       </div>
     </div>
   );

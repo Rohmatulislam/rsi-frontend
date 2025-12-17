@@ -8,6 +8,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { DoctorDto } from "~/features/home/api/getDoctors";
 import { CreateDoctorDto, UpdateDoctorDto } from "../types/doctor";
 import { DoctorImageUploadField } from "./DoctorImageUploadField";
+import { useUploadDoctorImage } from "../api/uploadDoctorImage";
 
 interface DoctorModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const DoctorModal = ({
   isSaving
 }: DoctorModalProps) => {
   const isEdit = !!doctor;
+  const { mutateAsync: uploadImage, isPending: isUploading } = useUploadDoctorImage();
   const [formData, setFormData] = useState<CreateDoctorDto | UpdateDoctorDto>({
     name: "",
     email: "",
@@ -102,7 +104,7 @@ export const DoctorModal = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked :
-               type === 'number' ? (value === '' ? 0 : Number(value)) : value;
+      type === 'number' ? (value === '' ? 0 : Number(value)) : value;
 
     setFormData(prev => ({
       ...prev,
@@ -125,6 +127,19 @@ export const DoctorModal = ({
     }));
   };
 
+  const handleImageUpload = async (file: File): Promise<string | void> => {
+    if (!doctor?.id) return;
+
+    const result = await uploadImage({ id: doctor.id, file });
+    if (result.imageUrl) {
+      setFormData(prev => ({
+        ...prev,
+        imageUrl: result.imageUrl
+      }));
+      return result.imageUrl; // Return the new URL
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData, isEdit);
@@ -143,9 +158,12 @@ export const DoctorModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <DoctorImageUploadField
-                value={formData.imageUrl}
+                value={formData.imageUrl || ""}
                 onChange={handleImageUrlChange}
-                disabled={isSaving}
+                disabled={isSaving || isUploading}
+                entityId={doctor?.id}
+                onUpload={handleImageUpload}
+                isUploading={isUploading}
               />
             </div>
 

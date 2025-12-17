@@ -11,6 +11,16 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "~/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { CheckCircle2, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAppointmentForm } from "../../hooks/useAppointmentForm";
@@ -33,6 +43,7 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [shouldResetAfterClose, setShouldResetAfterClose] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
 
@@ -270,7 +281,7 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              {step === 4 ? (
+              {step === 5 ? (
                 <span className="text-green-600 flex items-center gap-2">
                   <CheckCircle2 className="h-6 w-6" /> Booking Berhasil
                 </span>
@@ -310,18 +321,123 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
                   Lanjut <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button onClick={() => {
-                  console.log('Sebelum submit - formData:', formData);
-                  handleSubmit();
-                }} disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee} className="w-1/2 sm:w-auto min-w-[140px]">
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  {loading ? "Memproses Booking..." : "Konfirmasi Booking"}
+                <Button
+                  onClick={() => setShowConfirm(true)}
+                  disabled={loading}
+                  className="w-1/2 sm:w-auto min-w-[140px]"
+                >
+                  Konfirmasi Booking
                 </Button>
               )}
             </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Confirmation Alert Dialog */}
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Booking</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Apakah Anda yakin data yang Anda masukkan sudah benar?</p>
+              <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg space-y-2 text-sm">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">Detail Booking:</p>
+                <p><span className="text-muted-foreground">Dokter:</span> {doctor.name}</p>
+                <p><span className="text-muted-foreground">Poliklinik:</span> {formData.poliName}</p>
+                <p><span className="text-muted-foreground">Tanggal:</span> {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                }) : '-'}</p>
+                <p><span className="text-muted-foreground">Waktu:</span> {formData.time}</p>
+              </div>
+              <p className="mt-4 text-yellow-600 dark:text-yellow-400 font-medium">
+                ⚠️ Data booking akan langsung diproses ke sistem SIMRS dan tidak dapat diubah.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Consent Checkboxes */}
+          <div className="space-y-3 p-4 border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
+            <h4 className="font-semibold text-yellow-900 dark:text-yellow-100 text-sm">
+              Persetujuan <span className="text-red-500">*</span>
+            </h4>
+
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="alert-consent-terms"
+                  checked={formData.consentTerms}
+                  onChange={(e) => setFormData({ ...formData, consentTerms: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="alert-consent-terms" className="text-sm text-yellow-900 dark:text-yellow-100">
+                  Saya menyetujui Syarat & Ketentuan yang berlaku
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="alert-consent-privacy"
+                  checked={formData.consentPrivacy}
+                  onChange={(e) => setFormData({ ...formData, consentPrivacy: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="alert-consent-privacy" className="text-sm text-yellow-900 dark:text-yellow-100">
+                  Saya menyetujui Kebijakan Privasi rumah sakit
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="alert-consent-fee"
+                  checked={formData.consentFee}
+                  onChange={(e) => setFormData({ ...formData, consentFee: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="alert-consent-fee" className="text-sm text-yellow-900 dark:text-yellow-100">
+                  Saya bersedia membayar biaya konsultasi sebesar{' '}
+                  <span className="font-bold">
+                    Rp {doctor.consultation_fee?.toLocaleString('id-ID') || '0'}
+                  </span>
+                  {formData.paymentName?.toLowerCase().includes('bpjs') && ' (ditanggung BPJS)'}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Periksa Kembali</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!formData.consentTerms || !formData.consentPrivacy || !formData.consentFee) {
+                  toast.error("Mohon centang semua persetujuan terlebih dahulu");
+                  return;
+                }
+                console.log('Sebelum submit - formData:', formData);
+                setShowConfirm(false);
+                handleSubmit();
+              }}
+              disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Memproses...
+                </>
+              ) : (
+                "Ya, Lanjutkan Booking"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
