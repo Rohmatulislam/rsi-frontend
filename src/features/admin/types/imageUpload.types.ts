@@ -44,6 +44,8 @@ export interface ImageUploadFieldProps {
     label?: string;
     /** Placeholder text for URL input */
     placeholder?: string;
+    /** Callback when a file is selected (before upload) */
+    onFileSelect?: (file: File | null) => void;
 }
 
 /** Validation result for image file */

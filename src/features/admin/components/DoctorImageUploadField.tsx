@@ -126,6 +126,7 @@ export const DoctorImageUploadField = ({
   entityId: doctorId,
   onUpload,
   isUploading = false,
+  onFileSelect,
   label = "Image",
   placeholder = "Or enter image URL...",
 }: ImageUploadFieldProps) => {
@@ -169,6 +170,7 @@ export const DoctorImageUploadField = ({
         error: null,
         uploadSuccess: false,
       }));
+      onFileSelect?.(file);
     } catch {
       setState(prev => ({ ...prev, error: "Gagal membaca file" }));
     }

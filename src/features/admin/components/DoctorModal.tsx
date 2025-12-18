@@ -1,5 +1,6 @@
 // features/admin/components/DoctorModal.tsx
-import { useState, useEffect } from "react";
+// features/admin/components/DoctorModal.tsx
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -49,6 +50,9 @@ export const DoctorModal = ({
     description: "",
     isActive: true,
   });
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isAutoUploading, setIsAutoUploading] = useState(false);
 
   useEffect(() => {
     if (isEdit && doctor) {
@@ -136,13 +140,35 @@ export const DoctorModal = ({
         ...prev,
         imageUrl: result.imageUrl
       }));
-      return result.imageUrl; // Return the new URL
+      setSelectedFile(null); // Clear pending file after successful manual upload
+      return result.imageUrl;
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData, isEdit);
+
+    let finalFormData = { ...formData };
+
+    // Auto-upload if there's a selected file and it's an edit mode
+    // (In create mode, we might need a different strategy if backend requires ID, 
+    // but usually images are uploaded after creation or as base64)
+    if (selectedFile && isEdit && doctor?.id) {
+      setIsAutoUploading(true);
+      try {
+        const result = await uploadImage({ id: doctor.id, file: selectedFile });
+        if (result.imageUrl) {
+          finalFormData.imageUrl = result.imageUrl;
+        }
+      } catch (error) {
+        console.error("Auto-upload failed:", error);
+        // We might want to show an alert or continue with old data
+      } finally {
+        setIsAutoUploading(false);
+      }
+    }
+
+    onSave(finalFormData, isEdit);
   };
 
   return (
@@ -163,7 +189,8 @@ export const DoctorModal = ({
                 disabled={isSaving || isUploading}
                 entityId={doctor?.id}
                 onUpload={handleImageUpload}
-                isUploading={isUploading}
+                isUploading={isUploading || isAutoUploading}
+                onFileSelect={setSelectedFile}
               />
             </div>
 
@@ -314,9 +341,9 @@ export const DoctorModal = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isUploading || isAutoUploading}
             >
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving || isAutoUploading ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>
