@@ -9,6 +9,10 @@ import Providers from "./providers";
 export const metadata: Metadata = {
   title: "RSI Siti Hajar Mataram",
   description: "Rumah Sakit Islam Siti Hajar Mataram - Pelayanan Kesehatan Islami",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 const plusJakartaSans = Plus_Jakarta_Sans({
