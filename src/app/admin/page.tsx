@@ -108,8 +108,8 @@ export default function AdminDashboardPage() {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900">Dashboard Analytics</h1>
-                <p className="text-slate-500 mt-1">Pantau performa dan statistik booking</p>
+                <h1 className="text-3xl font-bold text-foreground">Dashboard Analytics</h1>
+                <p className="text-muted-foreground mt-1">Pantau performa dan statistik booking</p>
             </div>
 
             {/* Stats Cards */}
@@ -204,9 +204,9 @@ export default function AdminDashboardPage() {
                                         return labels[value] || value;
                                     }}
                                 />
-                                <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} name="count" />
-                                <Line type="monotone" dataKey="completed" stroke="#22c55e" strokeWidth={2} name="completed" />
-                                <Line type="monotone" dataKey="cancelled" stroke="#ef4444" strokeWidth={2} name="cancelled" />
+                                <Line type="monotone" dataKey="count" stroke="var(--chart-4)" strokeWidth={2} name="count" />
+                                <Line type="monotone" dataKey="completed" stroke="var(--chart-1)" strokeWidth={2} name="completed" />
+                                <Line type="monotone" dataKey="cancelled" stroke="var(--chart-3)" strokeWidth={2} name="cancelled" />
                             </LineChart>
                         </ResponsiveContainer>
                     )}
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
                                 {topDoctors?.map((doctor, index) => (
                                     <div
                                         key={doctor.doctorId}
-                                        className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                                     >
                                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
                                             {index + 1}

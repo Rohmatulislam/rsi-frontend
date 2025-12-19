@@ -42,28 +42,29 @@ export const AdminSidebar = () => {
     const menuItems = allMenuItems.filter((item) => item.roles.includes(role));
 
     return (
-        <div className="w-64 bg-slate-900 min-h-screen text-white flex flex-col">
-            <div className="p-6 border-b border-slate-800">
+        <div className="w-64 bg-sidebar min-h-screen text-sidebar-foreground flex flex-col border-r border-sidebar-border shadow-sm">
+            <div className="p-6 border-b border-sidebar-border">
                 <h1 className="text-xl font-bold flex items-center gap-2">
-                    <span className="text-primary">RSI</span> Admin
+                    <span className="text-primary">RSI</span>
+                    <span className="text-sidebar-foreground">Admin</span>
                 </h1>
             </div>
 
             {/* User Info with Role Badge */}
-            <div className="p-4 border-b border-slate-800">
+            <div className="p-4 border-b border-sidebar-border">
                 <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center border border-sidebar-border shadow-sm">
                         {isAdmin ? (
-                            <Shield className="w-5 h-5 text-red-400" />
+                            <Shield className="w-5 h-5 text-destructive" />
                         ) : (
-                            <User className="w-5 h-5 text-slate-300" />
+                            <User className="w-5 h-5 text-sidebar-foreground/70" />
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-semibold truncate">
                             {user?.name || "User"}
                         </p>
-                        <Badge className={`${ROLE_COLORS[role]} text-white text-[10px] px-2 py-0`}>
+                        <Badge className={`${ROLE_COLORS[role]} text-white text-[10px] px-2 py-0 border-0 shadow-sm`}>
                             {ROLE_LABELS[role]}
                         </Badge>
                     </div>
@@ -79,26 +80,26 @@ export const AdminSidebar = () => {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                ? "bg-primary text-white"
-                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
+                                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md font-medium"
+                                : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                                 }`}
                         >
-                            <Icon className="w-5 h-5" />
+                            <Icon className={`w-5 h-5 ${isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/60"}`} />
                             <span>{item.label}</span>
                         </Link>
                     );
                 })}
             </nav>
 
-            <div className="p-4 border-t border-slate-800">
+            <div className="p-4 border-t border-sidebar-border">
                 <button
                     onClick={logout}
                     disabled={isLoading}
-                    className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-400 hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
                 >
                     <LogOut className="w-5 h-5" />
-                    <span>Logout</span>
+                    <span className="font-medium">Logout</span>
                 </button>
             </div>
         </div>
