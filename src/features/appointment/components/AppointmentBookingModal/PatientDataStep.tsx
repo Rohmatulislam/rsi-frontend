@@ -37,13 +37,14 @@ export const PatientDataStep = ({
     <div className="space-y-6">
       <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
         <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-          {doctor.imageUrl ? (
+          {doctor?.imageUrl ? (
             <Image
               src={doctor.imageUrl}
-              alt={doctor.name}
+              alt={doctor?.name || "Dokter"}
               width={48}
               height={48}
               className="object-cover w-full h-full"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
@@ -52,8 +53,8 @@ export const PatientDataStep = ({
           )}
         </div>
         <div>
-          <p className="font-bold text-slate-900 dark:text-white">{doctor.name}</p>
-          <p className="text-sm text-muted-foreground">{doctor.specialization || "Dokter"}</p>
+          <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter Umum"}</p>
+          <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
           {formData.poliName && (
             <p className="text-sm font-medium text-primary mt-1">→ {formData.poliName}</p>
           )}

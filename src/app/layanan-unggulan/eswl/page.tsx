@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { ESWLPage } from "./ESWLPage";
+import { ESWLPage } from "~/features/featured-services/pages/ESWLPage";
 
 export const metadata: Metadata = {
     title: "ESWL - RSI Siti Hajar Mataram",

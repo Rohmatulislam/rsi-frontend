@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { BedahMinimalInvasifPage } from "./BedahMinimalInvasifPage";
+import { BedahMinimalInvasifPage } from "~/features/featured-services/pages/BedahMinimalInvasifPage";
 
 export const metadata: Metadata = {
     title: "Bedah Minimal Invasif - RSI Siti Hajar Mataram",

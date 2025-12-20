@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { LaboratoriumPage } from "./LaboratoriumPage";
+import { LaboratoriumPage } from "~/features/lab/pages/LaboratoriumPage";
 
 export const metadata: Metadata = {
     title: "Laboratorium - RSI Siti Hajar Mataram",

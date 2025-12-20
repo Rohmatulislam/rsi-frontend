@@ -11,6 +11,7 @@ interface ServiceCardProps {
     href?: string;
     color?: "primary" | "accent" | "success" | "purple" | "rose" | "cyan";
     className?: string;
+    children?: React.ReactNode;
 }
 
 const colorClasses = {
@@ -29,6 +30,7 @@ export const ServiceCard = ({
     href,
     color = "primary",
     className,
+    children,
 }: ServiceCardProps) => {
     const CardContent = (
         <div
@@ -54,6 +56,7 @@ export const ServiceCard = ({
                     <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
             )}
+            {children && <div className="mt-6 pt-auto">{children}</div>}
         </div>
     );
 

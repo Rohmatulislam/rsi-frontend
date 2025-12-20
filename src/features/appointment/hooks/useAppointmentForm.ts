@@ -3,22 +3,29 @@ import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } f
 import { useCreateAppointment } from '../api/createAppointment';
 import { toast } from "sonner";
 
-export const useAppointmentForm = (doctor: any, userId?: string) => {
-  // Jika dokter hanya memiliki 1 poliklinik, kita langsung set dan lanjut ke langkah 2
-  const initialStep = (doctor.categories && doctor.categories.length === 1) ? 2 : 1;
+export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: { id: string, name: string }, initialPoliId?: string) => {
+  // Jika poli sudah ditentukan atau dokter hanya memiliki 1 poliklinik, langsung lanjut ke jadwal
+  const hasFixedPoli = initialPoliId || (doctor?.categories && doctor.categories.length === 1);
+  const initialStep = hasFixedPoli ? 2 : 1;
   const [step, setStep] = useState(initialStep);
   const [bookingCode, setBookingCode] = useState('');
-  // Jika hanya ada 1 poliklinik, kita langsung set
-  const initialPoli = (doctor.categories && doctor.categories.length === 1)
-    ? {
+
+  // Tentukan poli awal
+  let initialPoli = { poliId: '', poliName: '' };
+  if (initialPoliId) {
+    initialPoli = { poliId: initialPoliId, poliName: '' }; // Name will be filled by step or backend
+  } else if (doctor?.categories && doctor.categories.length === 1) {
+    initialPoli = {
       poliId: doctor.categories[0].id || doctor.categories[0].slug || "1",
       poliName: doctor.categories[0].name
-    }
-    : { poliId: '', poliName: '' };
+    };
+  }
 
   const [formData, setFormData] = useState<AppointmentFormData>({
     poliId: initialPoli.poliId,
     poliName: initialPoli.poliName,
+    serviceItemId: serviceItem?.id,
+    serviceItemName: serviceItem?.name,
     date: '',
     time: '',
     patientType: 'old',
@@ -130,10 +137,10 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
 
       // Check if doctor has schedule on this day
       const dayOfWeek = date.getDay();
-      const hasSchedule = doctor.schedules?.some((s: any) => s.dayOfWeek === dayOfWeek);
+      const hasSchedule = doctor?.schedules?.some((s: any) => s.dayOfWeek === dayOfWeek);
 
       if (hasSchedule) {
-        const schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+        const schedule = doctor?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
         const dateStr = date.toISOString().split('T')[0];
         const dayName = daysMap[dayOfWeek];
         const dateDisplay = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -150,14 +157,14 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
 
   // Generate available times for a selected date based on doctor's schedule
   const getAvailableTimesForDate = (selectedDate: string): string[] => {
-    if (!selectedDate || !doctor.schedules) return [];
+    if (!selectedDate || !doctor?.schedules) return [];
 
     // Find the doctor's schedule for this day of week
     const date = new Date(selectedDate);
     const dayOfWeek = date.getDay();
 
     // Get the schedule for this day
-    const schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+    const schedule = doctor?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
     if (!schedule) return [];
 
     // Extract start and end times
@@ -192,8 +199,8 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
 
   const resetForm = (currentDoctor: any = doctor) => {
     // Jika dokter hanya memiliki 1 poliklinik, kita langsung set dan lanjut ke langkah 2
-    const resetStep = (currentDoctor.categories && currentDoctor.categories.length === 1) ? 2 : 1;
-    const resetPoli = (currentDoctor.categories && currentDoctor.categories.length === 1)
+    const resetStep = (currentDoctor?.categories && currentDoctor.categories.length === 1) ? 2 : 1;
+    const resetPoli = (currentDoctor?.categories && currentDoctor.categories.length === 1)
       ? {
         poliId: currentDoctor.categories[0].id || currentDoctor.categories[0].slug || "1",
         poliName: currentDoctor.categories[0].name
@@ -246,7 +253,7 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
     }
 
     console.log('Data yang dikirim ke backend:', {
-      doctorId: doctor.id,
+      doctorId: doctor?.id,
       poliId: formData.poliId,
       poliName: formData.poliName,
       bookingDate: formData.date,
@@ -258,13 +265,15 @@ export const useAppointmentForm = (doctor: any, userId?: string) => {
 
     // Build payload based on patient type
     const payload: any = {
-      doctorId: doctor.id,
+      doctorId: doctor?.id || null,
       poliId: formData.poliId, // Include the selected poli
       bookingDate: formData.date,
       bookingTime: formData.time, // Include the selected time
       patientType: formData.patientType,
       paymentType: formData.paymentType,
       createdByUserId: userId || null, // Track user yang membuat booking
+      serviceItemId: formData.serviceItemId,
+      serviceItemName: formData.serviceItemName,
     };
 
     // Add fields based on patient type

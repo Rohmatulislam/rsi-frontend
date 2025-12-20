@@ -9,7 +9,12 @@ import {
   Activity,
   FlaskConical,
   ScanLine,
-  ArrowRight
+  ArrowRight,
+  BedDouble,
+  Heart,
+  Shield,
+  FileCheck,
+  Clock
 } from "lucide-react";
 
 const HeroImage = () => {
@@ -77,15 +82,48 @@ const ServiceCard = ({
   return CardContent;
 };
 
+import { useGetServices } from "~/features/services/api/getServices";
+
+const iconMap: Record<string, any> = {
+  Stethoscope,
+  Star,
+  Crown,
+  Activity,
+  FlaskConical,
+  ScanLine,
+  Bed: BedDouble,
+  Heart,
+  Shield,
+  FileCheck,
+  Clock,
+};
+
 export const HeroSection = () => {
-  const services = [
+  const { data: servicesData, isLoading } = useGetServices();
+
+  const defaultServices = [
     { icon: Stethoscope, title: "Cari Dokter", href: "/doctors", color: "primary" },
     { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
-    { icon: Crown, title: "Poli Executive", href: "/layanan-unggulan/executive", color: "purple" },
-    { icon: Activity, title: "Medical Check Up", href: "/layanan/mcu", color: "rose" },
-    { icon: FlaskConical, title: "Laboratorium", href: "/layanan/laboratorium", color: "cyan" },
-    { icon: ScanLine, title: "Radiologi", href: "/layanan/radiologi", color: "success" },
   ];
+
+  // Map dynamic services to card format
+  const dynamicServices = servicesData?.filter(s =>
+    s.isActive &&
+    s.slug !== 'rawat-inap' &&
+    s.slug !== 'rawat-jalan'
+  ).map(service => ({
+    icon: iconMap[service.icon || 'Activity'] || Activity,
+    title: service.name,
+    href: `/layanan/${service.slug}`,
+    // Simple color rotation or selection
+    color: service.slug === 'mcu' ? 'rose' :
+      service.slug === 'laboratorium' ? 'cyan' :
+        service.slug === 'radiologi' ? 'success' :
+          service.slug === 'poli-executive' ? 'accent' : 'primary'
+  })) || [];
+
+  // Combine default items with active dynamic services, limiting to top 6
+  const displayServices = [...defaultServices, ...dynamicServices].slice(0, 6);
 
   return (
     <section className="w-full min-h-screen relative flex items-center">
@@ -116,18 +154,23 @@ export const HeroSection = () => {
 
           {/* Service Cards - Below, Centered */}
           <div className="flex justify-center w-full">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl">
-              {services.map((service, index) => {
-                return (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl">
+              {isLoading ? (
+                // Skeleton loading simple boxes
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="animate-pulse bg-card/50 backdrop-blur-sm border border-border rounded-xl p-4 h-[140px] w-full" />
+                ))
+              ) : (
+                displayServices.map((service, index) => (
                   <ServiceCard
                     key={index}
                     icon={service.icon}
                     title={service.title}
-                    href={service.href || "/doctors"}
+                    href={service.href}
                     color={service.color}
                   />
-                );
-              })}
+                ))
+              )}
             </div>
           </div>
         </div>

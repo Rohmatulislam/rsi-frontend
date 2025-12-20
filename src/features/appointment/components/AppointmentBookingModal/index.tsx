@@ -33,13 +33,21 @@ import { useAuth } from "~/features/auth/hook/useAuth";
 import { LoginPromptModal } from "~/features/auth/components/LoginPromptModal";
 
 interface AppointmentModalProps {
-  doctor: any;
+  doctor?: any; // Now optional
+  serviceItem?: { id: string; name: string }; // Optional pre-selected package
+  initialPoliId?: string; // Optional pre-selected poli
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   trigger?: React.ReactNode;
 }
 
-export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: AppointmentModalProps) => {
+export const AppointmentBookingModal = ({
+  doctor,
+  serviceItem,
+  initialPoliId,
+  trigger,
+  onOpenChange
+}: AppointmentModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [shouldResetAfterClose, setShouldResetAfterClose] = useState(false);
@@ -63,7 +71,7 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
     resetForm,
     handleSubmit,
     loading
-  } = useAppointmentForm(doctor, user?.id);
+  } = useAppointmentForm(doctor, user?.id, serviceItem, initialPoliId);
 
   const handleNext = async () => {
     // Validation before moving to next step
@@ -214,10 +222,11 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
           bookingCode={bookingCode}
           appointmentDate={formData.date}
           appointmentTime={formData.time}
-          doctorName={doctor.name}
+          doctorName={doctor?.name || 'Dokter Umum'}
           poliName={formData.poliName}
           patientName={patientSearch.patientData?.nm_pasien || formData.fullName}
           noRM={patientSearch.patientData?.no_rkm_medis || formData.mrNumber}
+          serviceItemName={formData.serviceItemName}
           onClose={() => {
             // Use setTimeout to prevent update during render
             setTimeout(() => {
@@ -339,23 +348,25 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Booking</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2">
-              <p>Apakah Anda yakin data yang Anda masukkan sudah benar?</p>
-              <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg space-y-2 text-sm">
-                <p className="font-semibold text-slate-900 dark:text-slate-100">Detail Booking:</p>
-                <p><span className="text-muted-foreground">Dokter:</span> {doctor.name}</p>
-                <p><span className="text-muted-foreground">Poliklinik:</span> {formData.poliName}</p>
-                <p><span className="text-muted-foreground">Tanggal:</span> {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                }) : '-'}</p>
-                <p><span className="text-muted-foreground">Waktu:</span> {formData.time}</p>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>Apakah Anda yakin data yang Anda masukkan sudah benar?</p>
+                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg space-y-2 text-sm">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">Detail Booking:</p>
+                  <p><span className="text-muted-foreground">Dokter:</span> {doctor?.name || '-'}</p>
+                  <p><span className="text-muted-foreground">Poliklinik:</span> {formData.poliName}</p>
+                  <p><span className="text-muted-foreground">Tanggal:</span> {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  }) : '-'}</p>
+                  <p><span className="text-muted-foreground">Waktu:</span> {formData.time}</p>
+                </div>
+                <p className="mt-4 text-yellow-600 dark:text-yellow-400 font-medium">
+                  ⚠️ Data booking akan langsung diproses ke sistem SIMRS dan tidak dapat diubah.
+                </p>
               </div>
-              <p className="mt-4 text-yellow-600 dark:text-yellow-400 font-medium">
-                ⚠️ Data booking akan langsung diproses ke sistem SIMRS dan tidak dapat diubah.
-              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -403,7 +414,7 @@ export const AppointmentBookingModal = ({ doctor, trigger, onOpenChange }: Appoi
                 <label htmlFor="alert-consent-fee" className="text-sm text-yellow-900 dark:text-yellow-100">
                   Saya bersedia membayar biaya konsultasi sebesar{' '}
                   <span className="font-bold">
-                    Rp {doctor.consultation_fee?.toLocaleString('id-ID') || '0'}
+                    Rp {doctor?.consultation_fee?.toLocaleString('id-ID') || '0'}
                   </span>
                   {formData.paymentName?.toLowerCase().includes('bpjs') && ' (ditanggung BPJS)'}
                 </label>

@@ -3,31 +3,35 @@
 import { ServiceHero, ServiceSection, ServiceGrid, ServiceCard, ServiceCTA } from "~/features/services";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, Stethoscope, Activity, Heart, Shield, Star } from "lucide-react";
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 
-const poliklinikList = [
-    { name: "Poli Umum", description: "Pemeriksaan kesehatan umum dan konsultasi", color: "primary" as const },
-    { name: "Poli Anak", description: "Kesehatan anak dan tumbuh kembang", color: "cyan" as const },
-    { name: "Poli Kandungan", description: "Kesehatan ibu hamil dan reproduksi", color: "rose" as const },
-    { name: "Poli Penyakit Dalam", description: "Penyakit organ dalam dan metabolik", color: "accent" as const },
-    { name: "Poli Bedah", description: "Konsultasi dan tindakan bedah", color: "success" as const },
-    { name: "Poli Jantung", description: "Kesehatan jantung dan pembuluh darah", color: "rose" as const },
-    { name: "Poli Saraf", description: "Gangguan sistem saraf dan otak", color: "purple" as const },
-    { name: "Poli Mata", description: "Kesehatan mata dan penglihatan", color: "cyan" as const },
-    { name: "Poli THT", description: "Telinga, hidung, dan tenggorokan", color: "accent" as const },
-    { name: "Poli Kulit", description: "Kesehatan kulit dan kelamin", color: "primary" as const },
-    { name: "Poli Orthopedi", description: "Tulang dan persendian", color: "success" as const },
-    { name: "Poli Urologi", description: "Saluran kemih dan reproduksi pria", color: "purple" as const },
-];
+const iconMap: Record<string, any> = {
+    Stethoscope,
+    Activity,
+    Heart,
+    Shield,
+    Star
+};
 
 export const RawatJalanPage = () => {
+    const { data: service, isLoading } = useGetServiceBySlug({ slug: 'rawat-jalan' });
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen">
             <ServiceHero
                 badge="LAYANAN RAWAT JALAN"
-                title="Rawat Jalan"
-                highlightText="Berbagai Poliklinik Spesialis"
-                subtitle="Layanan pemeriksaan dan konsultasi dengan dokter spesialis dari berbagai bidang keahlian"
+                title={service?.title || service?.name || "Rawat Jalan"}
+                highlightText={service?.subtitle || "Berbagai Poliklinik Spesialis"}
+                subtitle={service?.description || "Layanan pemeriksaan dan konsultasi dengan dokter spesialis dari berbagai bidang keahlian"}
             />
 
             {/* Poliklinik Grid */}
@@ -36,14 +40,17 @@ export const RawatJalanPage = () => {
                 subtitle="Pilih poliklinik sesuai dengan kebutuhan kesehatan Anda"
             >
                 <ServiceGrid columns={4}>
-                    {poliklinikList.map((poli) => (
-                        <ServiceCard
-                            key={poli.name}
-                            title={poli.name}
-                            description={poli.description}
-                            color={poli.color}
-                        />
-                    ))}
+                    {(service?.items?.length ? service.items : []).filter(item => item.isActive).map((item, idx) => {
+                        const colors: ("primary" | "cyan" | "rose" | "accent" | "success" | "purple")[] = ["primary", "cyan", "rose", "accent", "success", "purple"];
+                        return (
+                            <ServiceCard
+                                key={item.id}
+                                title={item.name}
+                                description={item.description}
+                                color={colors[idx % colors.length]}
+                            />
+                        );
+                    })}
                 </ServiceGrid>
             </ServiceSection>
 

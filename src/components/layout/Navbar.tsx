@@ -35,6 +35,40 @@ import { Button } from "~/components/ui/button";
 import { useAuth } from "~/features/auth/hook/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
+// Mobile Navigation Helper Components
+const MobileNavSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="border-b border-border/50 pb-2">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors"
+      >
+        <span className="font-semibold text-sm">{title}</span>
+        <ChevronDown className={cn(
+          "h-4 w-4 opacity-50 transition-transform duration-200",
+          isExpanded && "rotate-180"
+        )} />
+      </button>
+      {isExpanded && (
+        <div className="pl-4 mt-1 space-y-0.5">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MobileNavLink = ({ href, onClick, children }: { href: string; onClick?: () => void; children: React.ReactNode }) => (
+  <Link
+    href={href}
+    onClick={onClick}
+    className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/30 rounded-lg transition-colors"
+  >
+    {children}
+  </Link>
+);
 
 
 export const Navbar = () => {
@@ -311,93 +345,41 @@ export const Navbar = () => {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+          <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col gap-4 mt-6">
+            <div className="flex flex-col gap-2 mt-6">
               {/* Mobile Navigation */}
 
-              {/* Layanan Kesehatan */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-                  <span className="font-semibold text-sm">Layanan Kesehatan</span>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-full">
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/rawat-inap">Rawat Inap</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/rawat-jalan">Rawat Jalan</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/farmasi">Farmasi 24 Jam</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/laboratorium">Laboratorium</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/radiologi">Radiologi</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/rehabilitasi-medik">Rehabilitasi Medik</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan/mcu">MCU (Medical Check Up)</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Layanan Kesehatan - Collapsible */}
+              <MobileNavSection title="Layanan Kesehatan">
+                <MobileNavLink href="/layanan/rawat-inap" onClick={() => setIsOpen(false)}>Rawat Inap</MobileNavLink>
+                <MobileNavLink href="/layanan/rawat-jalan" onClick={() => setIsOpen(false)}>Rawat Jalan</MobileNavLink>
+                <MobileNavLink href="/layanan/farmasi" onClick={() => setIsOpen(false)}>Farmasi 24 Jam</MobileNavLink>
+                <MobileNavLink href="/layanan/laboratorium" onClick={() => setIsOpen(false)}>Laboratorium</MobileNavLink>
+                <MobileNavLink href="/layanan/radiologi" onClick={() => setIsOpen(false)}>Radiologi</MobileNavLink>
+                <MobileNavLink href="/layanan/rehabilitasi-medik" onClick={() => setIsOpen(false)}>Rehabilitasi Medik</MobileNavLink>
+                <MobileNavLink href="/layanan/mcu" onClick={() => setIsOpen(false)}>MCU (Medical Check Up)</MobileNavLink>
+              </MobileNavSection>
 
-              {/* Layanan Unggulan */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-                  <span className="font-semibold text-sm">Layanan Unggulan</span>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-full">
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan-unggulan/bedah-minimal-invasif">Bedah Minimal Invasif</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan-unggulan/eswl">ESWL</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan-unggulan/persalinan-syari">Persalinan Syar'i</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/layanan-unggulan/executive">Layanan Executive</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Layanan Unggulan - Collapsible */}
+              <MobileNavSection title="Layanan Unggulan">
+                <MobileNavLink href="/layanan-unggulan/bedah-minimal-invasif" onClick={() => setIsOpen(false)}>Bedah Minimal Invasif</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/eswl" onClick={() => setIsOpen(false)}>ESWL</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/persalinan-syari" onClick={() => setIsOpen(false)}>Persalinan Syar'i</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/executive" onClick={() => setIsOpen(false)}>Layanan Executive</MobileNavLink>
+              </MobileNavSection>
 
-              {/* Pusat Informasi */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-                  <span className="font-semibold text-sm">Pusat Informasi</span>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-full">
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/tentang-kami">Tentang Kami</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/artikel">Artikel & Berita</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/igd">IGD</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/lokasi">Peta Lokasi</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/kontak">Hubungi Kami</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/faq">FAQ (Tanya Jawab)</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Pusat Informasi - Collapsible */}
+              <MobileNavSection title="Pusat Informasi">
+                <MobileNavLink href="/tentang-kami" onClick={() => setIsOpen(false)}>Tentang Kami</MobileNavLink>
+                <MobileNavLink href="/artikel" onClick={() => setIsOpen(false)}>Artikel & Berita</MobileNavLink>
+                <MobileNavLink href="/igd" onClick={() => setIsOpen(false)}>IGD</MobileNavLink>
+                <MobileNavLink href="/lokasi" onClick={() => setIsOpen(false)}>Peta Lokasi</MobileNavLink>
+                <MobileNavLink href="/kontak" onClick={() => setIsOpen(false)}>Hubungi Kami</MobileNavLink>
+                <MobileNavLink href="/faq" onClick={() => setIsOpen(false)}>FAQ (Tanya Jawab)</MobileNavLink>
+              </MobileNavSection>
 
               {/* Mobile Auth Buttons */}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t">

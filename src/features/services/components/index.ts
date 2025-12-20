@@ -3,4 +3,3 @@ export { ServiceGrid } from "./ServiceGrid";
 export { ServiceCard } from "./ServiceCard";
 export { ServiceSection } from "./ServiceSection";
 export { ServiceCTA } from "./ServiceCTA";
-export { ServicePoliDetail } from "./ServicePoliDetail";

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { RawatInapPage } from "./RawatInapPage";
+import { RawatInapPage } from "~/features/inpatient/pages/RawatInapPage";
 
 export const metadata: Metadata = {
     title: "Rawat Inap - RSI Siti Hajar Mataram",

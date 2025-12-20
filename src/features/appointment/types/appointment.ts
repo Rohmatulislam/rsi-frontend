@@ -25,6 +25,8 @@ export interface AppointmentFormData {
   bpjsRujukan: string;
   penanggungJawab: string;
   hubunganPenanggungJawab: string;
+  serviceItemId?: string;   // Untuk menyimpan ID paket (MCU/dll)
+  serviceItemName?: string; // Nama paket yang dipilih
 }
 
 export interface PatientData {
@@ -37,6 +39,11 @@ export interface PatientData {
   alamat: string;
   email: string;
   no_peserta?: string; // No. BPJS dari data pasien
+  nm_ibu?: string;
+  tmp_lahir?: string;
+  gol_darah?: string;
+  pekerjaan?: string;
+  pnd?: string;
 }
 
 export interface PatientSearchState {

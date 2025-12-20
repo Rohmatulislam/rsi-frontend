@@ -22,26 +22,30 @@ export const PoliSelectionStep = ({
   const { data: activePolis, isLoading, error } = useGetActivePoli();
 
   // Filter hanya poliklinik yang sesuai dengan dokter ini (berdasarkan kategori dokter)
-  const doctorCategoryNames = doctor.categories?.map((cat: any) => cat.name) || [];
-  const filteredPolis = activePolis?.filter((poli: any) =>
-    doctorCategoryNames.some((catName: string) =>
-      poli.nm_poli.toLowerCase().includes(catName.toLowerCase()) ||
-      catName.toLowerCase().includes(poli.nm_poli.toLowerCase())
-    )
-  ) || [];
+  const doctorCategoryNames = doctor?.categories?.map((cat: any) => cat.name) || [];
+  const filteredPolis = !doctor
+    ? activePolis
+    : activePolis?.filter((poli: any) =>
+      doctorCategoryNames.length === 0 ||
+      doctorCategoryNames.some((catName: string) =>
+        poli.nm_poli.toLowerCase().includes(catName.toLowerCase()) ||
+        catName.toLowerCase().includes(poli.nm_poli.toLowerCase())
+      )
+    ) || [];
 
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
           <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-            {doctor.imageUrl ? (
+            {doctor?.imageUrl ? (
               <Image
                 src={doctor.imageUrl}
-                alt={doctor.name}
+                alt={doctor?.name || "Dokter"}
                 width={48}
                 height={48}
                 className="object-cover w-full h-full"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
@@ -50,8 +54,8 @@ export const PoliSelectionStep = ({
             )}
           </div>
           <div>
-            <p className="font-bold text-slate-900 dark:text-white">{doctor.name}</p>
-            <p className="text-sm text-muted-foreground">{doctor.specialization || "Dokter"}</p>
+            <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter Umum"}</p>
+            <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
           </div>
         </div>
 
@@ -67,13 +71,14 @@ export const PoliSelectionStep = ({
       <div className="space-y-6">
         <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
           <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-            {doctor.imageUrl ? (
+            {doctor?.imageUrl ? (
               <Image
                 src={doctor.imageUrl}
-                alt={doctor.name}
+                alt={doctor?.name || "Dokter"}
                 width={48}
                 height={48}
                 className="object-cover w-full h-full"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
@@ -82,8 +87,8 @@ export const PoliSelectionStep = ({
             )}
           </div>
           <div>
-            <p className="font-bold text-slate-900 dark:text-white">{doctor.name}</p>
-            <p className="text-sm text-muted-foreground">{doctor.specialization || "Dokter"}</p>
+            <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter Umum"}</p>
+            <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
           </div>
         </div>
 
@@ -100,13 +105,14 @@ export const PoliSelectionStep = ({
     <div className="space-y-6">
       <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
         <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-          {doctor.imageUrl ? (
+          {doctor?.imageUrl ? (
             <Image
               src={doctor.imageUrl}
-              alt={doctor.name}
+              alt={doctor?.name || "Dokter"}
               width={48}
               height={48}
               className="object-cover w-full h-full"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
@@ -115,8 +121,8 @@ export const PoliSelectionStep = ({
           )}
         </div>
         <div>
-          <p className="font-bold text-slate-900 dark:text-white">{doctor.name}</p>
-          <p className="text-sm text-muted-foreground">{doctor.specialization || "Dokter"}</p>
+          <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter Umum"}</p>
+          <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
         </div>
       </div>
 
@@ -130,11 +136,10 @@ export const PoliSelectionStep = ({
               <button
                 key={poli.kd_poli}
                 type="button"
-                className={`text-[12px] uppercase font-bold tracking-wider px-3 py-2 rounded-md transition-all duration-200 ${
-                  formData.poliId === poli.kd_poli
-                    ? 'text-primary-foreground bg-primary border border-primary shadow-md'
-                    : 'text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary'
-                }`}
+                className={`text-[12px] uppercase font-bold tracking-wider px-3 py-2 rounded-md transition-all duration-200 ${formData.poliId === poli.kd_poli
+                  ? 'text-primary-foreground bg-primary border border-primary shadow-md'
+                  : 'text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary'
+                  }`}
                 onClick={() => {
                   console.log('Poli dipilih:', {
                     id: poli.kd_poli,
@@ -159,7 +164,7 @@ export const PoliSelectionStep = ({
             ))}
           </div>
 
-          {filteredPolis.length === 0 && (
+          {filteredPolis && filteredPolis.length === 0 && (
             <p className="text-sm text-red-600 dark:text-red-400">
               Tidak ada poliklinik aktif tersedia untuk dokter ini saat ini.
             </p>

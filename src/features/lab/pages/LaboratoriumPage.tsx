@@ -12,72 +12,55 @@ import {
     FileCheck
 } from "lucide-react";
 
-const labServices = [
-    {
-        icon: Droplets,
-        title: "Hematologi",
-        description: "Pemeriksaan darah lengkap, hemoglobin, trombosit, dan sel darah",
-        color: "rose" as const,
-    },
-    {
-        icon: TestTube,
-        title: "Kimia Klinik",
-        description: "Gula darah, profil lipid, fungsi hati, fungsi ginjal, elektrolit",
-        color: "cyan" as const,
-    },
-    {
-        icon: Microscope,
-        title: "Urinalisis",
-        description: "Pemeriksaan urine lengkap untuk deteksi berbagai kondisi",
-        color: "accent" as const,
-    },
-    {
-        icon: Syringe,
-        title: "Serologi & Imunologi",
-        description: "Tes hepatitis, HIV, TORCH, dan pemeriksaan antibodi",
-        color: "purple" as const,
-    },
-];
-
-const benefits = [
-    {
-        icon: Zap,
-        title: "Hasil Cepat",
-        description: "Sebagian besar hasil tersedia dalam 1-2 jam",
-    },
-    {
-        icon: ShieldCheck,
-        title: "Akurat & Terpercaya",
-        description: "Menggunakan peralatan modern dengan kalibrasi rutin",
-    },
-    {
-        icon: Clock,
-        title: "Jam Operasional Luas",
-        description: "Buka setiap hari dengan jam pelayanan yang fleksibel",
-    },
-    {
-        icon: FileCheck,
-        title: "Hasil Digital",
-        description: "Hasil dapat diakses secara online dan dicetak",
-    },
-];
-
-const preparations = [
-    "Puasa 10-12 jam untuk pemeriksaan gula darah puasa dan profil lipid",
-    "Hindari konsumsi vitamin C berlebihan 24 jam sebelum tes",
-    "Informasikan obat-obatan yang sedang dikonsumsi",
-    "Bawa surat pengantar dokter jika ada",
-    "Datang pagi hari untuk hasil yang optimal",
-];
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
+import { LabCatalog } from "../components/LabCatalog";
+import { CatalogPageSkeleton } from "~/components/shared/PageSkeletons";
 
 export const LaboratoriumPage = () => {
+    const { data: service, isLoading } = useGetServiceBySlug({ slug: 'laboratorium' });
+
+    if (isLoading) {
+        return <CatalogPageSkeleton />;
+    }
+
+    const benefits = [
+        {
+            icon: Zap,
+            title: "Hasil Cepat",
+            description: "Sebagian besar hasil tersedia dalam 1-2 jam",
+        },
+        {
+            icon: ShieldCheck,
+            title: "Akurat & Terpercaya",
+            description: "Menggunakan peralatan modern dengan kalibrasi rutin",
+        },
+        {
+            icon: Clock,
+            title: "Jam Operasional Luas",
+            description: "Buka setiap hari dengan jam pelayanan yang fleksibel",
+        },
+        {
+            icon: FileCheck,
+            title: "Hasil Digital",
+            description: "Hasil dapat diakses secara online dan dicetak",
+        },
+    ];
+
+    const preparations = [
+        "Puasa 10-12 jam untuk pemeriksaan gula darah puasa dan profil lipid",
+        "Hindari konsumsi vitamin C berlebihan 24 jam sebelum tes",
+        "Informasikan obat-obatan yang sedang dikonsumsi",
+        "Bawa surat pengantar dokter jika ada",
+        "Datang pagi hari untuk hasil yang optimal",
+    ];
+
     return (
         <div className="min-h-screen">
             <ServiceHero
                 badge="LAYANAN LABORATORIUM"
-                title="Laboratorium"
-                highlightText="Hasil Cepat & Akurat"
-                subtitle="Pemeriksaan laboratorium lengkap dengan teknologi modern dan hasil yang akurat"
+                title={service?.title || service?.name || "Laboratorium"}
+                highlightText={service?.subtitle || "Hasil Cepat & Akurat"}
+                subtitle={service?.description || "Pemeriksaan laboratorium lengkap dengan teknologi modern dan hasil yang akurat"}
             />
 
             {/* Benefits Section */}
@@ -102,23 +85,13 @@ export const LaboratoriumPage = () => {
             <section className="py-16 bg-muted/30">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-2xl md:text-3xl font-bold mb-3">Jenis Pemeriksaan</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold mb-3 font-outfit">Katalog Pemeriksaan</h2>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
-                            Berbagai jenis pemeriksaan laboratorium untuk kebutuhan diagnosis Anda
+                            Cari dan pilih jenis pemeriksaan laboratorium sesuai kebutuhan Anda. Anda dapat memilih lebih dari satu tes sekaligus.
                         </p>
                     </div>
 
-                    <ServiceGrid columns={4}>
-                        {labServices.map((service) => (
-                            <ServiceCard
-                                key={service.title}
-                                icon={service.icon}
-                                title={service.title}
-                                description={service.description}
-                                color={service.color}
-                            />
-                        ))}
-                    </ServiceGrid>
+                    <LabCatalog />
                 </div>
             </section>
 
@@ -165,7 +138,7 @@ export const LaboratoriumPage = () => {
                 subtitle="Hubungi kami untuk informasi lebih lanjut atau kunjungi langsung rumah sakit"
                 primaryAction={{
                     label: "Hubungi via WhatsApp",
-                    href: "https://wa.me/6281234567890?text=Halo, saya ingin bertanya tentang pemeriksaan laboratorium",
+                    href: `https://wa.me/6281234567890?text=Halo, saya ingin bertanya tentang pemeriksaan laboratorium di RSI Siti Hajar`,
                     icon: "whatsapp",
                 }}
                 secondaryAction={{

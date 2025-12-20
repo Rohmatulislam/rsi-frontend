@@ -28,9 +28,9 @@ const nextConfig: NextConfig = {
         pathname: '**',
       },
       {
-        // Backend server for uploaded doctor images
+        // Backend server for uploaded doctor images (local network)
         protocol: 'http',
-        hostname: 'localhost',
+        hostname: '192.168.10.159',
         port: '2000',
         pathname: '/uploads/**',
       },
@@ -49,6 +49,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: '192.168.10.0',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '192.168.10.159',
         port: '',
         pathname: '**',
       },

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { ExecutivePage } from "./ExecutivePage";
+import { PoliExecutivePage } from "~/features/executive/pages/PoliExecutivePage";
 
 export const metadata: Metadata = {
     title: "Layanan Executive - RSI Siti Hajar Mataram",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <ExecutivePage />;
+    return <PoliExecutivePage />;
 }

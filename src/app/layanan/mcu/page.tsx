@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { MCUPage } from "./MCUPage";
+import { MCUPage } from "~/features/mcu/pages/MCUPage";
 
 export const metadata: Metadata = {
     title: "Medical Check Up - RSI Siti Hajar Mataram",

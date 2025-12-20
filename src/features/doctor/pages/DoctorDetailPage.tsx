@@ -67,6 +67,7 @@ const DoctorDetailPage = () => {
                                             fill
                                             className="object-cover"
                                             priority
+                                            unoptimized
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400">

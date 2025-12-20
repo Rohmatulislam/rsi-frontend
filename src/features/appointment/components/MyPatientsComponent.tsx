@@ -351,6 +351,18 @@ export const MyPatientsComponent = () => {
                                                     </div>
                                                 </div>
 
+                                                {appointment.reason && (
+                                                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg">
+                                                        <div className="flex items-start gap-2">
+                                                            <Activity className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                                                            <div>
+                                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Pemeriksaan / Keluhan</p>
+                                                                <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{appointment.reason}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
                                                 {/* Date & Time Info */}
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                                                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">

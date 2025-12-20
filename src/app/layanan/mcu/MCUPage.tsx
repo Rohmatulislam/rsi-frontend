@@ -1,89 +1,58 @@
 "use client";
 
 import { ServiceHero, ServiceSection, ServiceGrid, ServiceCard, ServiceCTA } from "~/features/services";
-import { Check, Clock, FileCheck, Heart, Shield, Star } from "lucide-react";
+import { Loader2, Check, Clock, FileCheck, Heart, Shield, Star, Database } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
+import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
+import { Button } from "~/components/ui/button";
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
+import { useGetMcuPackages, McuBookingModal } from "~/features/mcu";
 
-const mcuPackages = [
-    {
-        name: "Paket Basic",
-        price: "Rp 350.000",
-        description: "Pemeriksaan dasar untuk kesehatan umum",
-        features: [
-            "Pemeriksaan Fisik Lengkap",
-            "Tekanan Darah",
-            "Gula Darah Puasa",
-            "Kolesterol Total",
-            "Urine Lengkap",
-        ],
-        color: "primary" as const,
-        popular: false,
-    },
-    {
-        name: "Paket Standard",
-        price: "Rp 750.000",
-        description: "Pemeriksaan menengah untuk deteksi lebih detail",
-        features: [
-            "Semua Paket Basic",
-            "Profil Lipid Lengkap",
-            "Fungsi Hati (SGOT/SGPT)",
-            "Fungsi Ginjal (Ureum/Kreatinin)",
-            "Asam Urat",
-            "EKG",
-            "Rontgen Dada",
-        ],
-        color: "accent" as const,
-        popular: true,
-    },
-    {
-        name: "Paket Executive",
-        price: "Rp 1.500.000",
-        description: "Pemeriksaan komprehensif untuk kesehatan optimal",
-        features: [
-            "Semua Paket Standard",
-            "USG Abdomen",
-            "Hepatitis B (HBsAg)",
-            "Tumor Marker (PSA/CA-125)",
-            "Treadmill Test",
-            "Konsultasi Dokter Spesialis",
-            "Laporan Kesehatan Komprehensif",
-        ],
-        color: "purple" as const,
-        popular: false,
-    },
-];
-
-const benefits = [
-    {
-        icon: Shield,
-        title: "Deteksi Dini",
-        description: "Menemukan masalah kesehatan sebelum menjadi serius",
-    },
-    {
-        icon: Heart,
-        title: "Kesehatan Optimal",
-        description: "Memastikan tubuh dalam kondisi terbaik",
-    },
-    {
-        icon: FileCheck,
-        title: "Rekam Medis",
-        description: "Dokumentasi kesehatan yang lengkap dan terorganisir",
-    },
-    {
-        icon: Clock,
-        title: "Hemat Waktu",
-        description: "Pemeriksaan lengkap dalam satu kunjungan",
-    },
-];
 
 export const MCUPage = () => {
+    const { data: service, isLoading: serviceLoading } = useGetServiceBySlug({ slug: 'mcu' });
+    const { data: khanzaPackages, isLoading: khanzaLoading } = useGetMcuPackages();
+
+    const isLoading = serviceLoading;
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    const benefits = [
+        {
+            icon: Shield,
+            title: "Deteksi Dini",
+            description: "Menemukan masalah kesehatan sebelum menjadi serius",
+        },
+        {
+            icon: Heart,
+            title: "Kesehatan Optimal",
+            description: "Memastikan tubuh dalam kondisi terbaik",
+        },
+        {
+            icon: FileCheck,
+            title: "Rekam Medis",
+            description: "Dokumentasi kesehatan yang lengkap dan terorganisir",
+        },
+        {
+            icon: Clock,
+            title: "Hemat Waktu",
+            description: "Pemeriksaan lengkap dalam satu kunjungan",
+        },
+    ];
+
     return (
         <div className="min-h-screen">
             <ServiceHero
                 badge="LAYANAN MCU"
-                title="Medical Check Up"
-                highlightText="Paket Lengkap & Terjangkau"
-                subtitle="Investasi terbaik untuk kesehatan Anda dengan pemeriksaan menyeluruh dan akurat"
+                title={service?.title || service?.name || "Medical Check Up"}
+                highlightText={service?.subtitle || "Paket Lengkap & Terjangkau"}
+                subtitle={service?.description || "Investasi terbaik untuk kesehatan Anda dengan pemeriksaan menyeluruh dan akurat"}
             />
 
             {/* Benefits Section */}
@@ -114,37 +83,116 @@ export const MCUPage = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        {mcuPackages.map((pkg) => (
-                            <div
-                                key={pkg.name}
-                                className={`relative bg-card border rounded-2xl p-6 transition-all duration-300 hover:shadow-xl ${pkg.popular ? "border-primary shadow-lg scale-105" : "border-border"
-                                    }`}
-                            >
-                                {pkg.popular && (
-                                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                                        <Star className="h-3 w-3 mr-1" />
-                                        Terpopuler
-                                    </Badge>
-                                )}
-                                <div className="text-center mb-6">
-                                    <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
-                                    <p className="text-3xl font-black text-primary mb-2">{pkg.price}</p>
-                                    <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                                </div>
-                                <ul className="space-y-3">
-                                    {pkg.features.map((feature) => (
-                                        <li key={feature} className="flex items-start gap-2 text-sm">
-                                            <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                            <span>{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Loading state for Khanza packages */}
+                    {khanzaLoading && (
+                        <div className="flex justify-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    )}
+
+                    {/* Khanza Packages - Primary source */}
+                    {!khanzaLoading && khanzaPackages && khanzaPackages.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                            {khanzaPackages.filter(pkg =>
+                                pkg.name.toLowerCase().includes('mcu') ||
+                                pkg.name.toLowerCase().includes('medical check')
+                            ).slice(0, 6).map((pkg, idx) => {
+                                const isPopular = idx === 1;
+
+                                return (
+                                    <div
+                                        key={pkg.id}
+                                        className={`relative bg-card border rounded-2xl p-6 transition-all duration-300 hover:shadow-xl ${isPopular ? "border-primary shadow-lg scale-105" : "border-border"
+                                            }`}
+                                    >
+                                        {isPopular && (
+                                            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                                                <Star className="h-3 w-3 mr-1" />
+                                                Terpopuler
+                                            </Badge>
+                                        )}
+                                        <div className="text-center mb-6">
+                                            <Badge variant="secondary" className="mb-2">
+                                                <Database className="h-3 w-3 mr-1" />
+                                                SIMRS
+                                            </Badge>
+                                            <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
+                                            <p className="text-3xl font-black text-primary mb-2">
+                                                {pkg.price ? `Rp ${pkg.price.toLocaleString('id-ID')}` : 'Hubungi Kami'}
+                                            </p>
+                                        </div>
+
+                                        <McuBookingModal
+                                            package={pkg}
+                                            trigger={
+                                                <Button
+                                                    className="w-full mt-auto"
+                                                    variant={isPopular ? "default" : "outline"}
+                                                >
+                                                    Booking Sekarang
+                                                </Button>
+                                            }
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+
+
+                    {/* Fallback to local service items if no Khanza packages */}
+                    {!khanzaLoading && (!khanzaPackages || khanzaPackages.length === 0) && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                            {service?.items?.filter(item => item.isActive).map((pkg, idx) => {
+                                const features = pkg.features ? pkg.features.split(',') : [];
+                                const isPopular = idx === 1;
+
+                                return (
+                                    <div
+                                        key={pkg.id}
+                                        className={`relative bg-card border rounded-2xl p-6 transition-all duration-300 hover:shadow-xl ${isPopular ? "border-primary shadow-lg scale-105" : "border-border"
+                                            }`}
+                                    >
+                                        {isPopular && (
+                                            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                                                <Star className="h-3 w-3 mr-1" />
+                                                Terpopuler
+                                            </Badge>
+                                        )}
+                                        <div className="text-center mb-6">
+                                            <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
+                                            <p className="text-3xl font-black text-primary mb-2">
+                                                {pkg.price ? `Rp ${pkg.price.toLocaleString('id-ID')}` : 'Hubungi Kami'}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">{pkg.description}</p>
+                                        </div>
+                                        <ul className="space-y-3 mb-8">
+                                            {features.map((feature, fIdx) => (
+                                                <li key={fIdx} className="flex items-start gap-2 text-sm">
+                                                    <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                                    <span>{feature.trim()}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <AppointmentBookingModal
+                                            serviceItem={{ id: pkg.id, name: pkg.name }}
+                                            initialPoliId="mcu"
+                                            trigger={
+                                                <Button className="w-full mt-auto" variant={isPopular ? "default" : "outline"}>
+                                                    Booking Sekarang
+                                                </Button>
+                                            }
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </section>
+
 
             {/* Operating Hours */}
             <ServiceSection title="Informasi Layanan">
@@ -167,7 +215,7 @@ export const MCUPage = () => {
                 subtitle="Hubungi kami untuk reservasi atau informasi lebih lanjut"
                 primaryAction={{
                     label: "Hubungi via WhatsApp",
-                    href: "https://wa.me/6281234567890?text=Halo, saya ingin reservasi Medical Check Up",
+                    href: `https://wa.me/6281234567890?text=Halo, saya ingin reservasi Medical Check Up di RSI Siti Hajar`,
                     icon: "whatsapp",
                 }}
                 secondaryAction={{

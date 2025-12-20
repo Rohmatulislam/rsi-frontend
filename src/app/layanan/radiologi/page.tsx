@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { RadiologiPage } from "./RadiologiPage";
+import { RadiologiPage } from "~/features/radiology/pages/RadiologiPage";
 
 export const metadata: Metadata = {
     title: "Radiologi - RSI Siti Hajar Mataram",

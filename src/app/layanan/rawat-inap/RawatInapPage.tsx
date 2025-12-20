@@ -137,15 +137,75 @@ const generalFacilities = [
     { icon: Users, title: "Keamanan", description: "Security & CCTV 24 Jam" },
 ];
 
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
+import { Loader2 } from "lucide-react";
+
+// Mapping building names to images
+const buildingImages: Record<string, StaticImageData> = {
+    "Gedung Mina": minaImg,
+    "Gedung Multazam": multazamImg,
+    "Gedung Zam-zam": zamzamImg,
+    "Gedung Arafah": arafahImg,
+    "Gedung Jabal Rahmah": jabalImg,
+};
+
+const getBuildingColor = (name: string) => {
+    if (name.includes("Mina")) return "bg-gradient-to-br from-blue-500 to-blue-600";
+    if (name.includes("Multazam")) return "bg-gradient-to-br from-teal-500 to-teal-600";
+    if (name.includes("Zam-zam")) return "bg-gradient-to-br from-indigo-500 to-indigo-600";
+    if (name.includes("Arafah")) return "bg-gradient-to-br from-amber-500 to-amber-600";
+    if (name.includes("Jabal")) return "bg-gradient-to-br from-rose-500 to-rose-600";
+    return "bg-gradient-to-br from-primary to-primary/80";
+};
+
 export const RawatInapPage = () => {
+    const { data: service, isLoading } = useGetServiceBySlug({ slug: 'rawat-inap' });
     const [step, setStep] = useState<"building" | "class" | "detail">("building");
     const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
     const [selectedClass, setSelectedClass] = useState<RoomClass | null>(null);
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    // Transform dynamic items into building grouped structure
+    const dynamicBuildings: Building[] = [];
+    const groupedItems: Record<string, RoomClass[]> = {};
+
+    service?.items?.filter(item => item.isActive).forEach(item => {
+        const cat = item.category || "Umum";
+        if (!groupedItems[cat]) {
+            groupedItems[cat] = [];
+        }
+        groupedItems[cat].push({
+            name: item.name,
+            description: item.description || "",
+            price: item.price ? `Rp ${item.price.toLocaleString('id-ID')} / malam` : "Hubungi Kami",
+            capacity: "Cek ketersediaan", // Fallback as capacity might not be in basic item DTO yet or needs mapping
+            facilities: item.features ? item.features.split(',').map(f => f.trim()) : []
+        });
+    });
+
+    Object.keys(groupedItems).forEach(buildingName => {
+        dynamicBuildings.push({
+            id: buildingName.toLowerCase().replace(/\s+/g, '-'),
+            name: buildingName,
+            description: `Fasilitas perawatan di ${buildingName}`,
+            color: getBuildingColor(buildingName),
+            image: buildingImages[buildingName] || minaImg,
+            classes: groupedItems[buildingName]
+        });
+    });
+
+    const displayBuildings = dynamicBuildings.length > 0 ? dynamicBuildings : buildings;
+
     const handleSelectBuilding = (building: Building) => {
         setSelectedBuilding(building);
         setStep("class");
-        // Scroll to top
         window.scrollTo({ top: 300, behavior: "smooth" });
     };
 
@@ -167,9 +227,9 @@ export const RawatInapPage = () => {
         <div className="min-h-screen">
             <ServiceHero
                 badge="LAYANAN RAWAT INAP"
-                title="Fasilitas Rawat Inap"
-                highlightText="Kenyamanan Seperti di Rumah"
-                subtitle="Berbagai pilihan akomodasi rawat inap mulai dari kelas 3 hingga VVIP suite"
+                title={service?.title || service?.name || "Fasilitas Rawat Inap"}
+                highlightText={service?.subtitle || "Kenyamanan Seperti di Rumah"}
+                subtitle={service?.description || "Berbagai pilihan akomodasi rawat inap mulai dari kelas 3 hingga VVIP suite"}
             />
 
             <section className="py-8 container mx-auto px-4">
@@ -191,10 +251,10 @@ export const RawatInapPage = () => {
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="text-center mb-10">
                             <h2 className="text-3xl font-bold mb-3">Pilih Gedung Perawatan</h2>
-                            <p className="text-muted-foreground">Kami memiliki 5 gedung perawatan dengan karakteristik berbeda</p>
+                            <p className="text-muted-foreground">Kami memiliki berbagai gedung perawatan dengan karakteristik berbeda</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {buildings.map((building) => (
+                            {displayBuildings.map((building) => (
                                 <div
                                     key={building.id}
                                     onClick={() => handleSelectBuilding(building)}
@@ -208,9 +268,6 @@ export const RawatInapPage = () => {
                                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                        <div className="absolute bottom-4 left-4 text-white p-2">
-                                            {/* Icon removed to leave view clear, or we can keep it small */}
-                                        </div>
                                     </div>
                                     <div className="p-6">
                                         <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{building.name}</h3>

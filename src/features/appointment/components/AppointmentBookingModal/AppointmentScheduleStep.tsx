@@ -34,13 +34,14 @@ export const AppointmentScheduleStep = ({
     <div className="space-y-6">
       <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl border border-border">
         <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-          {doctor.imageUrl ? (
+          {doctor?.imageUrl ? (
             <Image
               src={doctor.imageUrl}
-              alt={doctor.name}
+              alt={doctor?.name || "Dokter"}
               width={48}
               height={48}
               className="object-cover w-full h-full"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-bold">
@@ -105,8 +106,8 @@ export const AppointmentScheduleStep = ({
                   key={index}
                   type="button"
                   className={`p-3 rounded-xl border-2 text-center transition-all ${formData.time === time
-                      ? 'border-primary bg-primary/10 text-primary font-medium'
-                      : 'border-border hover:border-primary hover:bg-primary/5'
+                    ? 'border-primary bg-primary/10 text-primary font-medium'
+                    : 'border-border hover:border-primary hover:bg-primary/5'
                     }`}
                   onClick={() => setFormData({ ...formData, time })}
                 >

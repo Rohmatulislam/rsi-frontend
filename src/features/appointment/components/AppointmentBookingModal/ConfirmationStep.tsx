@@ -27,13 +27,14 @@ export const ConfirmationStep = ({
       <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800 space-y-4">
         <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
           <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-            {doctor.imageUrl ? (
+            {doctor?.imageUrl ? (
               <Image
                 src={doctor.imageUrl}
-                alt={doctor.name}
+                alt={doctor?.name || "Dokter"}
                 width={48}
                 height={48}
                 className="object-cover w-full h-full"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
@@ -42,8 +43,8 @@ export const ConfirmationStep = ({
             )}
           </div>
           <div>
-            <p className="font-bold">{doctor.name}</p>
-            <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
+            <p className="font-bold">{doctor?.name || "Dokter Umum"}</p>
+            <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
             {formData.poliName && (
               <p className="text-sm font-medium text-primary mt-1">→ {formData.poliName}</p>
             )}
@@ -69,6 +70,12 @@ export const ConfirmationStep = ({
             <p className="text-muted-foreground mb-1">Jenis Pembayaran</p>
             <p className="font-semibold uppercase">{formData.paymentName || formData.paymentType}</p>
           </div>
+          {formData.serviceItemName && (
+            <div className="col-span-2">
+              <p className="text-muted-foreground mb-1">Pemeriksaan / Layanan</p>
+              <p className="font-semibold text-primary">{formData.serviceItemName}</p>
+            </div>
+          )}
           <div className="col-span-2">
             <p className="text-muted-foreground mb-1">Keluhan Utama</p>
             <p className="font-medium italic">"{formData.keluhan}"</p>

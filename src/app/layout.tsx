@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Navbar } from "~/components/layout/Navbar";
 import { Footer } from "~/components/layout/Footer";
+import { MobileBottomNav } from "~/components/shared/MobileBottomNav";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Providers from "./providers";
@@ -35,6 +36,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <MobileBottomNav />
           <Toaster />
         </body>
       </Providers>

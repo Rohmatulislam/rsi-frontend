@@ -15,6 +15,7 @@ interface SuccessStepProps {
   poliName?: string;
   patientName?: string;
   noRM?: string;
+  serviceItemName?: string;
   onClose?: () => void; // Optional callback to close modal
 }
 
@@ -26,6 +27,7 @@ export const SuccessStep = ({
   poliName,
   patientName,
   noRM,
+  serviceItemName,
   onClose
 }: SuccessStepProps) => {
   const [countdown, setCountdown] = useState(30); // Countdown from 30 seconds
@@ -41,6 +43,7 @@ export const SuccessStep = ({
     poli: poliName,
     patient: patientName,
     rm: noRM,
+    service: serviceItemName,
     hospital: "RSI Hospital"
   });
 
@@ -196,6 +199,18 @@ export const SuccessStep = ({
               <div className="flex-1 text-left">
                 <p className="text-xs text-muted-foreground">Poliklinik</p>
                 <p className="font-medium">{poliName}</p>
+              </div>
+            </div>
+          )}
+
+          {serviceItemName && (
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-primary/20">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <ClipboardList className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-xs text-muted-foreground">Pemeriksaan / Layanan</p>
+                <p className="font-medium text-primary">{serviceItemName}</p>
               </div>
             </div>
           )}

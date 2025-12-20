@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { LayananUnggulanIndexPage } from "./LayananUnggulanIndexPage";
+import { LayananUnggulanIndexPage } from "~/features/featured-services/pages/LayananUnggulanIndexPage";
 
 export const metadata: Metadata = {
     title: "Layanan Unggulan - RSI Siti Hajar Mataram",

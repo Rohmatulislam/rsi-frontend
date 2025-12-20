@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { PersalinanSyariPage } from "./PersalinanSyariPage";
+import { PersalinanSyariPage } from "~/features/featured-services/pages/PersalinanSyariPage";
 
 export const metadata: Metadata = {
     title: "Persalinan Syar'i - RSI Siti Hajar Mataram",

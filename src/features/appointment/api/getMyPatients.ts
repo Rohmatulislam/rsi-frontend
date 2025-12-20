@@ -12,6 +12,7 @@ export interface MyPatient {
         id: string;
         appointmentDate: string;
         status: string;
+        reason: string;
         doctor: {
             name: string;
             specialization: string;
