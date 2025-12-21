@@ -22,6 +22,7 @@ import { PharmacyHistory } from "../components/PharmacyHistory";
 import { PharmacyInfo } from "../components/PharmacyInfo";
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { PharmacyPageSkeleton } from "~/components/shared/PageSkeletons";
+import { MedicineSearch } from "../components/MedicineSearch";
 
 const farmasiServices: ServiceDetail[] = [
     {
@@ -139,6 +140,11 @@ export const FarmasiPage = () => {
                 steps={steps}
                 onOpenModal={() => setIsPrescriptionModalOpen(true)}
             />
+
+            {/* Medicine Stock Search */}
+            <div className="container mx-auto px-4 mb-20">
+                <MedicineSearch />
+            </div>
 
             {/* Main Content Area */}
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-12">
