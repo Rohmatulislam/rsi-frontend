@@ -12,9 +12,11 @@ export const axiosInstance = axios.create({
 // Interceptor untuk menyertakan token otentikasi jika ada
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem(LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
