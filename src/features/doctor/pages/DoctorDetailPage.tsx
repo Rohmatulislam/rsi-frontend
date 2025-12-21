@@ -11,6 +11,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { formatCurrency } from "~/lib/utils";
 import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
 import { DoctorScheduleByPoli } from "~/components/shared/DoctorScheduleByPoli";
+import { Breadcrumb } from "~/components/shared/Breadcrumb";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -41,14 +42,14 @@ const DoctorDetailPage = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950/30 pt-24 pb-20">
             <div className="container mx-auto px-4 md:px-6 max-w-6xl">
 
-                {/* Breadcrumb / Back Navigation */}
+                {/* Breadcrumb Navigation */}
                 <div className="mb-8">
-                    <Button variant="ghost" className="pl-0 hover:bg-transparent hover:text-primary transition-colors" asChild>
-                        <Link href="/doctors" className="flex items-center gap-2 text-muted-foreground">
-                            <ArrowLeft className="h-4 w-4" />
-                            Kembali ke Daftar Dokter
-                        </Link>
-                    </Button>
+                    <Breadcrumb
+                        items={[
+                            { label: "Dokter", href: "/doctors" },
+                            { label: doctor.name }
+                        ]}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">

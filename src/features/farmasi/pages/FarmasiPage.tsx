@@ -12,6 +12,7 @@ import { PrescriptionSubmissionModal } from "../components/PrescriptionSubmissio
 import { ServiceDetailModal } from "../components/ServiceDetailModal";
 import { ServiceDetail } from "../services/farmasiService";
 import { authClient } from "~/lib/auth-client";
+import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 
 // Modularized Components
 import { PharmacyWorkflow } from "../components/PharmacyWorkflow";
@@ -112,6 +113,13 @@ export const FarmasiPage = () => {
 
     return (
         <div className="min-h-screen pb-20">
+            <BreadcrumbContainer
+                items={[
+                    { label: "Layanan", href: "/layanan" },
+                    { label: "Farmasi" }
+                ]}
+                className="bg-muted/30 border-b"
+            />
             <ServiceHero
                 badge="Layanan Farmasi Modern"
                 title="Antrean Farmasi"

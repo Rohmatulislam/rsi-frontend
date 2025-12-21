@@ -7,6 +7,7 @@ import { AppointmentBookingModal } from "~/features/appointment/components/Appoi
 import { Button } from "~/components/ui/button";
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { useGetMcuPackages, McuBookingModal } from "~/features/mcu";
+import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 
 
 export const MCUPage = () => {
@@ -48,6 +49,13 @@ export const MCUPage = () => {
 
     return (
         <div className="min-h-screen">
+            <BreadcrumbContainer
+                items={[
+                    { label: "Layanan", href: "/layanan" },
+                    { label: "Medical Check Up" }
+                ]}
+                className="bg-muted/30 border-b"
+            />
             <ServiceHero
                 badge="LAYANAN MCU"
                 title={service?.title || service?.name || "Medical Check Up"}

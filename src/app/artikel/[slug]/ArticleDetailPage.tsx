@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Skeleton } from "~/components/ui/skeleton";
 import { getImageSrc } from "~/lib/utils";
 import { useState } from "react";
+import { Breadcrumb } from "~/components/shared/Breadcrumb";
 
 interface ArticleDetailPageProps {
     slug: string;
@@ -55,11 +56,14 @@ export const ArticleDetailPage = ({ slug }: ArticleDetailPageProps) => {
             {/* Header */}
             <div className="bg-muted/30 py-12 border-b">
                 <div className="container mx-auto px-4 max-w-4xl">
-                    <Button variant="ghost" className="mb-8 pl-0 hover:pl-0 hover:bg-transparent" asChild>
-                        <Link href="/artikel" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-                            <ArrowLeft className="h-4 w-4" /> Kembali ke Artikel
-                        </Link>
-                    </Button>
+                    <div className="mb-4">
+                        <Breadcrumb
+                            items={[
+                                { label: "Artikel", href: "/artikel" },
+                                { label: article.title }
+                            ]}
+                        />
+                    </div>
 
                     <div className="flex flex-wrap items-center gap-4 mb-6">
                         <Badge variant="secondary" className="text-sm px-3 py-1">

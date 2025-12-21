@@ -15,6 +15,7 @@ import {
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { RadioCatalog } from "../components/RadioCatalog";
 import { CatalogPageSkeleton } from "~/components/shared/PageSkeletons";
+import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 
 export const RadiologiPage = () => {
     const [selectedTestIds, setSelectedTestIds] = useState<string[]>([]);
@@ -57,6 +58,13 @@ export const RadiologiPage = () => {
 
     return (
         <div className="min-h-screen">
+            <BreadcrumbContainer
+                items={[
+                    { label: "Layanan", href: "/layanan" },
+                    { label: "Radiologi" }
+                ]}
+                className="bg-muted/30 border-b"
+            />
             <ServiceHero
                 badge="LAYANAN RADIOLOGI"
                 title={service?.title || service?.name || "Radiologi"}

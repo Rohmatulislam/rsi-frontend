@@ -139,6 +139,7 @@ const generalFacilities = [
 
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { Loader2 } from "lucide-react";
+import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 
 // Mapping building names to images
 const buildingImages: Record<string, StaticImageData> = {
@@ -225,6 +226,13 @@ export const RawatInapPage = () => {
 
     return (
         <div className="min-h-screen">
+            <BreadcrumbContainer
+                items={[
+                    { label: "Layanan", href: "/layanan" },
+                    { label: "Rawat Inap" }
+                ]}
+                className="bg-muted/30 border-b"
+            />
             <ServiceHero
                 badge="LAYANAN RAWAT INAP"
                 title={service?.title || service?.name || "Fasilitas Rawat Inap"}

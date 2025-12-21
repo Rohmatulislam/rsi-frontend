@@ -15,6 +15,7 @@ import {
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { LabCatalog } from "../components/LabCatalog";
 import { CatalogPageSkeleton } from "~/components/shared/PageSkeletons";
+import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 
 export const LaboratoriumPage = () => {
     const { data: service, isLoading } = useGetServiceBySlug({ slug: 'laboratorium' });
@@ -56,6 +57,13 @@ export const LaboratoriumPage = () => {
 
     return (
         <div className="min-h-screen">
+            <BreadcrumbContainer
+                items={[
+                    { label: "Layanan", href: "/layanan" },
+                    { label: "Laboratorium" }
+                ]}
+                className="bg-muted/30 border-b"
+            />
             <ServiceHero
                 badge="LAYANAN LABORATORIUM"
                 title={service?.title || service?.name || "Laboratorium"}
