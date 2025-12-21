@@ -140,6 +140,7 @@ const generalFacilities = [
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { Loader2 } from "lucide-react";
 import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
+import { InpatientPageSkeleton } from "~/components/shared/PageSkeletons";
 
 // Mapping building names to images
 const buildingImages: Record<string, StaticImageData> = {
@@ -166,11 +167,7 @@ export const RawatInapPage = () => {
     const [selectedClass, setSelectedClass] = useState<RoomClass | null>(null);
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <InpatientPageSkeleton />;
     }
 
     // Transform dynamic items into building grouped structure

@@ -12,6 +12,7 @@ import { formatCurrency } from "~/lib/utils";
 import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
 import { DoctorScheduleByPoli } from "~/components/shared/DoctorScheduleByPoli";
 import { Breadcrumb } from "~/components/shared/Breadcrumb";
+import { DoctorDetailSkeleton } from "~/components/shared/PageSkeletons";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -20,11 +21,7 @@ const DoctorDetailPage = () => {
     const { data: doctor, isLoading, error } = useGetDoctorBySlug({ slug });
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <DoctorDetailSkeleton />;
     }
 
     if (error || !doctor) {

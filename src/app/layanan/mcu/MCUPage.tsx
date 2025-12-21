@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 import { useGetMcuPackages, McuBookingModal } from "~/features/mcu";
 import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
+import { MCUPageSkeleton } from "~/components/shared/PageSkeletons";
 
 
 export const MCUPage = () => {
@@ -17,11 +18,7 @@ export const MCUPage = () => {
     const isLoading = serviceLoading;
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <MCUPageSkeleton />;
     }
 
     const benefits = [

@@ -1,15 +1,16 @@
 "use client";
 
-import { 
-    QueryClient, 
-    QueryClientProvider, 
-    isServer 
+import {
+    QueryClient,
+    QueryClientProvider,
+    isServer
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryConfig } from "~/lib/react-query";
+import { ThemeProvider } from "next-themes";
 
 
-function makeQueryClient(){
+function makeQueryClient() {
     return new QueryClient({
         defaultOptions: {
             ...queryConfig,
@@ -26,24 +27,31 @@ function makeQueryClient(){
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-function getQueryClient(){
+function getQueryClient() {
     if (isServer) {
         //server: always make a new query client
         return makeQueryClient();
-    }else{
-        if (!browserQueryClient){
+    } else {
+        if (!browserQueryClient) {
             browserQueryClient = makeQueryClient();
         }
         return browserQueryClient;
     }
 }
 
-export default function TanstackQueryProvider({children}: {children: React.ReactNode}){
-  const queryClient = getQueryClient();
+export default function TanstackQueryProvider({ children }: { children: React.ReactNode }) {
+    const queryClient = getQueryClient();
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  )
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                {children}
+            </ThemeProvider>
+        </QueryClientProvider>
+    )
 }

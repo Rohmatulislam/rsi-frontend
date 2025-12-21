@@ -20,6 +20,8 @@ import { PharmacyCatalog } from "../components/PharmacyCatalog";
 import { PharmacyTracking } from "../components/PharmacyTracking";
 import { PharmacyHistory } from "../components/PharmacyHistory";
 import { PharmacyInfo } from "../components/PharmacyInfo";
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
+import { PharmacyPageSkeleton } from "~/components/shared/PageSkeletons";
 
 const farmasiServices: ServiceDetail[] = [
     {
@@ -85,6 +87,7 @@ const steps = [
 ];
 
 export const FarmasiPage = () => {
+    const { data: service, isLoading: serviceLoading } = useGetServiceBySlug({ slug: 'farmasi' });
     const [searchQuery, setSearchQuery] = useState("");
     const [identifier, setIdentifier] = useState("");
     const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
@@ -110,6 +113,10 @@ export const FarmasiPage = () => {
         setSearchQuery(id);
         setIdentifier(id);
     };
+
+    if (serviceLoading) {
+        return <PharmacyPageSkeleton />;
+    }
 
     return (
         <div className="min-h-screen pb-20">

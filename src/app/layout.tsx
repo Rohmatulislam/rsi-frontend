@@ -28,9 +28,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <Providers>
-        <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
+        <Providers>
           <Navbar />
           <main className="min-h-screen">
             {children}
@@ -38,8 +38,8 @@ export default function RootLayout({
           <Footer />
           <MobileBottomNav />
           <Toaster />
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   );
 }

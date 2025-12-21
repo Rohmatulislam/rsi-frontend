@@ -20,13 +20,26 @@ export const ArticleDetailPage = ({ slug }: ArticleDetailPageProps) => {
 
     if (isLoading) {
         return (
-            <div className="container mx-auto px-4 py-12 max-w-4xl">
-                <Skeleton className="h-8 w-1/3 mb-8" />
-                <Skeleton className="h-[400px] w-full rounded-2xl mb-8" />
-                <div className="space-y-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
+            <div className="min-h-screen">
+                <div className="bg-muted/30 py-12 border-b">
+                    <div className="container mx-auto px-4 max-w-4xl">
+                        <Skeleton className="h-6 w-32 mb-8" />
+                        <div className="flex gap-4 mb-6">
+                            <Skeleton className="h-6 w-24 rounded-full" />
+                            <Skeleton className="h-6 w-32" />
+                        </div>
+                        <Skeleton className="h-12 w-full mb-4" />
+                        <Skeleton className="h-12 w-2/3" />
+                    </div>
+                </div>
+                <div className="container mx-auto px-4 max-w-4xl -mt-8">
+                    <Skeleton className="aspect-video w-full rounded-3xl mb-12 shadow-xl" />
+                    <div className="space-y-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-2/3" />
+                    </div>
                 </div>
             </div>
         );

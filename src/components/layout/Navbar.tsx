@@ -34,6 +34,7 @@ import { ChevronDown, LogIn, Menu, UserPlus, Search, ShoppingCart, User, LogOut,
 import { Button } from "~/components/ui/button";
 import { useAuth } from "~/features/auth/hook/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { ThemeToggle } from "~/components/shared/ThemeToggle";
 
 // Mobile Navigation Helper Components
 const MobileNavSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
@@ -197,10 +198,11 @@ export const Navbar = () => {
           <InputGroupInput placeholder="Cari Dokter" />
         </InputGroup> */}
 
-        {/* Mobile Search Button */}
         <Button size="icon" variant="ghost" className="lg:hidden" onClick={() => setSearchOpen(true)}>
           <Search className="h-5 w-5" />
         </Button>
+
+        <ThemeToggle />
 
         {/* Search Dialog */}
         <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
