@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
-import { CreateMcuBookingDto } from "../types";
+import { CreateMcuBookingDto } from "../services/mcuService";
 import { mcuKeys } from "./getMcuPackages";
 
 

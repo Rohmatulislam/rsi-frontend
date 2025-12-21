@@ -1,7 +1,7 @@
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
-import { LabGuarantor } from "../types";
+import { LabGuarantor } from "../services/labService";
 
 export const getLabGuarantors = async (): Promise<LabGuarantor[]> => {
     const response = await axiosInstance.get("/lab/guarantors");

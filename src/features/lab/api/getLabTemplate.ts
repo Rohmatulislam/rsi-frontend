@@ -1,7 +1,7 @@
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
-import { LabTemplateWithParent } from "../types";
+import { LabTemplateWithParent } from "../services/labService";
 
 export const getLabTemplate = async (id: number): Promise<LabTemplateWithParent> => {
     const response = await axiosInstance.get(`/lab/template/${id}`);

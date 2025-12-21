@@ -1,5 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
-import { AppointmentFormData, PatientSearchState } from "../../types/appointment";
+import { AppointmentFormData, PatientSearchState } from "../../services/appointmentService";
 import Image from "next/image";
 import { Stethoscope } from "lucide-react";
 

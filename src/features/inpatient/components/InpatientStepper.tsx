@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
-import { InpatientStep, Building, RoomClass } from "../types";
+import { InpatientStep, Building, RoomClass } from "../services/inpatientService";
 
 interface InpatientStepperProps {
     step: InpatientStep;

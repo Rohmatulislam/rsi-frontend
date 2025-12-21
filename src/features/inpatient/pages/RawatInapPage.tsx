@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ServiceHero, ServiceCTA } from "~/features/services";
 import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
-import { Building, RoomClass, InpatientStep, InpatientRoom } from "../types";
+import { Building, RoomClass, InpatientStep, InpatientRoom } from "../services/inpatientService";
 import { useGetBedAvailability } from "../api/getBedAvailability";
 import { useGetRooms } from "../api/getRooms";
 import { InpatientPageSkeleton } from "~/components/shared/PageSkeletons";

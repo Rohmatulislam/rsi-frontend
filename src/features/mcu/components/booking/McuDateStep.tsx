@@ -2,7 +2,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { format, addDays } from "date-fns";
-import { McuBookingFormData, MCU_TIME_SLOTS } from "../../types";
+import { McuBookingFormData, MCU_TIME_SLOTS } from "../../services/mcuService";
 
 interface McuDateStepProps {
     formData: McuBookingFormData;
@@ -44,8 +44,8 @@ export const McuDateStep = ({ formData, setFormData }: McuDateStepProps) => {
                             key={slot.id}
                             onClick={() => setFormData({ ...formData, timeSlot: slot.id })}
                             className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.timeSlot === slot.id
-                                    ? "border-primary bg-primary/5"
-                                    : "border-slate-200 hover:border-slate-300"
+                                ? "border-primary bg-primary/5"
+                                : "border-slate-200 hover:border-slate-300"
                                 }`}
                         >
                             <p className="font-medium text-sm">{slot.label}</p>

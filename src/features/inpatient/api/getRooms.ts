@@ -1,6 +1,6 @@
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { axiosInstance as axios } from "~/lib/axios";
-import { InpatientRoom } from "../types";
+import { InpatientRoom } from "../services/inpatientService";
 
 export const getRooms = async (): Promise<InpatientRoom[]> => {
     const response = await axios.get("/inpatient/rooms");

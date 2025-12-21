@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import { useRegisterForm } from "../hook/useRegisterForm";
-import { authClient } from "~/lib/auth-clent";
+import { authClient } from "~/lib/auth-client";
 
 export const RegisterForm = () => {
   const { data: session } = authClient.useSession();

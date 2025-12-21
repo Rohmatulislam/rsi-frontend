@@ -2,7 +2,7 @@ import React from "react";
 import { ArrowLeft, BedDouble } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { InpatientRoom, Building, RoomClass } from "../types";
+import { InpatientRoom, Building, RoomClass } from "../services/inpatientService";
 
 interface RoomGridProps {
     selectedBuilding: Building;

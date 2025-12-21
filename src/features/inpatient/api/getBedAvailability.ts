@@ -1,6 +1,6 @@
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { axiosInstance as axios } from "~/lib/axios";
-import { BedAvailability } from "../types";
+import { BedAvailability } from "../services/inpatientService";
 
 export const getBedAvailability = async (): Promise<BedAvailability[]> => {
     const response = await axios.get("/inpatient/bed-availability");

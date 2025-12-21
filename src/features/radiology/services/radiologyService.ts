@@ -1,3 +1,4 @@
+// Radiology types and interfaces
 export interface RadiologiTest {
     id: string;
     name: string;

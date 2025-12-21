@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
-import { ArticleDto } from "../types";
+import { ArticleDto } from "../services/articleService";
 
 export const getArticleBySlug = async (slug: string) => {
     const response = await axiosInstance.get<ArticleDto>(`/articles/${slug}`);

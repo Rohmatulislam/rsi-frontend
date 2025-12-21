@@ -1,5 +1,5 @@
 "use client";
-import { authClient } from "~/lib/auth-clent";
+import { authClient } from "~/lib/auth-client";
 import { RegisterForm } from "../components/RegisterForm";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";

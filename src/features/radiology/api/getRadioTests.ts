@@ -1,7 +1,7 @@
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
-import { RadiologiTest } from "../types";
+import { RadiologiTest } from "../services/radiologyService";
 
 export const getRadioTests = async (kd_pj?: string): Promise<RadiologiTest[]> => {
     const response = await axiosInstance.get("/radiologi/tests", {

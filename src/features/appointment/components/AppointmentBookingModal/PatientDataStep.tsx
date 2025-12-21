@@ -2,7 +2,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import { AppointmentFormData, PatientSearchState } from "../../types/appointment";
+import { AppointmentFormData, PatientSearchState } from "../../services/appointmentService";
 import Image from "next/image";
 import { Stethoscope } from "lucide-react";
 import { useGetPaymentMethods } from "~/features/doctor/api/getPaymentMethods";

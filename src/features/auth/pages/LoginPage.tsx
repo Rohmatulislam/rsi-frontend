@@ -1,12 +1,12 @@
 "use client";
-import { authClient } from "~/lib/auth-clent";
+import { authClient } from "~/lib/auth-client";
 import { LoginForm } from "../components/LoginForm";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { data: session, isPending} = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     if (session) {
@@ -20,7 +20,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center w-full">
-     <LoginForm />
+      <LoginForm />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { ServiceCTA } from "~/features/services";
-import { Building, RoomClass, InpatientRoom } from "../types";
+import { Building, RoomClass, InpatientRoom } from "../services/inpatientService";
 
 interface RoomDetailProps {
     selectedBuilding: Building;

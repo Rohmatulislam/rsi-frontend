@@ -1,6 +1,6 @@
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import { AppointmentFormData } from "~/features/appointment/types/appointment";
+import { AppointmentFormData } from "~/features/appointment/services/appointmentService";
 import { useGetActivePoli } from "~/features/doctor/api/getActivePoli";
 import Image from "next/image";
 import { Stethoscope } from "lucide-react";

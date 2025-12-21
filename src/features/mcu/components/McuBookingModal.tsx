@@ -15,9 +15,9 @@ import { CheckCircle2, Loader2, ArrowRight, ArrowLeft, Package } from "lucide-re
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { McuPackage, McuBookingFormData, MCU_TIME_SLOTS } from "../types";
+import { McuPackage, McuBookingFormData, MCU_TIME_SLOTS } from "../services/mcuService";
 import { McuDateStep, McuPatientStep, McuConfirmStep, McuSuccessStep } from "./booking";
-import { PatientSearchState, PatientData } from "../../appointment/types/appointment";
+import { PatientSearchState, PatientData } from "~/features/appointment/services/appointmentService";
 import { useCreateMcuBooking } from "../api";
 
 

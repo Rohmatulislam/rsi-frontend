@@ -1,7 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { McuBookingFormData, McuPackage } from "../../types";
+import { McuBookingFormData, McuPackage } from "../../services/mcuService";
 
 interface McuSuccessStepProps {
     formData: McuBookingFormData;

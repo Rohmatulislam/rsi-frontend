@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { RegisterFormSchema, registerFormSchema } from "../forms/register";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient, getErrorMessage } from "~/lib/auth-clent";
+import { authClient, getErrorMessage } from "~/lib/auth-client";
 import { toast } from "sonner";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
 

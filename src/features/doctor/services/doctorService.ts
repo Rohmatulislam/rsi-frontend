@@ -1,5 +1,5 @@
 // services/doctorService.ts
-import { AppointmentFormData } from "~/features/appointment/types/appointment";
+import { AppointmentFormData } from "~/features/appointment/services/appointmentService";
 
 export interface Doctor {
   id: string;

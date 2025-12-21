@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Building } from "../types";
+import { Building } from "../services/inpatientService";
 
 interface BuildingGridProps {
     buildings: Building[];

@@ -1,7 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
-import { AppointmentFormData, AvailableDate } from "../../types/appointment";
+import { AppointmentFormData, AvailableDate } from "../../services/appointmentService";
 import Image from "next/image";
 import { Stethoscope, Calendar, Clock } from "lucide-react";
 

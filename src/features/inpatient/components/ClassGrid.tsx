@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, CheckCircle2, Info } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Building, RoomClass } from "../types";
+import { Building, RoomClass } from "../services/inpatientService";
 
 interface ClassGridProps {
     selectedBuilding: Building;

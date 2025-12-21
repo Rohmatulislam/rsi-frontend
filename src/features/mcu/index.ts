@@ -11,5 +11,5 @@ export { useGetMcuPackages, getMcuPackages, mcuKeys } from "./api";
 export { McuBookingModal } from "./components";
 
 // Types
-export type { McuPackage, McuBookingFormData, CreateMcuBookingDto, McuTimeSlot } from "./types";
-export { MCU_TIME_SLOTS } from "./types";
+export type { McuPackage, McuBookingFormData, CreateMcuBookingDto, McuTimeSlot } from "./services/mcuService";
+export { MCU_TIME_SLOTS } from "./services/mcuService";

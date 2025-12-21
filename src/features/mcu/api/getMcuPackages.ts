@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
-import { McuPackage, McuPackagesResponse } from "../types";
+import { McuPackage, McuPackagesResponse } from "../services/mcuService";
 
 export type { McuPackage };
 

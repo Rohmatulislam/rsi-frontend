@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { McuBookingFormData, McuPackage, MCU_TIME_SLOTS } from "../../types";
+import { McuBookingFormData, McuPackage, MCU_TIME_SLOTS } from "../../services/mcuService";
 
 interface McuConfirmStepProps {
     formData: McuBookingFormData;

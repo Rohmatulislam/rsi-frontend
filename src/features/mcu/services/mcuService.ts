@@ -1,3 +1,57 @@
+// MCU types and interfaces
+export interface MCUPackage {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    duration: string;
+    category: string;
+    isActive: boolean;
+    items: MCUItem[];
+}
+
+export interface MCUItem {
+    id: string;
+    name: string;
+    description?: string;
+    category: string;
+}
+
+export interface MCUBooking {
+    id: string;
+    packageId: string;
+    packageName: string;
+    patientId: string;
+    patientName: string;
+    patientPhone: string;
+    patientEmail?: string;
+    bookingDate: string;
+    bookingTime: string;
+    status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+    totalPrice: number;
+    createdAt: string;
+}
+
+export interface MCUResult {
+    id: string;
+    bookingId: string;
+    patientId: string;
+    patientName: string;
+    packageName: string;
+    results: MCUItemResult[];
+    overallStatus: 'NORMAL' | 'ABNORMAL' | 'PENDING';
+    completedAt?: string;
+    verifiedAt?: string;
+}
+
+export interface MCUItemResult {
+    itemName: string;
+    result: string;
+    unit?: string;
+    normalRange?: string;
+    status: 'NORMAL' | 'ABNORMAL' | 'PENDING';
+}
+
 /**
  * MCU (Medical Check Up) Feature Types
  */
@@ -69,8 +123,6 @@ export interface CreateMcuBookingDto {
     penanggungJawab?: string;
     hubunganPenanggungJawab?: string;
 }
-
-
 
 // Time Slot Definition
 export interface McuTimeSlot {
