@@ -129,7 +129,7 @@ export default function BannersPage() {
                                 ref={provided.innerRef}
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                             >
-                                {displayBanners.map((banner, index) => (
+                                {displayBanners.map((banner: Banner, index: number) => (
                                     <Draggable key={banner.id} draggableId={banner.id} index={index}>
                                         {(provided, snapshot) => (
                                             <div
@@ -259,7 +259,7 @@ export default function BannersPage() {
             {/* Delete Confirmation Dialog */}
             <AlertDialog
                 open={!!deletingBanner}
-                onOpenChange={(open) => !open && setDeletingBanner(null)}
+                onOpenChange={(open: boolean) => !open && setDeletingBanner(null)}
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>

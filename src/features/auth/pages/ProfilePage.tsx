@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
 import { ProtectedRoute } from "~/features/auth/components/ProtectedRoute";
+import { LabTrends } from "~/features/profile/components/LabTrends";
 
 // Role display names in Indonesian
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -82,66 +83,70 @@ const ProfilePage = () => {
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-3">
-                        {/* Profile Card */}
-                        <Card className="md:col-span-2">
-                            <CardHeader>
-                                <CardTitle>Informasi Akun</CardTitle>
-                                <CardDescription>Detail akun Anda</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {/* Avatar & Name */}
-                                <div className="flex items-center gap-4">
-                                    <Avatar className="h-20 w-20">
-                                        <AvatarImage src={user?.image || undefined} alt={user?.name} />
-                                        <AvatarFallback className="bg-primary text-white text-2xl">
-                                            {user?.name?.charAt(0).toUpperCase() || "U"}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <h2 className="text-2xl font-bold">{user?.name || "User"}</h2>
-                                        <Badge className={`${ROLE_COLORS[role]} text-white mt-1`}>
-                                            <RoleIcon className="h-3 w-3 mr-1" />
-                                            {ROLE_LABELS[role]}
-                                        </Badge>
-                                    </div>
-                                </div>
-
-                                {/* Info Grid */}
-                                <div className="grid gap-4 pt-4 border-t">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Mail className="h-5 w-5 text-slate-600" />
-                                        </div>
+                        {/* Profile Card & Lab Trends */}
+                        <div className="md:col-span-2 space-y-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Informasi Akun</CardTitle>
+                                    <CardDescription>Detail akun Anda</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Avatar & Name */}
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-20 w-20">
+                                            <AvatarImage src={user?.image || undefined} alt={user?.name} />
+                                            <AvatarFallback className="bg-primary text-white text-2xl">
+                                                {user?.name?.charAt(0).toUpperCase() || "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">Email</p>
-                                            <p className="font-medium">{user?.email || "-"}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Calendar className="h-5 w-5 text-slate-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Bergabung sejak</p>
-                                            <p className="font-medium">{formattedDate}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Shield className="h-5 w-5 text-slate-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Status Email</p>
-                                            <Badge variant={user?.emailVerified ? "default" : "secondary"}>
-                                                {user?.emailVerified ? "Terverifikasi" : "Belum Terverifikasi"}
+                                            <h2 className="text-2xl font-bold">{user?.name || "User"}</h2>
+                                            <Badge className={`${ROLE_COLORS[role]} text-white mt-1`}>
+                                                <RoleIcon className="h-3 w-3 mr-1" />
+                                                {ROLE_LABELS[role]}
                                             </Badge>
                                         </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+
+                                    {/* Info Grid */}
+                                    <div className="grid gap-4 pt-4 border-t">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                                <Mail className="h-5 w-5 text-slate-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Email</p>
+                                                <p className="font-medium">{user?.email || "-"}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                                <Calendar className="h-5 w-5 text-slate-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Bergabung sejak</p>
+                                                <p className="font-medium">{formattedDate}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                                <Shield className="h-5 w-5 text-slate-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Status Email</p>
+                                                <Badge variant={user?.emailVerified ? "default" : "secondary"}>
+                                                    {user?.emailVerified ? "Terverifikasi" : "Belum Terverifikasi"}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {role === 'PATIENT' && <LabTrends />}
+                        </div>
 
                         {/* Quick Actions */}
                         <div className="space-y-4">

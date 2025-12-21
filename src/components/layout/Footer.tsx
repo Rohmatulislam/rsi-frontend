@@ -4,30 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube, Heart } from "lucide-react";
 import logo from "~/assets/logo.png";
-
-const quickLinks = [
-    { label: "Beranda", href: "/" },
-    { label: "Tentang Kami", href: "/tentang-kami" },
-    { label: "Daftar Dokter", href: "/doctors" },
-    { label: "Artikel Kesehatan", href: "/artikel" },
-    { label: "FAQ", href: "/faq" },
-];
-
-const serviceLinks = [
-    { label: "Rawat Jalan", href: "/layanan/rawat-jalan" },
-    { label: "Rawat Inap", href: "/layanan/rawat-inap" },
-    { label: "IGD 24 Jam", href: "/igd" },
-    { label: "Laboratorium", href: "/layanan/laboratorium" },
-    { label: "Radiologi", href: "/layanan/radiologi" },
-    { label: "Farmasi", href: "/layanan/farmasi" },
-];
+import { useTranslations } from "next-intl";
 
 const contactInfo = {
-    address: "Jalan Catur Warga No. 10 B, Pajang, Kecamatan Mataram, Kota Mataram, Nusa Tenggara Barat (NTB), kode pos 83126, ",
     phone: "(0370) 631885",
     emergency: "(0370) 631886",
     email: "info@rsisitihajar.com",
-    hours: "24 Jam (IGD)",
 };
 
 const socialLinks = [
@@ -37,7 +19,28 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+    const t = useTranslations("Footer");
+    const n = useTranslations("Navbar");
     const currentYear = new Date().getFullYear();
+
+    const quickLinks = [
+        { label: n("home"), href: "/" },
+        { label: n("about"), href: "/tentang-kami" },
+        { label: n("doctors"), href: "/doctors" },
+        { label: n("news"), href: "/artikel" },
+        { label: n("faq"), href: "/faq" },
+    ];
+
+    const serviceLinks = [
+        { label: n("outpatient"), href: "/layanan/rawat-jalan" },
+        { label: n("inpatient"), href: "/layanan/rawat-inap" },
+        { label: n("igd"), href: "/igd" },
+        { label: n("lab"), href: "/layanan/laboratorium" },
+        { label: n("radiology"), href: "/layanan/radiologi" },
+        { label: n("pharmacy"), href: "/layanan/farmasi" },
+    ];
+
+    const address = "Jalan Catur Warga No. 10 B, Pajang, Kecamatan Mataram, Kota Mataram, Nusa Tenggara Barat (NTB), kode pos 83126";
 
     return (
         <footer className="bg-slate-900 text-white">
@@ -60,8 +63,7 @@ export const Footer = () => {
                             </div>
                         </Link>
                         <p className="text-slate-400 text-sm leading-relaxed">
-                            Rumah Sakit Islam yang memberikan pelayanan kesehatan terbaik dengan
-                            nilai-nilai syariah untuk masyarakat Mataram dan NTB.
+                            {t("description")}
                         </p>
                         {/* Social Links */}
                         <div className="flex gap-3">
@@ -82,7 +84,7 @@ export const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6">Tautan Cepat</h4>
+                        <h4 className="font-bold text-lg mb-6">{t("quick_links")}</h4>
                         <ul className="space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.href}>
@@ -99,7 +101,7 @@ export const Footer = () => {
 
                     {/* Services */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6">Layanan</h4>
+                        <h4 className="font-bold text-lg mb-6">{t("services")}</h4>
                         <ul className="space-y-3">
                             {serviceLinks.map((link) => (
                                 <li key={link.href}>
@@ -116,11 +118,11 @@ export const Footer = () => {
 
                     {/* Contact Info */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6">Hubungi Kami</h4>
+                        <h4 className="font-bold text-lg mb-6">{t("contact")}</h4>
                         <ul className="space-y-4">
                             <li className="flex gap-3 text-sm">
                                 <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                <span className="text-slate-400">{contactInfo.address}</span>
+                                <span className="text-slate-400">{address}</span>
                             </li>
                             <li className="flex gap-3 text-sm">
                                 <Phone className="w-5 h-5 text-primary shrink-0" />
@@ -137,7 +139,7 @@ export const Footer = () => {
                             </li>
                             <li className="flex gap-3 text-sm">
                                 <Clock className="w-5 h-5 text-primary shrink-0" />
-                                <span className="text-slate-400">{contactInfo.hours}</span>
+                                <span className="text-slate-400">{t("igd_24h")}</span>
                             </li>
                         </ul>
                     </div>
@@ -149,16 +151,17 @@ export const Footer = () => {
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
                         <p className="flex items-center gap-1">
-                            © {currentYear} RSI Siti Hajar Mataram. Dibuat dengan
-                            <Heart className="w-4 h-4 text-red-500 fill-red-500 mx-1" />
-                            untuk kesehatan umat.
+                            {t.rich("copyright", {
+                                year: currentYear,
+                                heart: (chunks) => <Heart className="w-4 h-4 text-red-500 fill-red-500 mx-1" />
+                            })}
                         </p>
                         <div className="flex gap-6">
                             <Link href="/kebijakan-privasi" className="hover:text-primary transition-colors">
-                                Kebijakan Privasi
+                                {t("privacy")}
                             </Link>
                             <Link href="/syarat-ketentuan" className="hover:text-primary transition-colors">
-                                Syarat & Ketentuan
+                                {t("terms")}
                             </Link>
                         </div>
                     </div>

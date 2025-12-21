@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
     Stethoscope,
@@ -13,6 +14,7 @@ import {
     Clock
 } from "lucide-react";
 import { useGetServices } from "~/features/services/api/getServices";
+import { useTranslations } from "next-intl";
 
 const iconMap: Record<string, any> = {
     Stethoscope,
@@ -75,11 +77,12 @@ const ServiceCard = ({
 };
 
 export const ServiceCardsSection = () => {
+    const n = useTranslations("Navbar");
     const { data: servicesData, isLoading } = useGetServices();
 
     const defaultServices = [
-        { icon: Stethoscope, title: "Cari Dokter", href: "/doctors", color: "primary" },
-        { icon: Star, title: "Layanan Unggulan", href: "/layanan-unggulan", color: "accent" },
+        { icon: Stethoscope, title: n("doctors"), href: "/doctors", color: "primary" },
+        { icon: Star, title: n("featured_services"), href: "/layanan-unggulan", color: "accent" },
     ];
 
     const dynamicServices = servicesData?.filter(s =>

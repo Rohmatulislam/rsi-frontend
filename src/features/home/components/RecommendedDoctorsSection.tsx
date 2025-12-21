@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { useGetDoctors, DoctorSortBy } from "../api/getDoctors";
 import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
+import { useTranslations } from "next-intl";
 
 export const RecommendedDoctorsSection = () => {
+  const t = useTranslations("Doctors");
   const { data: doctors, isLoading, error } = useGetDoctors({
     input: {
       sort: DoctorSortBy.RECOMMENDED,
@@ -18,7 +20,7 @@ export const RecommendedDoctorsSection = () => {
     return (
       <section className="w-full py-16 bg-slate-50 dark:bg-slate-950/50">
         <div className="container mx-auto px-4 md:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">DOKTER PILIHAN</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{t("recommended")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <DoctorCardSkeleton key={i} />
@@ -94,15 +96,15 @@ export const RecommendedDoctorsSection = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div className="space-y-3">
             <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-              Dokter Pilihan <span className="text-primary">Kami</span>
+              {t("title")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              Temukan dokter spesialis berpengalaman yang siap memberikan pelayanan kesehatan terbaik untuk Anda dan keluarga.
+              {t("subtitle")}
             </p>
           </div>
           <Button variant="outline" size="lg" asChild className="hidden md:flex rounded-full px-6 hover:bg-primary hover:text-white transition-all duration-300">
             <Link href="/doctors">
-              Lihat Semua Dokter
+              {t("view_all")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -118,7 +120,7 @@ export const RecommendedDoctorsSection = () => {
         <div className="mt-12 flex justify-center md:hidden">
           <Button variant="outline" size="lg" className="rounded-full w-full" asChild>
             <Link href="/doctors">
-              Lihat Semua Dokter
+              {t("view_all")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

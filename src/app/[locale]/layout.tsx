@@ -3,11 +3,17 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Navbar } from "~/components/layout/Navbar";
 import { Footer } from "~/components/layout/Footer";
 import { MobileBottomNav } from "~/components/shared/MobileBottomNav";
-import "./globals.css";
+import { ChatBot } from "~/components/shared/ChatBot";
+import "../globals.css";
 import { Toaster } from "sonner";
-import Providers from "./providers";
+import Providers from "../providers";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { locales } from "~/i18n";
 
 export const metadata: Metadata = {
+  // ... existing metadata
   metadataBase: new URL("https://rsisitihajarmataram.com"), // Placeholder domain
   title: {
     default: "RSI Siti Hajar Mataram - Pelayanan Kesehatan Islami",
@@ -57,13 +63,18 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
+  params
+}: {
   children: React.ReactNode;
-}>) {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const messages = await getMessages();
+
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -108,13 +119,16 @@ export default function RootLayout({
       </head>
       <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
         <Providers>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <MobileBottomNav />
-          <Toaster />
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <MobileBottomNav />
+            <ChatBot />
+            <Toaster />
+          </NextIntlClientProvider>
         </Providers>
       </body>
     </html>

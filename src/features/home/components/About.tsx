@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import { useGetAboutContent } from "~/features/about/api/getAboutContent";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useTranslations } from "next-intl";
 
 export const About = () => {
+  const t = useTranslations("About");
   // Fetch dynamic content from API
   const { data: descriptionData, isLoading: isLoadingDesc } = useGetAboutContent({
     key: "description"
@@ -29,24 +31,23 @@ export const About = () => {
     : [];
 
   // Default description fallback
-  const description = descriptionData?.value ||
-    "RSI Siti Hajar Mataram adalah rumah sakit Islam yang berkomitmen memberikan pelayanan kesehatan terbaik dengan mengedepankan nilai-nilai Islami. Kami dilengkapi dengan fasilitas medis modern dan tenaga profesional yang siap melayani dengan sepenuh hati.";
+  const description = descriptionData?.value || t("description");
 
   // Default features fallback
   const defaultFeatures = [
-    "Tenaga medis profesional dan berpengalaman",
-    "Peralatan medis modern dan canggih",
-    "Pelayanan berbasis syariah",
-    "Ruang rawat inap yang nyaman",
-    "Laboratorium dan radiologi lengkap",
-    "Layanan ambulance 24 jam",
+    t("feature_pro"),
+    t("feature_modern"),
+    t("feature_sharia"),
+    t("feature_comfort"),
+    t("feature_complete"),
+    t("feature_ambulance"),
   ];
 
   const displayFeatures = features.length > 0 ? features : defaultFeatures;
 
   return (
     <section className="w-full container mx-auto px-4 space-y-16 md:py-24">
-      <h2 className="text-3xl font-bold text-center">TENTANG KAMI</h2>
+      <h2 className="text-3xl font-bold text-center">{t("title")}</h2>
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Image */}
@@ -71,8 +72,8 @@ export const About = () => {
                     <Award className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-bold text-lg">Terakreditasi</p>
-                    <p className="text-sm text-muted-foreground">Standar Nasional</p>
+                    <p className="font-bold text-lg">{t("accredited")}</p>
+                    <p className="text-sm text-muted-foreground">{t("accredited_standard")}</p>
                   </div>
                 </div>
               </div>
@@ -83,8 +84,8 @@ export const About = () => {
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4">
-                Rumah Sakit Islam <br />{" "}
-                <span className="text-primary">Siti Hajar Mataram</span>
+                {t("hospital_type")} <br />{" "}
+                <span className="text-primary">{t("hospital_name")}</span>
               </h2>
 
               {/* Description */}
@@ -125,7 +126,7 @@ export const About = () => {
             <div className="mt-4">
               <Button size="lg" asChild>
                 <Link href="/tentang-kami">
-                  Selengkapnya
+                  {t("cta_more")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

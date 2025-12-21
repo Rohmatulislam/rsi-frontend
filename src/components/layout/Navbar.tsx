@@ -4,6 +4,7 @@ import { cn } from "~/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,7 @@ import { Button } from "~/components/ui/button";
 import { useAuth } from "~/features/auth/hook/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { ThemeToggle } from "~/components/shared/ThemeToggle";
+import { LanguageSwitcher } from "~/components/shared/LanguageSwitcher";
 
 // Mobile Navigation Helper Components
 const MobileNavSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
@@ -73,6 +75,7 @@ const MobileNavLink = ({ href, onClick, children }: { href: string; onClick?: ()
 
 
 export const Navbar = () => {
+  const t = useTranslations("Navbar");
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, isAuthenticated, isLoading, logout, canAccessAdmin } = useAuth();
@@ -108,30 +111,30 @@ export const Navbar = () => {
           {/* Layanan Kesehatan */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-              Layanan Kesehatan
+              {t("services")}
               <ChevronDown className="h-4 w-4 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuItem asChild>
-                <Link href="/layanan/rawat-inap">Rawat Inap</Link>
+                <Link href="/layanan/rawat-inap">{t("inpatient")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/rawat-jalan">Rawat Jalan</Link>
+                <Link href="/layanan/rawat-jalan">{t("outpatient")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/farmasi">Farmasi 24 Jam</Link>
+                <Link href="/layanan/farmasi">{t("pharmacy")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/laboratorium">Laboratorium</Link>
+                <Link href="/layanan/laboratorium">{t("lab")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/radiologi">Radiologi</Link>
+                <Link href="/layanan/radiologi">{t("radiology")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/rehabilitasi-medik">Rehabilitasi Medik</Link>
+                <Link href="/layanan/rehabilitasi-medik">{t("rehab")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/mcu">MCU (Medical Check Up)</Link>
+                <Link href="/layanan/mcu">{t("mcu")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -139,21 +142,21 @@ export const Navbar = () => {
           {/* Layanan Unggulan */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-              Layanan Unggulan
+              {t("featured_services")}
               <ChevronDown className="h-4 w-4 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuItem asChild>
-                <Link href="/layanan-unggulan/bedah-minimal-invasif">Bedah Minimal Invasif</Link>
+                <Link href="/layanan-unggulan/bedah-minimal-invasif">{t("surgery")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan-unggulan/eswl">ESWL</Link>
+                <Link href="/layanan-unggulan/eswl">{t("eswl")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan-unggulan/persalinan-syari">Persalinan Syar'i</Link>
+                <Link href="/layanan-unggulan/persalinan-syari">{t("birth")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan-unggulan/executive">Layanan Executive</Link>
+                <Link href="/layanan-unggulan/executive">{t("executive")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -161,27 +164,27 @@ export const Navbar = () => {
           {/* Pusat Informasi */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-accent/50 transition-colors outline-none">
-              Pusat Informasi
+              {t("info_center")}
               <ChevronDown className="h-4 w-4 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuItem asChild>
-                <Link href="/tentang-kami">Tentang Kami</Link>
+                <Link href="/tentang-kami">{t("about")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/artikel">Artikel & Berita</Link>
+                <Link href="/artikel">{t("news")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/igd">IGD</Link>
+                <Link href="/igd">{t("igd")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/lokasi">Peta Lokasi</Link>
+                <Link href="/lokasi">{t("location")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/kontak">Hubungi Kami</Link>
+                <Link href="/kontak">{t("contact")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/faq">FAQ (Tanya Jawab)</Link>
+                <Link href="/faq">{t("faq")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -202,71 +205,72 @@ export const Navbar = () => {
           <Search className="h-5 w-5" />
         </Button>
 
+        <LanguageSwitcher />
         <ThemeToggle />
 
         {/* Search Dialog */}
         <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-          <CommandInput placeholder="Cari dokter, layanan, atau informasi..." />
+          <CommandInput placeholder={t("search_placeholder")} />
           <CommandList>
-            <CommandEmpty>Tidak ada hasil ditemukan.</CommandEmpty>
+            <CommandEmpty>{t("no_results")}</CommandEmpty>
 
-            <CommandGroup heading="Layanan Kesehatan">
+            <CommandGroup heading={t("services")}>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rawat-inap'; }}>
-                Rawat Inap
+                {t("inpatient")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rawat-jalan'; }}>
-                Rawat Jalan
+                {t("outpatient")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/farmasi'; }}>
-                Farmasi 24 Jam
+                {t("pharmacy")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/laboratorium'; }}>
-                Laboratorium
+                {t("lab")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/radiologi'; }}>
-                Radiologi
+                {t("radiology")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rehabilitasi-medik'; }}>
-                Rehabilitasi Medik
+                {t("rehab")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/mcu'; }}>
-                MCU (Medical Check Up)
+                {t("mcu")}
               </CommandItem>
             </CommandGroup>
 
-            <CommandGroup heading="Layanan Unggulan">
+            <CommandGroup heading={t("featured_services")}>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/bedah-minimal-invasif'; }}>
-                Bedah Minimal Invasif
+                {t("surgery")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/eswl'; }}>
-                ESWL
+                {t("eswl")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/persalinan-syari'; }}>
-                Persalinan Syar'i
+                {t("birth")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/executive'; }}>
-                Layanan Executive
+                {t("executive")}
               </CommandItem>
             </CommandGroup>
 
-            <CommandGroup heading="Pusat Informasi">
+            <CommandGroup heading={t("info_center")}>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/tentang-kami'; }}>
-                Tentang Kami
+                {t("about")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/artikel'; }}>
-                Artikel & Berita
+                {t("news")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/igd'; }}>
-                IGD
+                {t("igd")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/lokasi'; }}>
-                Peta Lokasi
+                {t("location")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/kontak'; }}>
-                Hubungi Kami
+                {t("contact")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/faq'; }}>
-                FAQ (Tanya Jawab)
+                {t("faq")}
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -300,25 +304,25 @@ export const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link href="/admin">
                       <Settings className="h-4 w-4 mr-2" />
-                      Admin Panel
+                      {t("admin_panel")}
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link href="/profil">
                     <User className="h-4 w-4 mr-2" />
-                    Profil Saya
+                    {t("my_profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/riwayat-booking">
                     <ClipboardList className="h-4 w-4 mr-2" />
-                    Riwayat Booking
+                    {t("booking_history")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={logout} className="text-red-600">
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  {t("logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -327,13 +331,13 @@ export const Navbar = () => {
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">
                   <LogIn className="h-4 w-4" />
-                  <span className="hidden lg:inline">Sign In</span>
+                  <span className="hidden lg:inline">{t("login")}</span>
                 </Link>
               </Button>
               <Button size="sm" asChild>
                 <Link href="/register">
                   <UserPlus className="h-4 w-4" />
-                  <span className="hidden lg:inline">Sign Up</span>
+                  <span className="hidden lg:inline">{t("register")}</span>
                 </Link>
               </Button>
             </>
@@ -355,32 +359,32 @@ export const Navbar = () => {
               {/* Mobile Navigation */}
 
               {/* Layanan Kesehatan - Collapsible */}
-              <MobileNavSection title="Layanan Kesehatan">
-                <MobileNavLink href="/layanan/rawat-inap" onClick={() => setIsOpen(false)}>Rawat Inap</MobileNavLink>
-                <MobileNavLink href="/layanan/rawat-jalan" onClick={() => setIsOpen(false)}>Rawat Jalan</MobileNavLink>
-                <MobileNavLink href="/layanan/farmasi" onClick={() => setIsOpen(false)}>Farmasi 24 Jam</MobileNavLink>
-                <MobileNavLink href="/layanan/laboratorium" onClick={() => setIsOpen(false)}>Laboratorium</MobileNavLink>
-                <MobileNavLink href="/layanan/radiologi" onClick={() => setIsOpen(false)}>Radiologi</MobileNavLink>
-                <MobileNavLink href="/layanan/rehabilitasi-medik" onClick={() => setIsOpen(false)}>Rehabilitasi Medik</MobileNavLink>
-                <MobileNavLink href="/layanan/mcu" onClick={() => setIsOpen(false)}>MCU (Medical Check Up)</MobileNavLink>
+              <MobileNavSection title={t("services")}>
+                <MobileNavLink href="/layanan/rawat-inap" onClick={() => setIsOpen(false)}>{t("inpatient")}</MobileNavLink>
+                <MobileNavLink href="/layanan/rawat-jalan" onClick={() => setIsOpen(false)}>{t("outpatient")}</MobileNavLink>
+                <MobileNavLink href="/layanan/farmasi" onClick={() => setIsOpen(false)}>{t("pharmacy")}</MobileNavLink>
+                <MobileNavLink href="/layanan/laboratorium" onClick={() => setIsOpen(false)}>{t("lab")}</MobileNavLink>
+                <MobileNavLink href="/layanan/radiologi" onClick={() => setIsOpen(false)}>{t("radiology")}</MobileNavLink>
+                <MobileNavLink href="/layanan/rehabilitasi-medik" onClick={() => setIsOpen(false)}>{t("rehab")}</MobileNavLink>
+                <MobileNavLink href="/layanan/mcu" onClick={() => setIsOpen(false)}>{t("mcu")}</MobileNavLink>
               </MobileNavSection>
 
               {/* Layanan Unggulan - Collapsible */}
-              <MobileNavSection title="Layanan Unggulan">
-                <MobileNavLink href="/layanan-unggulan/bedah-minimal-invasif" onClick={() => setIsOpen(false)}>Bedah Minimal Invasif</MobileNavLink>
-                <MobileNavLink href="/layanan-unggulan/eswl" onClick={() => setIsOpen(false)}>ESWL</MobileNavLink>
-                <MobileNavLink href="/layanan-unggulan/persalinan-syari" onClick={() => setIsOpen(false)}>Persalinan Syar'i</MobileNavLink>
-                <MobileNavLink href="/layanan-unggulan/executive" onClick={() => setIsOpen(false)}>Layanan Executive</MobileNavLink>
+              <MobileNavSection title={t("featured_services")}>
+                <MobileNavLink href="/layanan-unggulan/bedah-minimal-invasif" onClick={() => setIsOpen(false)}>{t("surgery")}</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/eswl" onClick={() => setIsOpen(false)}>{t("eswl")}</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/persalinan-syari" onClick={() => setIsOpen(false)}>{t("birth")}</MobileNavLink>
+                <MobileNavLink href="/layanan-unggulan/executive" onClick={() => setIsOpen(false)}>{t("executive")}</MobileNavLink>
               </MobileNavSection>
 
               {/* Pusat Informasi - Collapsible */}
-              <MobileNavSection title="Pusat Informasi">
-                <MobileNavLink href="/tentang-kami" onClick={() => setIsOpen(false)}>Tentang Kami</MobileNavLink>
-                <MobileNavLink href="/artikel" onClick={() => setIsOpen(false)}>Artikel & Berita</MobileNavLink>
-                <MobileNavLink href="/igd" onClick={() => setIsOpen(false)}>IGD</MobileNavLink>
-                <MobileNavLink href="/lokasi" onClick={() => setIsOpen(false)}>Peta Lokasi</MobileNavLink>
-                <MobileNavLink href="/kontak" onClick={() => setIsOpen(false)}>Hubungi Kami</MobileNavLink>
-                <MobileNavLink href="/faq" onClick={() => setIsOpen(false)}>FAQ (Tanya Jawab)</MobileNavLink>
+              <MobileNavSection title={t("info_center")}>
+                <MobileNavLink href="/tentang-kami" onClick={() => setIsOpen(false)}>{t("about")}</MobileNavLink>
+                <MobileNavLink href="/artikel" onClick={() => setIsOpen(false)}>{t("news")}</MobileNavLink>
+                <MobileNavLink href="/igd" onClick={() => setIsOpen(false)}>{t("igd")}</MobileNavLink>
+                <MobileNavLink href="/lokasi" onClick={() => setIsOpen(false)}>{t("location")}</MobileNavLink>
+                <MobileNavLink href="/kontak" onClick={() => setIsOpen(false)}>{t("contact")}</MobileNavLink>
+                <MobileNavLink href="/faq" onClick={() => setIsOpen(false)}>{t("faq")}</MobileNavLink>
               </MobileNavSection>
 
               {/* Mobile Auth Buttons */}
@@ -403,20 +407,20 @@ export const Navbar = () => {
                       <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
                         <Link href="/admin">
                           <Settings className="h-4 w-4" />
-                          Admin Panel
+                          {t("admin_panel")}
                         </Link>
                       </Button>
                     )}
                     <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
                       <Link href="/profil">
                         <User className="h-4 w-4" />
-                        Profil Saya
+                        {t("my_profile")}
                       </Link>
                     </Button>
                     <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
                       <Link href="/riwayat-booking">
                         <ClipboardList className="h-4 w-4" />
-                        Riwayat Booking
+                        {t("booking_history")}
                       </Link>
                     </Button>
                     <Button
@@ -425,7 +429,7 @@ export const Navbar = () => {
                       onClick={() => { setIsOpen(false); logout(); }}
                     >
                       <LogOut className="h-4 w-4" />
-                      Logout
+                      {t("logout")}
                     </Button>
                   </>
                 ) : (
@@ -433,13 +437,13 @@ export const Navbar = () => {
                     <Button variant="ghost" className="justify-start" asChild onClick={() => setIsOpen(false)}>
                       <Link href="/login">
                         <LogIn className="h-4 w-4" />
-                        Sign In
+                        {t("login")}
                       </Link>
                     </Button>
                     <Button className="justify-start" asChild onClick={() => setIsOpen(false)}>
                       <Link href="/register">
                         <UserPlus className="h-4 w-4" />
-                        Sign Up
+                        {t("register")}
                       </Link>
                     </Button>
                   </>

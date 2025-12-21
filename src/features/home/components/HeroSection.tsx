@@ -83,6 +83,7 @@ const ServiceCard = ({
 };
 
 import { useGetServices } from "~/features/services/api/getServices";
+import { useTranslations } from "next-intl";
 
 const iconMap: Record<string, any> = {
   Stethoscope,
@@ -99,6 +100,7 @@ const iconMap: Record<string, any> = {
 };
 
 export const HeroSection = () => {
+  const t = useTranslations("Hero");
   const { data: servicesData, isLoading } = useGetServices();
 
   const defaultServices = [
@@ -135,18 +137,17 @@ export const HeroSection = () => {
           {/* Title & Description - Left Aligned */}
           <div className="flex flex-col gap-6 max-w-3xl">
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black leading-tight">
-              SELAMAT DATANG DI RUMAH SAKIT ISLAM <br /> {" "}
+              {t("title")} <br /> {" "}
               <span className="text-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl">SITI HAJAR MATARAM</span>
             </h1>
 
             <p className="text-base md:text-lg text-slate-100 font-medium max-w-2xl">
-              Memberikan pelayanan kesehatan terbaik dengan teknologi modern
-              dan tenaga medis profesional di Mataram.
+              {t("subtitle")}
             </p>
 
             <div className="flex flex-wrap gap-4 mt-4">
               <Link href="/tentang-kami" className={buttonVariants({ variant: "default", size: "lg" })}>
-                Tentang Kami
+                {t("cta_info")}
                 <ArrowRight className="size-4" />
               </Link>
             </div>

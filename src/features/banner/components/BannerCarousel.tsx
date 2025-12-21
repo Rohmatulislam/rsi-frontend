@@ -7,8 +7,10 @@ import { Button } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
 import { getImageSrc } from "~/lib/utils";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export const BannerCarousel = () => {
+    const t = useTranslations("About");
     const { data: banners, isLoading } = useGetActiveBanners();
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -93,7 +95,7 @@ export const BannerCarousel = () => {
                                         className="bg-primary text-white hover:bg-primary/90 font-bold px-6 py-4 md:px-8 md:py-6 text-base md:text-lg shadow-xl hover:shadow-2xl transition-all"
                                     >
                                         <Link href={currentBanner.link}>
-                                            {currentBanner.linkText || "Selengkapnya"}
+                                            {currentBanner.linkText || t("cta_more")}
                                             <ChevronRight className="ml-2 h-5 w-5" />
                                         </Link>
                                     </Button>

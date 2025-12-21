@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     description: "Daftar lengkap layanan kesehatan di RSI Siti Hajar Mataram.",
 };
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     return <LayananIndexPage />;
 }
