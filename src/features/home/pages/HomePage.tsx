@@ -1,13 +1,17 @@
-import {HeroSection} from "../components/HeroSection";
-import {About} from "../components/About";
+import { About } from "../components/About";
 import { RecommendedDoctorsSection } from "../components/RecommendedDoctorsSection";
+import { BannerCarousel } from "~/features/banner/components/BannerCarousel";
+import { ServiceCardsSection } from "../components/ServiceCardsSection";
 
 const HomePage = () => {
   return (
-    <div className="space-y-10">
-      <HeroSection />
-      <About />
-      <RecommendedDoctorsSection />
+    <div>
+      <BannerCarousel />
+      <ServiceCardsSection />
+      <div className="space-y-10">
+        <About />
+        <RecommendedDoctorsSection />
+      </div>
     </div>
   )
 };
