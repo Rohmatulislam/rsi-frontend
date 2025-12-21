@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
-import { ArticleDto } from "~/features/article/types";
+import { ArticleDto } from "~/features/article/services/articleService";
 import { CreateArticleDto } from "~/features/admin/types/article";
 
 export const createArticle = async (data: CreateArticleDto) => {

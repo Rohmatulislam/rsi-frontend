@@ -8,7 +8,7 @@ import { useDeleteArticle } from "~/features/admin/api/deleteArticle";
 import { useCreateArticle } from "~/features/admin/api/createArticle";
 import { useUpdateArticle } from "~/features/admin/api/updateArticle";
 import { useState } from "react";
-import { ArticleDto } from "~/features/article/types";
+import { ArticleDto } from "~/features/article/services/articleService";
 import { ArticleModal } from "~/features/admin/components/ArticleModal";
 import { CreateArticleDto, UpdateArticleDto } from "~/features/admin/types/article";
 

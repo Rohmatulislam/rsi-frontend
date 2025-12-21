@@ -8,7 +8,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Upload, Trash2, X } from "lucide-react";
 
-import { ArticleDto } from "~/features/article/types";
+import { ArticleDto } from "~/features/article/services/articleService";
 import { CreateArticleDto, UpdateArticleDto } from "~/features/admin/types/article";
 import { getImageSrc } from "~/lib/utils";
 

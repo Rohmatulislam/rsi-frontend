@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } from '../types/appointment';
+import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } from '../services/appointmentService';
 import { useCreateAppointment } from '../api/createAppointment';
 import { toast } from "sonner";
 
