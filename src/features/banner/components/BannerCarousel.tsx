@@ -68,19 +68,19 @@ export const BannerCarousel = () => {
                 {/* Content */}
                 <div className="relative h-full flex items-center">
                     <div className="container mx-auto px-4 md:px-8">
-                        <div className="max-w-2xl text-white space-y-6">
-                            <h1 className="text-4xl md:text-6xl font-bold leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-8 duration-700">
+                        <div className="max-w-2xl text-white space-y-4 md:space-y-6 pb-20 md:pb-0">
+                            <h1 className="text-2xl sm:text-3xl md:text-6xl font-bold leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-8 duration-700">
                                 {currentBanner.title}
                             </h1>
 
                             {currentBanner.subtitle && (
-                                <p className="text-xl md:text-2xl font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                                <p className="text-lg md:text-2xl font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                                     {currentBanner.subtitle}
                                 </p>
                             )}
 
                             {currentBanner.description && (
-                                <p className="text-base md:text-lg drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                                <p className="text-sm md:text-lg drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 line-clamp-3 md:line-clamp-none">
                                     {currentBanner.description}
                                 </p>
                             )}
@@ -90,7 +90,7 @@ export const BannerCarousel = () => {
                                     <Button
                                         asChild
                                         size="lg"
-                                        className="bg-primary text-white hover:bg-primary/90 font-bold px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all"
+                                        className="bg-primary text-white hover:bg-primary/90 font-bold px-6 py-4 md:px-8 md:py-6 text-base md:text-lg shadow-xl hover:shadow-2xl transition-all"
                                     >
                                         <Link href={currentBanner.link}>
                                             {currentBanner.linkText || "Selengkapnya"}

@@ -99,7 +99,7 @@ export const ServiceCardsSection = () => {
     const displayServices = [...defaultServices, ...dynamicServices].slice(0, 6);
 
     return (
-        <section className="w-full -mt-20 relative z-10 pb-8">
+        <section className="w-full -mt-16 md:-mt-20 relative z-10 pb-8">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="flex justify-center w-full">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl w-full">
