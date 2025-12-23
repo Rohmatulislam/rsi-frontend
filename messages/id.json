@@ -80,5 +80,10 @@
     "copyright": "© {year} RSI Siti Hajar Mataram. Dibuat dengan {heart} untuk kesehatan umat.",
     "privacy": "Kebijakan Privasi",
     "terms": "Syarat & Ketentuan"
+  },
+  "Home": {
+    "latest_articles": "Artikel & Berita Terbaru",
+    "view_all_articles": "Lihat Semua Artikel",
+    "read_more": "Baca Selengkapnya"
   }
 }

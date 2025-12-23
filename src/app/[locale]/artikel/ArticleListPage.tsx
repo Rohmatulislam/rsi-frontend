@@ -30,7 +30,7 @@ export const ArticleListPage = () => {
         if (!articles) return [];
         const uniqueCategories = [...new Set(
             articles
-                .map(article => article.category?.name)
+                .flatMap(article => article.categories?.filter(c => c.type === "ARTICLE_CATEGORY").map(c => c.name) || [])
                 .filter(Boolean)
         )];
         return uniqueCategories;
@@ -50,7 +50,7 @@ export const ArticleListPage = () => {
 
             // Category filter
             const matchesCategory = categoryFilter === "all" ||
-                article.category?.name === categoryFilter;
+                article.categories?.some(cat => cat.name === categoryFilter);
 
             return matchesSearch && matchesCategory;
         });
@@ -85,8 +85,8 @@ export const ArticleListPage = () => {
                         <div className="flex flex-wrap gap-2 justify-center">
                             <button
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${categoryFilter === 'all'
-                                        ? 'bg-primary text-white shadow-md'
-                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary'
+                                    ? 'bg-primary text-white shadow-md'
+                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary'
                                     }`}
                                 onClick={() => setCategoryFilter('all')}
                             >
@@ -96,8 +96,8 @@ export const ArticleListPage = () => {
                                 <button
                                     key={index}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${categoryFilter === category
-                                            ? 'bg-primary text-white shadow-md'
-                                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary'
+                                        ? 'bg-primary text-white shadow-md'
+                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary'
                                         }`}
                                     onClick={() => setCategoryFilter(category as string)}
                                 >
@@ -180,7 +180,7 @@ export const ArticleListPage = () => {
                                         )}
                                         <div className="absolute top-4 left-4">
                                             <Badge variant="secondary" className="backdrop-blur-md bg-white/80">
-                                                {article.category?.name || "Umum"}
+                                                {article.categories?.find(c => c.type === "ARTICLE_CATEGORY")?.name || article.categories?.[0]?.name || "Umum"}
                                             </Badge>
                                         </div>
                                     </div>

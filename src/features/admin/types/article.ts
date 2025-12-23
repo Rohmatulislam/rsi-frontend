@@ -4,7 +4,7 @@ export interface CreateArticleDto {
     content: string;
     excerpt?: string;
     image?: string;
-    category?: string;
+    categoryIds?: string[];
     isActive?: boolean;
 }
 

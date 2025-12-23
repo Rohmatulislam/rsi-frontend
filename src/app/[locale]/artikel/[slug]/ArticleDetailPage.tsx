@@ -80,7 +80,7 @@ export const ArticleDetailPage = ({ slug }: ArticleDetailPageProps) => {
 
                     <div className="flex flex-wrap items-center gap-4 mb-6">
                         <Badge variant="secondary" className="text-sm px-3 py-1">
-                            {article.category?.name || "Kesehatan"}
+                            {article.categories?.find(c => c.type === "ARTICLE_CATEGORY")?.name || article.categories?.[0]?.name || "Kesehatan"}
                         </Badge>
                         <span className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4" />

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield, FileText, Info, Stethoscope, Building2 } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield, FileText, Info, Stethoscope } from "lucide-react";
 import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
 import { Badge } from "~/components/ui/badge";
 
@@ -75,7 +75,7 @@ export const AdminSidebar = () => {
             <nav className="flex-1 p-4 space-y-2">
                 {menuItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
                     return (
                         <Link

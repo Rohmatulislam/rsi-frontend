@@ -80,5 +80,10 @@
         "copyright": "© {year} RSI Siti Hajar Mataram. Made with {heart} for the health of the community.",
         "privacy": "Privacy Policy",
         "terms": "Terms & Conditions"
+    },
+    "Home": {
+        "latest_articles": "Latest Articles & News",
+        "view_all_articles": "View All Articles",
+        "read_more": "Read More"
     }
 }

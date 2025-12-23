@@ -3,6 +3,7 @@ import { About } from "../components/About";
 import { RecommendedDoctorsSection } from "../components/RecommendedDoctorsSection";
 import { BannerCarousel } from "~/features/banner/components/BannerCarousel";
 import { ServiceCardsSection } from "../components/ServiceCardsSection";
+import { ArticlesSection } from "../components/ArticlesSection";
 import Link from "next/link";
 
 const HomePage = () => {
@@ -13,6 +14,7 @@ const HomePage = () => {
       <div className="space-y-10">
         <About />
         <RecommendedDoctorsSection />
+        <ArticlesSection />
       </div>
     </div>
   )

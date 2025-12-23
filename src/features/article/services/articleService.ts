@@ -6,18 +6,18 @@ export interface Article {
     excerpt: string;
     content: string;
     imageUrl?: string;
-    categoryId?: string;
-    category?: ArticleCategory;
     isPublished: boolean;
     publishedAt?: string;
     createdAt: string;
     updatedAt: string;
+    categories: ArticleCategory[];
 }
 
 export interface ArticleCategory {
     id: string;
     name: string;
     slug: string;
+    type: "ARTICLE_CATEGORY" | "ARTICLE_TAG" | "POLI" | "FEATURED" | "DEPARTMENT";
     description?: string;
 }
 
@@ -31,10 +31,12 @@ export type ArticleDto = {
     author?: string;
     publishedAt?: string;
     createdAt: string;
+    updatedAt: string;
     viewCount: number;
-    category?: {
+    categories: Array<{
+        id: string;
         name: string;
         slug: string;
-    };
-    updatedAt: string;
+        type: string;
+    }>;
 };
