@@ -36,4 +36,5 @@ export type ArticleDto = {
         name: string;
         slug: string;
     };
+    updatedAt: string;
 };

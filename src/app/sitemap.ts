@@ -1,13 +1,14 @@
 import { MetadataRoute } from 'next';
-import { getDoctors } from '~/features/home/api/getDoctors';
+import { getDoctors, DoctorDto } from '~/features/home/api/getDoctors';
 import { getArticles } from '~/features/article/api/getArticles';
+import { ArticleDto } from '~/features/article/services/articleService';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://rsisitihajarmataram.com';
 
     // Fetch dynamic data
-    let doctors = [];
-    let articles = [];
+    let doctors: DoctorDto[] = [];
+    let articles: ArticleDto[] = [];
 
     try {
         [doctors, articles] = await Promise.all([
