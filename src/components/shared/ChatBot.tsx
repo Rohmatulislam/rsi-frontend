@@ -11,7 +11,28 @@ interface Message {
     role: "user" | "bot";
     content: string;
     timestamp: Date;
+    isTyping?: boolean;
 }
+
+// Typing effect component
+const TypingText = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
+    const [displayedText, setDisplayedText] = useState("");
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (currentIndex < text.length) {
+            const timeout = setTimeout(() => {
+                setDisplayedText((prev) => prev + text[currentIndex]);
+                setCurrentIndex((prev) => prev + 1);
+            }, 15); // Speed: 15ms per character
+            return () => clearTimeout(timeout);
+        } else {
+            onComplete?.();
+        }
+    }, [currentIndex, text, onComplete]);
+
+    return <span>{displayedText}<span className="animate-pulse">|</span></span>;
+};
 
 export const ChatBot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -20,8 +41,9 @@ export const ChatBot = () => {
     const [messages, setMessages] = useState<Message[]>([
         {
             role: "bot",
-            content: "Halo! Saya Asisten Virtual RSI. Ada yang bisa saya bantu hari ini?",
+            content: "Halo! Saya Siti, Asisten Virtual RSI. Ada yang bisa saya bantu?",
             timestamp: new Date(),
+            isTyping: false,
         },
     ]);
     const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +55,12 @@ export const ChatBot = () => {
         }
     }, [messages]);
 
+    const handleTypingComplete = (idx: number) => {
+        setMessages((prev) =>
+            prev.map((msg, i) => (i === idx ? { ...msg, isTyping: false } : msg))
+        );
+    };
+
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;
 
@@ -40,6 +68,7 @@ export const ChatBot = () => {
             role: "user",
             content: input,
             timestamp: new Date(),
+            isTyping: false,
         };
 
         setMessages((prev) => [...prev, userMsg]);
@@ -58,6 +87,7 @@ export const ChatBot = () => {
                 role: "bot",
                 content: data.response,
                 timestamp: new Date(),
+                isTyping: true, // Enable typing effect
             };
             setMessages((prev) => [...prev, botMsg]);
         } catch (error) {
@@ -66,6 +96,7 @@ export const ChatBot = () => {
                 role: "bot",
                 content: "Maaf, sistem sedang sibuk. Silakan coba lagi nanti.",
                 timestamp: new Date(),
+                isTyping: false,
             }]);
         } finally {
             setIsLoading(false);
@@ -127,7 +158,14 @@ export const ChatBot = () => {
                                                     ? "bg-primary text-white rounded-tr-none"
                                                     : "bg-white dark:bg-slate-800 border rounded-tl-none"
                                             )}>
-                                                {msg.content}
+                                                {msg.role === "bot" && msg.isTyping ? (
+                                                    <TypingText
+                                                        text={msg.content}
+                                                        onComplete={() => handleTypingComplete(idx)}
+                                                    />
+                                                ) : (
+                                                    msg.content
+                                                )}
                                                 <div className={cn(
                                                     "text-[10px] mt-1 opacity-60",
                                                     msg.role === "user" ? "text-right" : "text-left"
@@ -165,6 +203,30 @@ export const ChatBot = () => {
                                             <Send className="h-4 w-4" />
                                         </Button>
                                     </div>
+
+                                    {/* Quick Reply Buttons */}
+                                    {messages.length <= 2 && (
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {[
+                                                "Jadwal Dokter",
+                                                "Daftar Online",
+                                                "Alamat RS",
+                                                "Layanan Kami"
+                                            ].map((text) => (
+                                                <button
+                                                    key={text}
+                                                    onClick={() => {
+                                                        setInput(text);
+                                                        setTimeout(() => handleSend(), 100);
+                                                    }}
+                                                    className="px-3 py-1.5 text-xs bg-primary/10 hover:bg-primary/20 text-primary rounded-full transition-colors"
+                                                >
+                                                    {text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     <p className="text-[10px] text-center text-muted-foreground mt-2 italic">
                                         Powered by RSI Care AI
                                     </p>

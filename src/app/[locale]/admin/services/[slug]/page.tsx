@@ -8,17 +8,20 @@ import { useCreateServiceItem } from "~/features/services/api/createServiceItem"
 import { useUpdateServiceItem } from "~/features/services/api/updateServiceItem";
 import { useDeleteServiceItem } from "~/features/services/api/deleteServiceItem";
 import { Button } from "~/components/ui/button";
-import { ArrowLeft, Loader2, Layout, Package } from "lucide-react";
+import { ArrowLeft, Loader2, Layout, Package, Building2 } from "lucide-react";
 import Link from "next/link";
 import { ServiceDetailForm } from "~/features/services/components/admin/ServiceDetailForm";
 import { ServiceItemManagement } from "~/features/services/components/admin/ServiceItemManagement";
+import { UnitManagement } from "~/features/admin/components/UnitManagement";
+import { BedManagement } from "~/features/admin/components/BedManagement";
 
-type TabType = "detail" | "items";
+type TabType = "detail" | "items" | "units" | "beds";
 
 export default function ServiceEditPage() {
     const params = useParams();
     const router = useRouter();
     const slug = params.slug as string;
+    const isRawatInap = slug === "rawat-inap";
 
     const [activeTab, setActiveTab] = useState<TabType>("detail");
     const { data: service, isLoading } = useGetServiceBySlug({ slug });
@@ -75,10 +78,10 @@ export default function ServiceEditPage() {
             </div>
 
             {/* Content Tabs */}
-            <div className="flex gap-2 border-b">
+            <div className="flex gap-2 border-b overflow-x-auto">
                 <button
                     onClick={() => setActiveTab("detail")}
-                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === "detail" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                    className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === "detail" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <div className="flex items-center gap-2">
@@ -87,13 +90,35 @@ export default function ServiceEditPage() {
                 </button>
                 <button
                     onClick={() => setActiveTab("items")}
-                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === "items" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                    className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === "items" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <div className="flex items-center gap-2">
                         <Package className="h-4 w-4" /> Item & Paket Layanan ({service.items?.length || 0})
                     </div>
                 </button>
+                {isRawatInap && (
+                    <>
+                        <button
+                            onClick={() => setActiveTab("units")}
+                            className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === "units" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Building2 className="h-4 w-4" /> Manajemen Unit
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("beds")}
+                            className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === "beds" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Package className="h-4 w-4" /> Manajemen Bed
+                            </div>
+                        </button>
+                    </>
+                )}
             </div>
 
             {/* Tab: Detail Layanan */}
@@ -116,6 +141,16 @@ export default function ServiceEditPage() {
                     onUpdateItem={handleUpdateItem}
                     onDeleteItem={handleDeleteItem}
                 />
+            )}
+
+            {/* Tab: Manajemen Unit (Rawat Inap Only) */}
+            {activeTab === "units" && isRawatInap && (
+                <UnitManagement />
+            )}
+
+            {/* Tab: Manajemen Bed (Rawat Inap Only) */}
+            {activeTab === "beds" && isRawatInap && (
+                <BedManagement />
             )}
         </div>
     );

@@ -10,6 +10,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { ImageUploadField } from "~/features/admin/components/ImageUploadField";
 import { ServiceItemDto } from "../../types";
 
 interface ServiceItemModalProps {
@@ -28,8 +29,10 @@ export function ServiceItemModal({ isOpen, onClose, item, isSaving, onSave }: Se
         order: 0,
         isActive: true,
         description: "",
-        features: ""
+        features: "",
+        imageUrl: ""
     });
+
 
     useEffect(() => {
         if (item) {
@@ -40,7 +43,8 @@ export function ServiceItemModal({ isOpen, onClose, item, isSaving, onSave }: Se
                 order: item.order || 0,
                 isActive: item.isActive ?? true,
                 description: item.description || "",
-                features: item.features || ""
+                features: item.features || "",
+                imageUrl: item.imageUrl || ""
             });
         }
     }, [item]);
@@ -75,7 +79,7 @@ export function ServiceItemModal({ isOpen, onClose, item, isSaving, onSave }: Se
                                     id="item-category"
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    placeholder="Gedung Mina / Tes Darah"
+                                    placeholder="Unit Mina / Tes Darah"
                                 />
                             </div>
                         </div>
@@ -119,6 +123,30 @@ export function ServiceItemModal({ isOpen, onClose, item, isSaving, onSave }: Se
                                 onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                                 className="h-20"
                                 placeholder="Konsultasi Dokter, Pemeriksaan Fisik, Thorax..."
+                            />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label>Gambar Item</Label>
+                            <ImageUploadField
+                                value={formData.imageUrl || ""}
+                                onChange={(value) => setFormData({ ...formData, imageUrl: value })}
+                                label="Upload Gambar"
+                                placeholder="Klik untuk upload gambar (unit, fasilitas, dll)"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 border rounded-xl bg-slate-50/50">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="item-active" className="text-base font-semibold">Item Aktif</Label>
+                                <p className="text-sm text-muted-foreground">Aktifkan agar item ini muncul di halaman layanan publik.</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                id="item-active"
+                                checked={formData.isActive}
+                                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                className="h-6 w-6 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer transition-all hover:scale-110"
                             />
                         </div>
                     </div>

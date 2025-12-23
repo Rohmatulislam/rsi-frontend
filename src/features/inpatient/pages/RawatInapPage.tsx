@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { ServiceHero, ServiceCTA } from "~/features/services";
-import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
-import { Building, RoomClass, InpatientStep, InpatientRoom } from "../services/inpatientService";
-import { useGetBedAvailability } from "../api/getBedAvailability";
-import { useGetRooms } from "../api/getRooms";
 import { InpatientPageSkeleton } from "~/components/shared/PageSkeletons";
 
 // Modular Components
 import { InpatientStepper } from "../components/InpatientStepper";
-import { BuildingGrid } from "../components/BuildingGrid";
+import { UnitGrid } from "../components/UnitGrid";
 import { ClassGrid } from "../components/ClassGrid";
 import { RoomGrid } from "../components/RoomGrid";
 import { RoomDetail } from "../components/RoomDetail";
@@ -18,58 +13,31 @@ import { GeneralFacilities } from "../components/GeneralFacilities";
 
 // Services and Constants
 import { getFilteredRooms, transformInpatientData } from "../services/inpatientService";
-import { buildingImages, defaultInpatientImage, getBuildingColor, generalFacilities } from "../constants/inpatientConstants";
+import { unitImages, defaultInpatientImage, getUnitColor, generalFacilities } from "../constants/inpatientConstants";
+
+import { useInpatientData } from "../hooks/useInpatientData";
 
 export const RawatInapPage = () => {
-    const { data: service, isLoading: serviceLoading } = useGetServiceBySlug({ slug: 'rawat-inap' });
-    const { data: availability, isLoading: availabilityLoading } = useGetBedAvailability();
-    const { data: rooms, isLoading: roomsLoading } = useGetRooms();
-
-    const [step, setStep] = useState<InpatientStep>("building");
-    const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
-    const [selectedClass, setSelectedClass] = useState<RoomClass | null>(null);
-    const [selectedRoom, setSelectedRoom] = useState<InpatientRoom | null>(null);
-
-    const isLoading = serviceLoading || availabilityLoading;
+    const {
+        service,
+        isLoading,
+        displayUnits,
+        filteredRooms,
+        step,
+        selectedUnit,
+        selectedClass,
+        selectedRoom,
+        handleSelectUnit,
+        handleSelectClass,
+        handleSelectRoom,
+        handleBack,
+        setStep,
+        setSelectedUnit
+    } = useInpatientData();
 
     if (isLoading) {
         return <InpatientPageSkeleton />;
     }
-
-    const displayBuildings = transformInpatientData(
-        service?.items,
-        availability,
-        getBuildingColor,
-        buildingImages,
-        defaultInpatientImage
-    );
-
-    const handleSelectBuilding = (building: Building) => {
-        setSelectedBuilding(building);
-        setStep("class");
-        window.scrollTo({ top: 300, behavior: "smooth" });
-    };
-
-    const handleSelectClass = (cls: RoomClass) => {
-        setSelectedClass(cls);
-        setStep("room");
-        window.scrollTo({ top: 300, behavior: "smooth" });
-    };
-
-    const handleSelectRoom = (room: InpatientRoom) => {
-        setSelectedRoom(room);
-        setStep("detail");
-        window.scrollTo({ top: 300, behavior: "smooth" });
-    };
-
-    const handleBack = () => {
-        if (step === "detail") setStep("room");
-        else if (step === "room") setStep("class");
-        else if (step === "class") {
-            setStep("building");
-            setSelectedBuilding(null);
-        }
-    };
 
     const whatsappLink = (roomDetail?: string) => {
         const text = roomDetail
@@ -90,41 +58,41 @@ export const RawatInapPage = () => {
             <section className="py-8 container mx-auto px-4">
                 <InpatientStepper
                     step={step}
-                    selectedBuilding={selectedBuilding}
+                    selectedUnit={selectedUnit}
                     selectedClass={selectedClass}
                     onSetStep={setStep}
-                    onResetBuilding={() => setSelectedBuilding(null)}
+                    onResetUnit={() => setSelectedUnit(null)}
                 />
 
                 {/* STEPS RENDERER */}
                 {step === "building" && (
-                    <BuildingGrid
-                        buildings={displayBuildings}
-                        onSelect={handleSelectBuilding}
+                    <UnitGrid
+                        units={displayUnits}
+                        onSelect={handleSelectUnit}
                     />
                 )}
 
-                {step === "class" && selectedBuilding && (
+                {step === "class" && selectedUnit && (
                     <ClassGrid
-                        selectedBuilding={selectedBuilding}
+                        selectedUnit={selectedUnit}
                         onSelectClass={handleSelectClass}
                         onBack={handleBack}
                     />
                 )}
 
-                {step === "room" && selectedBuilding && selectedClass && (
+                {step === "room" && selectedUnit && selectedClass && (
                     <RoomGrid
-                        selectedBuilding={selectedBuilding}
+                        selectedUnit={selectedUnit}
                         selectedClass={selectedClass}
-                        rooms={getFilteredRooms(rooms, selectedBuilding, selectedClass)}
+                        rooms={filteredRooms}
                         onSelectRoom={handleSelectRoom}
                         onBack={handleBack}
                     />
                 )}
 
-                {step === "detail" && selectedClass && selectedBuilding && (
+                {step === "detail" && selectedClass && selectedUnit && (
                     <RoomDetail
-                        selectedBuilding={selectedBuilding}
+                        selectedUnit={selectedUnit}
                         selectedClass={selectedClass}
                         selectedRoom={selectedRoom}
                         onBack={handleBack}
@@ -140,7 +108,7 @@ export const RawatInapPage = () => {
                 subtitle="Tim admission kami siap membantu proses pendaftaran dan administrasi Anda 24 jam."
                 primaryAction={{
                     label: "Hubungi Admission",
-                    href: whatsappLink(selectedClass ? `${selectedClass.name}${selectedRoom ? ` - ${selectedRoom.id}` : ""} (${selectedBuilding?.name || ""})` : undefined),
+                    href: whatsappLink(selectedClass ? `${selectedClass.name}${selectedRoom ? ` - ${selectedRoom.id}` : ""} (${selectedUnit?.name || ""})` : undefined),
                     icon: "calendar",
                 }}
                 secondaryAction={{

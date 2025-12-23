@@ -38,8 +38,8 @@ export function ServiceListTable({ services, isLoading, isDeleting, onDelete }: 
 
     return (
         <>
-            <Card className="border-none shadow-md overflow-hidden ring-1 ring-slate-200">
-                <CardHeader className="bg-slate-50 border-b">
+            <Card className="border-none shadow-md overflow-hidden ring-1 ring-border">
+                <CardHeader className="bg-secondary border-b border-border">
                     <CardTitle>Daftar Layanan Utama</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -52,7 +52,7 @@ export function ServiceListTable({ services, isLoading, isDeleting, onDelete }: 
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50/50 text-muted-foreground font-medium border-b">
+                                <thead className="bg-secondary text-foreground font-medium border-b border-border">
                                     <tr>
                                         <th className="px-6 py-4">Nama Layanan</th>
                                         <th className="px-6 py-4">Slug</th>
@@ -61,21 +61,21 @@ export function ServiceListTable({ services, isLoading, isDeleting, onDelete }: 
                                         <th className="px-6 py-4 text-right">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-border">
                                     {services?.map((service) => (
-                                        <tr key={service.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <tr key={service.id} className="hover:bg-muted/50 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-semibold text-slate-900">{service.name}</span>
+                                                    <span className="font-semibold text-foreground">{service.name}</span>
                                                     {service.isFeatured && (
-                                                        <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200 text-[10px] font-bold">
+                                                        <Badge className="bg-accent/20 text-accent border-accent/30 text-[10px] font-bold">
                                                             UNGGULAN
                                                         </Badge>
                                                     )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <code className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-mono">
+                                                <code className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-mono">
                                                     /{service.slug}
                                                 </code>
                                             </td>

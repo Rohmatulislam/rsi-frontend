@@ -90,7 +90,7 @@ export function ServiceDetailForm({ service, isUpdating, onUpdate }: ServiceDeta
                         <CardTitle>Pengaturan Tampilan</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-6">
-                        <div className="flex items-center justify-between p-4 border rounded-xl bg-slate-50/50">
+                        <div className="flex items-center justify-between p-4 border border-border rounded-xl bg-secondary/50">
                             <div className="space-y-0.5">
                                 <Label>Status Aktif</Label>
                                 <p className="text-xs text-muted-foreground">Tampilkan di menu navigasi.</p>
@@ -102,7 +102,7 @@ export function ServiceDetailForm({ service, isUpdating, onUpdate }: ServiceDeta
                                 className="w-5 h-5 accent-primary cursor-pointer"
                             />
                         </div>
-                        <div className="flex items-center justify-between p-4 border rounded-xl bg-slate-50/50">
+                        <div className="flex items-center justify-between p-4 border border-border rounded-xl bg-secondary/50">
                             <div className="space-y-0.5">
                                 <Label>Layanan Unggulan</Label>
                                 <p className="text-xs text-muted-foreground">Tampilkan di halaman utama.</p>
@@ -111,7 +111,7 @@ export function ServiceDetailForm({ service, isUpdating, onUpdate }: ServiceDeta
                                 type="checkbox"
                                 checked={metadata.isFeatured}
                                 onChange={(e) => setMetadata({ ...metadata, isFeatured: e.target.checked })}
-                                className="w-5 h-5 accent-amber-500 cursor-pointer"
+                                className="w-5 h-5 accent-accent cursor-pointer"
                             />
                         </div>
                         <div className="grid gap-2">

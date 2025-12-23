@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
         hostname: "upload.wikimedia.org",
       },
       {
+        protocol: "https",
+        hostname: "vpncigkytgwjlhqzvcbt.supabase.co",
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '',

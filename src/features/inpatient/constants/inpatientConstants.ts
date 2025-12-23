@@ -8,23 +8,23 @@ import zamzamImg from "~/assets/rawat-inap/zamzam.png";
 import arafahImg from "~/assets/rawat-inap/arafah.png";
 import jabalImg from "~/assets/rawat-inap/jabal-rahmah.png";
 
-export const buildingImages: Record<string, StaticImageData> = {
-    "Gedung Mina": minaImg,
-    "Gedung Multazam": multazamImg,
-    "Gedung Zam-zam": zamzamImg,
-    "Gedung Arafah": arafahImg,
-    "Gedung Jabal Rahmah": jabalImg,
-    "Gedung Safa": zamzamImg,
-    "Gedung Bayi Safa": zamzamImg,
-    "Gedung ICU": arafahImg,
-    "Gedung ICCU": arafahImg,
-    "Gedung NICU": arafahImg,
-    "Gedung HCU": arafahImg,
+export const unitImages: Record<string, StaticImageData> = {
+    "Unit Mina": minaImg,
+    "Unit Multazam": multazamImg,
+    "Unit Zam-zam": zamzamImg,
+    "Unit Arafah": arafahImg,
+    "Unit Jabal Rahmah": jabalImg,
+    "Unit Safa": zamzamImg,
+    "Unit Bayi Safa": zamzamImg,
+    "Unit ICU": arafahImg,
+    "Unit ICCU": arafahImg,
+    "Unit NICU": arafahImg,
+    "Unit HCU": arafahImg,
 };
 
 export const defaultInpatientImage = minaImg;
 
-export const getBuildingColor = (name: string) => {
+export const getUnitColor = (name: string) => {
     const n = name.toLowerCase();
     if (n.includes("mina")) return "bg-gradient-to-br from-blue-500 to-blue-600";
     if (n.includes("multazam")) return "bg-gradient-to-br from-teal-500 to-teal-600";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit, Trash2, ListChecks, Package, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, ListChecks, Package, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -67,7 +67,7 @@ export function ServiceItemManagement({
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {service?.items?.map((item) => (
-                    <Card key={item.id} className="group overflow-hidden border-slate-200 hover:border-primary/50 transition-all hover:shadow-md">
+                    <Card key={item.id} className={`group overflow-hidden border-slate-200 hover:border-primary/50 transition-all hover:shadow-md ${!item.isActive ? "bg-slate-50 opacity-80" : ""}`}>
                         <CardContent className="p-0">
                             <div className="p-5 space-y-4">
                                 <div className="flex justify-between items-start">
@@ -80,7 +80,7 @@ export function ServiceItemManagement({
                                         <h3 className="font-bold text-lg text-slate-900 group-hover:text-primary transition-colors">{item.name}</h3>
                                     </div>
                                     {!item.isActive && (
-                                        <Badge variant="outline" className="text-red-500 border-red-200">Draft</Badge>
+                                        <Badge variant="outline" className="text-slate-500 border-slate-200 bg-white">Non-aktif</Badge>
                                     )}
                                 </div>
 
@@ -97,6 +97,15 @@ export function ServiceItemManagement({
                                 <div className="flex justify-between items-center pt-2 gap-2 border-t border-slate-100">
                                     <div className="text-[10px] text-slate-400 font-medium">ORDER: {item.order}</div>
                                     <div className="flex gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className={`h-8 w-8 ${item.isActive ? "text-slate-400 hover:text-amber-500" : "text-amber-500"} hover:bg-amber-50`}
+                                            onClick={() => onUpdateItem(item.id, { isActive: !item.isActive })}
+                                            title={item.isActive ? "Non-aktifkan" : "Aktifkan"}
+                                        >
+                                            {item.isActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                                        </Button>
                                         <Button
                                             variant="ghost"
                                             size="icon"

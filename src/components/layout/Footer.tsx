@@ -151,10 +151,9 @@ export const Footer = () => {
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
                         <p className="flex items-center gap-1">
-                            {t.rich("copyright", {
-                                year: currentYear,
-                                heart: (chunks) => <Heart className="w-4 h-4 text-red-500 fill-red-500 mx-1" />
-                            })}
+                            © {currentYear} RSI Siti Hajar Mataram.
+                            <Heart className="w-4 h-4 text-red-500 fill-red-500 mx-1" />
+                            {t("privacy") === "Privacy Policy" ? "Made for the health of the community." : "untuk kesehatan umat."}
                         </p>
                         <div className="flex gap-6">
                             <Link href="/kebijakan-privasi" className="hover:text-primary transition-colors">

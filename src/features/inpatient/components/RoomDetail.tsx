@@ -4,10 +4,10 @@ import { ArrowLeft, CheckCircle2, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { ServiceCTA } from "~/features/services";
-import { Building, RoomClass, InpatientRoom } from "../services/inpatientService";
+import { InpatientUnit, RoomClass, InpatientRoom } from "../services/inpatientService";
 
 interface RoomDetailProps {
-    selectedBuilding: Building;
+    selectedUnit: InpatientUnit;
     selectedClass: RoomClass;
     selectedRoom: InpatientRoom | null;
     onBack: () => void;
@@ -15,7 +15,7 @@ interface RoomDetailProps {
 }
 
 export const RoomDetail: React.FC<RoomDetailProps> = ({
-    selectedBuilding,
+    selectedUnit,
     selectedClass,
     selectedRoom,
     onBack,
@@ -32,7 +32,7 @@ export const RoomDetail: React.FC<RoomDetailProps> = ({
             <div className="bg-card border rounded-[2rem] overflow-hidden shadow-2xl border-border/40">
                 <div className="h-96 relative">
                     <Image
-                        src={selectedBuilding.image}
+                        src={selectedClass.imageUrl || selectedUnit.image}
                         alt={selectedClass.name}
                         fill
                         className="object-cover"
@@ -41,13 +41,17 @@ export const RoomDetail: React.FC<RoomDetailProps> = ({
                     <div className="absolute bottom-0 left-0 w-full p-10 flex flex-col md:flex-row items-end justify-between text-white z-10">
                         <div className="text-left mb-6 md:mb-0">
                             <Badge className="mb-4 bg-primary text-white border-none px-4 py-1">
-                                {selectedBuilding.name} {selectedRoom ? `- ${selectedRoom.id}` : ""}
+                                {selectedUnit.name} {selectedRoom ? `- ${selectedRoom.id}` : ""}
                             </Badge>
                             <h1 className="text-4xl md:text-5xl font-bold">{selectedClass.name}</h1>
                         </div>
                         <div className="text-right">
                             <p className="text-sm opacity-80 mb-1 font-medium">Tarif Layanan</p>
-                            <p className="text-4xl font-black text-white">{selectedClass.price}</p>
+                            <p className="text-4xl font-black text-white">
+                                {selectedRoom
+                                    ? `Rp ${selectedRoom.price.toLocaleString('id-ID')} / malam`
+                                    : selectedClass.price}
+                            </p>
                             <p className="text-xs opacity-60 mt-1">*Tarif per malam, belum termasuk tindakan & obat</p>
                         </div>
                     </div>
@@ -80,14 +84,14 @@ export const RoomDetail: React.FC<RoomDetailProps> = ({
                             <div className="flex-1 text-center md:text-left">
                                 <h3 className="text-2xl font-bold mb-2">Konfirmasi Pemesanan</h3>
                                 <p className="text-muted-foreground">
-                                    Silakan hubungi tim pendaftaran kami untuk melakukan reservasi di {selectedBuilding.name} - {selectedClass.name}.
+                                    Silakan hubungi tim pendaftaran kami untuk melakukan reservasi di {selectedUnit.name} - {selectedClass.name}.
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                                 <Button
                                     size="lg"
                                     className="rounded-xl h-14 px-10 gap-2 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
-                                    onClick={() => window.open(whatsappLink(`${selectedClass.name}${selectedRoom ? ` - ${selectedRoom.id}` : ""} (${selectedBuilding.name})`), '_blank')}
+                                    onClick={() => window.open(whatsappLink(`${selectedClass.name}${selectedRoom ? ` - ${selectedRoom.id}` : ""} (${selectedUnit.name})`), '_blank')}
                                 >
                                     Hubungi Admission
                                 </Button>

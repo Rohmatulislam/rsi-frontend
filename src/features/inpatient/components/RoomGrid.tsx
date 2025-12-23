@@ -2,10 +2,10 @@ import React from "react";
 import { ArrowLeft, BedDouble } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { InpatientRoom, Building, RoomClass } from "../services/inpatientService";
+import { InpatientRoom, InpatientUnit, RoomClass } from "../services/inpatientService";
 
 interface RoomGridProps {
-    selectedBuilding: Building;
+    selectedUnit: InpatientUnit;
     selectedClass: RoomClass;
     rooms: InpatientRoom[];
     onSelectRoom: (room: InpatientRoom) => void;
@@ -13,7 +13,7 @@ interface RoomGridProps {
 }
 
 export const RoomGrid: React.FC<RoomGridProps> = ({
-    selectedBuilding,
+    selectedUnit,
     selectedClass,
     rooms,
     onSelectRoom,
@@ -30,7 +30,7 @@ export const RoomGrid: React.FC<RoomGridProps> = ({
             <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-4">Pilih Kamar & Bed</h2>
                 <p className="text-muted-foreground">
-                    Tersedia di {selectedBuilding.name} - {selectedClass.name}
+                    Tersedia di {selectedUnit.name} - {selectedClass.name}
                 </p>
             </div>
 
@@ -42,8 +42,8 @@ export const RoomGrid: React.FC<RoomGridProps> = ({
                             key={room.id}
                             onClick={() => isAvailable && onSelectRoom(room)}
                             className={`relative group rounded-2xl border p-4 transition-all duration-300 ${isAvailable
-                                    ? "cursor-pointer hover:border-primary hover:shadow-lg border-border/60"
-                                    : "opacity-60 grayscale cursor-not-allowed bg-muted/30"
+                                ? "cursor-pointer hover:border-primary hover:shadow-lg border-border/60"
+                                : "opacity-60 grayscale cursor-not-allowed bg-muted/30"
                                 }`}
                         >
                             <div className="flex flex-col items-center text-center gap-2">
