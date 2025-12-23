@@ -104,7 +104,7 @@ export const ChatBot = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-[100] flex flex-col items-end">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -112,7 +112,7 @@ export const ChatBot = () => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         className={cn(
-                            "mb-4 w-[350px] md:w-[400px] bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden",
+                            "mb-4 w-[calc(100vw-3rem)] sm:w-[350px] md:w-[400px] bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden",
                             isMinimized ? "h-[60px]" : "h-[500px]"
                         )}
                     >
