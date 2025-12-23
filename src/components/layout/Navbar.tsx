@@ -364,12 +364,14 @@ export const Navbar = () => {
                 </DropdownMenuSub>
 
                 <DropdownMenuItem onClick={toggleTheme}>
-                  {theme === "dark" ? (
+                  {!mounted ? (
+                    <div className="h-4 w-4 mr-2" />
+                  ) : theme === "dark" ? (
                     <Sun className="h-4 w-4 mr-2" />
                   ) : (
                     <Moon className="h-4 w-4 mr-2" />
                   )}
-                  {t("theme")}: {theme === "dark" ? t("light") : t("dark")}
+                  {t("theme")}: {!mounted ? "..." : (theme === "dark" ? t("light") : t("dark"))}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -408,12 +410,14 @@ export const Navbar = () => {
                   </DropdownMenuSub>
 
                   <DropdownMenuItem onClick={toggleTheme}>
-                    {theme === "dark" ? (
+                    {!mounted ? (
+                      <div className="h-4 w-4 mr-2" />
+                    ) : theme === "dark" ? (
                       <Sun className="h-4 w-4 mr-2" />
                     ) : (
                       <Moon className="h-4 w-4 mr-2" />
                     )}
-                    {t("theme")}: {theme === "dark" ? t("light") : t("dark")}
+                    {t("theme")}: {!mounted ? "..." : (theme === "dark" ? t("light") : t("dark"))}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -507,7 +511,13 @@ export const Navbar = () => {
 
                   <div className="flex items-center justify-between px-1 border-t border-border/50 pt-2">
                     <div className="flex items-center gap-2 text-sm font-medium">
-                      {theme === "dark" ? <Moon className="h-4 w-4 opacity-70" /> : <Sun className="h-4 w-4 opacity-70" />}
+                      {!mounted ? (
+                        <div className="h-4 w-4 opacity-70" />
+                      ) : theme === "dark" ? (
+                        <Moon className="h-4 w-4 opacity-70" />
+                      ) : (
+                        <Sun className="h-4 w-4 opacity-70" />
+                      )}
                       {t("theme")}
                     </div>
                     <Button
@@ -516,7 +526,7 @@ export const Navbar = () => {
                       className="h-7 px-3 text-[10px]"
                       onClick={toggleTheme}
                     >
-                      {theme === "dark" ? t("light") : t("dark")}
+                      {!mounted ? "..." : (theme === "dark" ? t("light") : t("dark"))}
                     </Button>
                   </div>
                 </div>
