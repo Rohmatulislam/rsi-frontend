@@ -31,7 +31,12 @@
         "booking_history": "Booking History",
         "logout": "Logout",
         "search_placeholder": "Search doctor, service, or info...",
-        "no_results": "No results found."
+        "no_results": "No results found.",
+        "settings": "Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark"
     },
     "Hero": {
         "badge": "Islamic Healthcare Excellence",

@@ -31,7 +31,12 @@
     "booking_history": "Riwayat Booking",
     "logout": "Logout",
     "search_placeholder": "Cari dokter, layanan, atau informasi...",
-    "no_results": "Tidak ada hasil ditemukan."
+    "no_results": "Tidak ada hasil ditemukan.",
+    "settings": "Pengaturan",
+    "language": "Bahasa",
+    "theme": "Tema",
+    "light": "Terang",
+    "dark": "Gelap"
   },
   "Hero": {
     "badge": "Pelayanan Kesehatan Islami",

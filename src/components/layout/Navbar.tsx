@@ -10,6 +10,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "~/components/ui/dropdown-menu";
 import {
   Sheet,
@@ -31,12 +36,14 @@ import {
   CommandItem,
   CommandList,
 } from "~/components/ui/command";
-import { ChevronDown, LogIn, Menu, UserPlus, Search, ShoppingCart, User, LogOut, Settings, ClipboardList } from "lucide-react";
+import { ChevronDown, LogIn, Menu, UserPlus, Search, ShoppingCart, User, LogOut, Settings, ClipboardList, Languages, Sun, Moon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { useAuth } from "~/features/auth/hook/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { ThemeToggle } from "~/components/shared/ThemeToggle";
-import { LanguageSwitcher } from "~/components/shared/LanguageSwitcher";
+import { useLocale } from "next-intl";
+import { useRouter, usePathname as useIntlPathname } from "~/navigation";
+import { useTheme } from "next-themes";
+import { useEffect, useState as useMountedState } from "react";
 
 // Mobile Navigation Helper Components
 const MobileNavSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
@@ -78,7 +85,25 @@ export const Navbar = () => {
   const t = useTranslations("Navbar");
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mounted, setMounted] = useMountedState(false);
   const { user, isAuthenticated, isLoading, logout, canAccessAdmin } = useAuth();
+
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = useIntlPathname();
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleLanguage = (newLocale: "id" | "en") => {
+    router.replace(pathname, { locale: newLocale });
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
     <nav
@@ -205,9 +230,6 @@ export const Navbar = () => {
           <Search className="h-5 w-5" />
         </Button>
 
-        <LanguageSwitcher />
-        <ThemeToggle />
-
         {/* Search Dialog */}
         <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
           <CommandInput placeholder={t("search_placeholder")} />
@@ -299,27 +321,59 @@ export const Navbar = () => {
                 </span>
                 <ChevronDown className="h-4 w-4 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuContent align="end" className="w-[220px]">
                 {canAccessAdmin && (
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">
+                    <Link href="/admin" className="flex items-center">
                       <Settings className="h-4 w-4 mr-2" />
                       {t("admin_panel")}
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <Link href="/profil">
+                  <Link href="/profil" className="flex items-center">
                     <User className="h-4 w-4 mr-2" />
                     {t("my_profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/riwayat-booking">
+                  <Link href="/riwayat-booking" className="flex items-center">
                     <ClipboardList className="h-4 w-4 mr-2" />
                     {t("booking_history")}
                   </Link>
                 </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                {/* Theme & Language Integrated */}
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Languages className="h-4 w-4 mr-2" />
+                    {t("language")}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => toggleLanguage("id")} className={cn(locale === "id" && "bg-accent")}>
+                        <span className="mr-2">🇮🇩</span> Bahasa Indonesia
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => toggleLanguage("en")} className={cn(locale === "en" && "bg-accent")}>
+                        <span className="mr-2">🇺🇸</span> English (US)
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuItem onClick={toggleTheme}>
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Moon className="h-4 w-4 mr-2" />
+                  )}
+                  {t("theme")}: {theme === "dark" ? t("light") : t("dark")}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={logout} className="text-red-600">
                   <LogOut className="h-4 w-4 mr-2" />
                   {t("logout")}
@@ -328,6 +382,42 @@ export const Navbar = () => {
             </DropdownMenu>
           ) : (
             <>
+              {/* Settings for Guests */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Languages className="h-4 w-4 mr-2" />
+                      {t("language")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem onClick={() => toggleLanguage("id")} className={locale === "id" ? "bg-accent" : ""}>
+                          <span className="mr-2">🇮🇩</span> Bahasa Indonesia
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toggleLanguage("en")} className={locale === "en" ? "bg-accent" : ""}>
+                          <span className="mr-2">🇺🇸</span> English (US)
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuItem onClick={toggleTheme}>
+                    {theme === "dark" ? (
+                      <Sun className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Moon className="h-4 w-4 mr-2" />
+                    )}
+                    {t("theme")}: {theme === "dark" ? t("light") : t("dark")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">
                   <LogIn className="h-4 w-4" />
@@ -385,6 +475,51 @@ export const Navbar = () => {
                 <MobileNavLink href="/lokasi" onClick={() => setIsOpen(false)}>{t("location")}</MobileNavLink>
                 <MobileNavLink href="/kontak" onClick={() => setIsOpen(false)}>{t("contact")}</MobileNavLink>
                 <MobileNavLink href="/faq" onClick={() => setIsOpen(false)}>{t("faq")}</MobileNavLink>
+              </MobileNavSection>
+
+              {/* Settings - Mobile */}
+              <MobileNavSection title={t("settings")}>
+                <div className="flex flex-col gap-2 p-2">
+                  <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Languages className="h-4 w-4 opacity-70" />
+                      {t("language")}
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        variant={locale === "id" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 px-2 text-[10px]"
+                        onClick={() => toggleLanguage("id")}
+                      >
+                        ID
+                      </Button>
+                      <Button
+                        variant={locale === "en" ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 px-2 text-[10px]"
+                        onClick={() => toggleLanguage("en")}
+                      >
+                        EN
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between px-1 border-t border-border/50 pt-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      {theme === "dark" ? <Moon className="h-4 w-4 opacity-70" /> : <Sun className="h-4 w-4 opacity-70" />}
+                      {t("theme")}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-3 text-[10px]"
+                      onClick={toggleTheme}
+                    >
+                      {theme === "dark" ? t("light") : t("dark")}
+                    </Button>
+                  </div>
+                </div>
               </MobileNavSection>
 
               {/* Mobile Auth Buttons */}
@@ -453,6 +588,6 @@ export const Navbar = () => {
           </SheetContent>
         </Sheet>
       </div>
-    </nav>
+    </nav >
   );
 };
