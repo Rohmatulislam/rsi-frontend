@@ -13,6 +13,7 @@ import { AppointmentBookingModal } from "~/features/appointment/components/Appoi
 import { DoctorScheduleByPoli } from "~/components/shared/DoctorScheduleByPoli";
 import { Breadcrumb } from "~/components/shared/Breadcrumb";
 import { DoctorDetailSkeleton } from "~/components/shared/PageSkeletons";
+import { QueueStatusCard } from "~/features/appointment/components/QueueStatusCard";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -123,6 +124,15 @@ const DoctorDetailPage = () => {
                     {/* Right Column: Sticky Booking Card */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-6">
+                            {/* Queue Status Integration */}
+                            {doctor.kd_dokter && doctor.scheduleDetails && doctor.scheduleDetails.length > 0 && (
+                                <QueueStatusCard
+                                    doctorCode={doctor.kd_dokter}
+                                    poliCode={doctor.scheduleDetails[0].kd_poli}
+                                    className="mb-6"
+                                />
+                            )}
+
                             <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardContent className="p-6 space-y-6">
                                     <div>

@@ -86,7 +86,7 @@ export default async function RootLayout({
               "image": "https://rsisitihajarmataram.com/logo.png",
               "@id": "",
               "url": "https://rsisitihajarmataram.com",
-              "telephone": "(0370) 631885",
+              "telephone": "087865733233",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Jalan Catur Warga No. 10 B, Pajang, Kecamatan Mataram",

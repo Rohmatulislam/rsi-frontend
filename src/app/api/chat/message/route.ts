@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
         console.error('Chat API error:', error);
         return NextResponse.json(
-            { response: 'Maaf, sistem sedang sibuk. Silakan coba lagi nanti atau hubungi Customer Service kami di (0370) 631885.' },
+            { response: 'Maaf, sistem sedang sibuk. Silakan coba lagi nanti atau hubungi Customer Service kami di 087865733233.' },
             { status: 500 }
         );
     }

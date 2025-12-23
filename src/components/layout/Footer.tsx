@@ -7,8 +7,8 @@ import logo from "~/assets/logo.png";
 import { useTranslations } from "next-intl";
 
 const contactInfo = {
-    phone: "(0370) 631885",
-    emergency: "(0370) 631886",
+    phone: "087865733233",
+    emergency: "087865733233",
     email: "info@rsisitihajar.com",
 };
 
