@@ -150,9 +150,18 @@ export const FamilyManagementPage = () => {
                                             <Input
                                                 id="nik"
                                                 value={formData.nik}
-                                                onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
-                                                placeholder="Nomor KTP"
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/\D/g, "");
+                                                    if (value.length <= 16) {
+                                                        setFormData({ ...formData, nik: value });
+                                                    }
+                                                }}
+                                                placeholder="16 digit NIK"
+                                                maxLength={16}
                                             />
+                                            {formData.nik && formData.nik.length !== 16 && (
+                                                <p className="text-xs text-red-500">NIK harus 16 digit angka</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="phone">No. Telepon</Label>

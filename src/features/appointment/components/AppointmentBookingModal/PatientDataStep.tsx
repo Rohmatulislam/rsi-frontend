@@ -140,12 +140,17 @@ export const PatientDataStep = ({
             <Input
               placeholder="16 digit NIK"
               value={formData.nik}
-              onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 16) {
+                  setFormData({ ...formData, nik: value });
+                }
+              }}
               className="rounded-xl"
               maxLength={16}
             />
             {formData.nik && formData.nik.length !== 16 && (
-              <p className="text-xs text-red-500">NIK harus 16 digit</p>
+              <p className="text-xs text-red-500">NIK harus 16 digit angka</p>
             )}
           </div>
           <div className="space-y-2">
@@ -345,14 +350,22 @@ export const PatientDataStep = ({
                 <Input
                   placeholder="0001234567890"
                   value={displayValue}
-                  onChange={(e) => setFormData({ ...formData, bpjsNumber: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    if (value.length <= 13) {
+                      setFormData({ ...formData, bpjsNumber: value });
+                    }
+                  }}
                   className="h-12 rounded-xl"
                   maxLength={13}
                 />
+                {displayValue && displayValue.length !== 13 && (
+                  <p className="text-xs text-red-500">Nomor BPJS harus 13 digit angka</p>
+                )}
                 {isAutoFilled ? (
-                  <p className="text-xs text-green-600 dark:text-green-400">✓ Diambil dari data pasien ({noPesertaDariPasien})</p>
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Diambil dari data pasien ({noPesertaDariPasien})</p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">13 digit nomor kartu BPJS Kesehatan</p>
+                  <p className="text-xs text-muted-foreground mt-1">13 digit nomor kartu BPJS Kesehatan</p>
                 )}
               </div>
 

@@ -167,9 +167,43 @@ export const PatientHistoryComponent = ({ patientId }: PatientHistoryProps) => {
                 </div>
               )}
 
-              {/* Cancel Button */}
+              {/* Actions Footer */}
               {canCancel(appointment) && (
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 pt-4 border-t flex flex-wrap gap-2">
+                  {/* Reschedule Button */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-primary border-primary/20 hover:bg-primary/5"
+                      >
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Ubah Jadwal
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Ubah Jadwal Booking</DialogTitle>
+                        <DialogDescription>
+                          Fitur penjadwalan ulang sedang dalam pengembangan. Silakan hubungi Customer Service kami via WhatsApp untuk mengubah jadwal Anda ke tanggal yang baru secara cepat.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          onClick={() => window.open(`https://wa.me/628123456789?text=Halo%20RSI,%20saya%20ingin%20mengubah%20jadwal%20booking%20dengan%20ID%20${appointment.id}`, '_blank')}
+                        >
+                          Chat WhatsApp CS
+                        </Button>
+                        <DialogClose asChild>
+                          <Button variant="outline" className="w-full">Tutup</Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Cancel Button */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -186,7 +220,7 @@ export const PatientHistoryComponent = ({ patientId }: PatientHistoryProps) => {
                         ) : (
                           <>
                             <XCircle className="h-4 w-4 mr-2" />
-                            Batalkan Booking
+                            Batalkan
                           </>
                         )}
                       </Button>
@@ -208,7 +242,7 @@ export const PatientHistoryComponent = ({ patientId }: PatientHistoryProps) => {
                           Tindakan ini tidak dapat dibatalkan.
                         </DialogDescription>
                       </DialogHeader>
-                      <DialogFooter>
+                      <DialogFooter className="gap-2 sm:gap-0">
                         <DialogClose asChild>
                           <Button variant="outline">Batal</Button>
                         </DialogClose>
@@ -217,7 +251,7 @@ export const PatientHistoryComponent = ({ patientId }: PatientHistoryProps) => {
                             onClick={() => handleCancelBooking(appointment)}
                             className="bg-red-600 hover:bg-red-700"
                           >
-                            Ya, Batalkan Booking
+                            Ya, Batalkan
                           </Button>
                         </DialogClose>
                       </DialogFooter>

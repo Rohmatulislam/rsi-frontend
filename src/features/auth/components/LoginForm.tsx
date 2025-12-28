@@ -58,6 +58,15 @@ export const LoginForm = () => {
             )}
           />
 
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-primary hover:underline"
+            >
+              Lupa kata sandi?
+            </Link>
+          </div>
+
           <Button className="w-full" type="submit">
             Sign in
           </Button>
