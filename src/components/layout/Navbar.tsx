@@ -305,7 +305,7 @@ export const Navbar = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-2">
-          {isLoading ? (
+          {isLoading || !mounted ? (
             <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
           ) : isAuthenticated && user ? (
             <DropdownMenu>
@@ -534,7 +534,12 @@ export const Navbar = () => {
 
               {/* Mobile Auth Buttons */}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
-                {isAuthenticated && user ? (
+                {!mounted || isLoading ? (
+                  <div className="flex flex-col gap-2 p-3">
+                    <div className="h-10 w-full bg-slate-100 animate-pulse rounded-lg" />
+                    <div className="h-10 w-full bg-slate-100 animate-pulse rounded-lg" />
+                  </div>
+                ) : isAuthenticated && user ? (
                   <>
                     <div className="flex items-center gap-3 px-3 py-2">
                       <Avatar className="h-10 w-10">

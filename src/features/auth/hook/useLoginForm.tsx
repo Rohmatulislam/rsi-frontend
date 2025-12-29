@@ -27,7 +27,16 @@ export const useLoginForm = () => {
 
       //handle auth errors
       if (error?.code) {
-        toast.error(getErrorMessage(error.code));
+        if (error.code === "EMAIL_NOT_VERIFIED") {
+          // Trigger resend email verification
+          await authClient.sendVerificationEmail({
+            email: data.email,
+            callbackURL: "/", // Optional: redirect after clicking the link in email
+          });
+          toast.info("Email belum diverifikasi. Tautan verifikasi baru telah dikirim ke email Anda.");
+        } else {
+          toast.error(getErrorMessage(error.code));
+        }
         return;
       }
 

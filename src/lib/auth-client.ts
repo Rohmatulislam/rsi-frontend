@@ -26,29 +26,28 @@ export const authClient = createAuthClient({
   }
 });
 
-type ErrorTypes = Partial<
-  Record<
-    keyof typeof authClient.$ERROR_CODES,
-    {
-      en: string;
-    }
-  >
->;
-
 const errorCodes = {
   USER_ALREADY_EXISTS: {
     en: "User already registered",
+    id: "Email sudah terdaftar",
   },
   USER_EMAIL_NOT_FOUND: {
     en: "Email not found",
+    id: "Email tidak ditemukan",
   },
   INVALID_PASSWORD: {
     en: "Invalid password",
+    id: "Kata sandi salah",
   },
   USER_NOT_FOUND: {
     en: "User not found",
+    id: "Pengguna tidak ditemukan",
   },
-} satisfies ErrorTypes;
+  EMAIL_NOT_VERIFIED: {
+    en: "Email not verified",
+    id: "Email belum diverifikasi. Silakan cek kotak masuk email Anda.",
+  },
+} satisfies Record<string, { en: string; id: string }>;
 
 export type AuthError = {
   code?: string | undefined | keyof typeof authClient.$ERROR_CODES;
@@ -57,9 +56,9 @@ export type AuthError = {
   statusText: string;
 } | null;
 
-export const getErrorMessage = (code: string) => {
+export const getErrorMessage = (code: string, lang: "en" | "id" = "id") => {
   if (code in errorCodes) {
-    return errorCodes[code as keyof typeof errorCodes]["en"];
+    return errorCodes[code as keyof typeof errorCodes][lang];
   }
-  return "An error occurred, please try again";
+  return lang === "en" ? "An error occurred, please try again" : "Terjadi kesalahan, silakan coba lagi";
 };
