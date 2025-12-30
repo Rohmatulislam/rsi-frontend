@@ -12,6 +12,8 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "~/i18n";
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   // ... existing metadata
   metadataBase: new URL("https://rsisitihajarmataram.com"), // Placeholder domain

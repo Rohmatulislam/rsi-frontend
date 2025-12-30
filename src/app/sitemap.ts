@@ -3,6 +3,8 @@ import { getDoctors, DoctorDto } from '~/features/home/api/getDoctors';
 import { getArticles } from '~/features/article/api/getArticles';
 import { ArticleDto } from '~/features/article/services/articleService';
 
+export const runtime = 'edge';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://rsisitihajarmataram.com';
 
