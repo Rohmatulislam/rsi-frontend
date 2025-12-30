@@ -25,7 +25,7 @@ export const getAdminAppointments = async (startDate?: string, endDate?: string)
     if (startDate) params.append("startDate", startDate);
     if (endDate) params.append("endDate", endDate);
 
-    const response = await axiosInstance.get<AdminAppointmentsReport>("/admin/reports/appointments", {
+    const response = await axiosInstance.get<AdminAppointmentsReport>("/admin/appointments/reports", {
         params
     });
     return response.data;

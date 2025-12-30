@@ -7,7 +7,7 @@ import { Download } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 export default function AdminAppointmentsPage() {
-    const { data: report, isLoading } = useAdminAppointments();
+    const { data: report, isLoading, error } = useAdminAppointments();
 
     const handleExport = () => {
         if (!report?.appointments) return;
@@ -39,7 +39,16 @@ export default function AdminAppointmentsPage() {
         document.body.removeChild(link);
     };
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <div className="p-8 text-center text-slate-500">Loading appointments...</div>;
+
+    if (error) {
+        return (
+            <div className="p-8 text-center border-2 border-dashed border-red-200 rounded-2xl bg-red-50">
+                <p className="text-red-600 font-medium">Error loading appointments</p>
+                <p className="text-red-500 text-sm mt-1">{(error as any)?.message || 'Terjadi kesalahan sistem'}</p>
+            </div>
+        );
+    }
 
     const appointments = report?.appointments || [];
 
