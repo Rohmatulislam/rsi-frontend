@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { ServiceHero } from "~/features/services";
 import { useGetArticles } from "~/features/article/api/getArticles";
 import { Badge } from "~/components/ui/badge";
@@ -13,9 +14,30 @@ import { getImageSrc } from "~/lib/utils";
 export const ArticleListPage = () => {
     const { data: articles, isLoading } = useGetArticles();
 
+    const searchParams = useSearchParams();
+
     // State for search and filter
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
+
+    // Handle initial search params
+    useEffect(() => {
+        const tag = searchParams.get("tag");
+        const category = searchParams.get("category");
+
+        if (tag || category) {
+            const filterValue = tag || category;
+            // We'll try to find if this slug exists in our articles
+            if (articles) {
+                const found = articles.flatMap(a => a.categories || [])
+                    .find(c => c.slug === filterValue || c.name.toLowerCase() === filterValue?.toLowerCase());
+
+                if (found) {
+                    setCategoryFilter(found.name);
+                }
+            }
+        }
+    }, [searchParams, articles]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("id-ID", {
@@ -30,7 +52,11 @@ export const ArticleListPage = () => {
         if (!articles) return [];
         const uniqueCategories = [...new Set(
             articles
-                .flatMap(article => article.categories?.filter(c => c.type === "ARTICLE_CATEGORY").map(c => c.name) || [])
+                .flatMap(article =>
+                    article.categories?.filter(c =>
+                        c.type === "ARTICLE_CATEGORY" || c.type === "ARTICLE_TAG"
+                    ).map(c => c.name) || []
+                )
                 .filter(Boolean)
         )];
         return uniqueCategories;
@@ -179,7 +205,7 @@ export const ArticleListPage = () => {
                                             </div>
                                         )}
                                         <div className="absolute top-4 left-4">
-                                            <Badge variant="secondary" className="backdrop-blur-md bg-white/80">
+                                            <Badge variant="secondary" className="backdrop-blur-md bg-white/90 dark:bg-slate-900/80 text-slate-900 dark:text-white border-none shadow-sm">
                                                 {article.categories?.find(c => c.type === "ARTICLE_CATEGORY")?.name || article.categories?.[0]?.name || "Umum"}
                                             </Badge>
                                         </div>
