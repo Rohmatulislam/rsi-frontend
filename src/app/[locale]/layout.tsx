@@ -16,7 +16,7 @@ export const runtime = 'edge';
 
 export const metadata: Metadata = {
   // ... existing metadata
-  metadataBase: new URL("https://rsisitihajarmataram.com"), // Placeholder domain
+  metadataBase: new URL("https://rsisitihajarmataram.co.id"),
   title: {
     default: "RSI Siti Hajar Mataram - Pelayanan Kesehatan Islami",
     template: "%s | RSI Siti Hajar Mataram"
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://rsisitihajarmataram.com",
+    url: "https://rsisitihajarmataram.co.id",
     siteName: "RSI Siti Hajar Mataram",
     title: "RSI Siti Hajar Mataram - Pelayanan Kesehatan Islami",
     description: "Rumah Sakit Islam Siti Hajar Mataram memberikan pelayanan terbaik dengan nilai syariah.",
@@ -85,9 +85,9 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "Hospital",
               "name": "RSI Siti Hajar Mataram",
-              "image": "https://rsisitihajarmataram.com/logo.png",
+              "image": "https://rsisitihajarmataram.co.id/logo.png",
               "@id": "",
-              "url": "https://rsisitihajarmataram.com",
+              "url": "https://rsisitihajarmataram.co.id",
               "telephone": "087865733233",
               "address": {
                 "@type": "PostalAddress",

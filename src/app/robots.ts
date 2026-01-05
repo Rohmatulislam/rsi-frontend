@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/admin/', '/api/', '/login', '/register'],
         },
-        sitemap: 'https://rsisitihajarmataram.com/sitemap.xml',
+        sitemap: 'https://rsisitihajarmataram.co.id/sitemap.xml',
     };
 }

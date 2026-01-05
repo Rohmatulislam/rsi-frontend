@@ -6,7 +6,7 @@ import { ArticleDto } from '~/features/article/services/articleService';
 export const runtime = 'edge';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://rsisitihajarmataram.com';
+    const baseUrl = 'https://rsisitihajarmataram.co.id';
 
     // Fetch dynamic data
     let doctors: DoctorDto[] = [];
