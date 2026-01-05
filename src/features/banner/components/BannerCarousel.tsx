@@ -48,7 +48,32 @@ export const BannerCarousel = () => {
     }
 
     if (!banners || banners.length === 0) {
-        return null; // Don't show anything if no banners
+        return (
+            <div className="relative w-full h-[500px] md:h-[600px] flex items-center bg-gradient-to-br from-[#008080] to-[#004d4d] overflow-hidden">
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80')] bg-cover bg-center" />
+                </div>
+                <div className="container mx-auto px-4 md:px-8 relative z-10">
+                    <div className="max-w-2xl text-white space-y-6">
+                        <h1 className="text-4xl md:text-7xl font-bold leading-tight">
+                            RSI Siti Hajar <br />
+                            <span className="text-accent italic">Mataram</span>
+                        </h1>
+                        <p className="text-lg md:text-2xl text-white/90">
+                            Memberikan Pelayanan Terbaik dengan Nilai-Nilai Islami.
+                        </p>
+                        <div className="pt-4 flex flex-wrap gap-4">
+                            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-white font-bold h-14 px-8">
+                                <Link href="/doctors">Cari Dokter</Link>
+                            </Button>
+                            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10 h-14 px-8">
+                                <Link href="/layanan-unggulan">Layanan Utama</Link>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     const currentBanner = banners[currentIndex];
