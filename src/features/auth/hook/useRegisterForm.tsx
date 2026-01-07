@@ -17,6 +17,7 @@ export const useRegisterForm = () => {
   });
 
   const onSubmit = async (data: RegisterFormSchema) => {
+    console.log('[REGISTER] Starting registration for:', data.email);
     try {
       // Registrasi pengguna baru
       const { error, data: authResponseData } = await authClient.signUp.email({
@@ -25,23 +26,37 @@ export const useRegisterForm = () => {
         name: data.name,
       });
 
+      console.log('[REGISTER] Response:', { error, authResponseData });
+
       // Handle auth errors
       if (error?.code) {
+        console.error('[REGISTER] Auth error:', error);
         toast.error(getErrorMessage(error.code));
         return;
       }
 
-      if (authResponseData?.token) {
-        localStorage.setItem(
-          LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY,
-          authResponseData.token
-        );
-
-        // Handle success
-        toast.success("Registrasi berhasil! Anda telah masuk.");
+      // If we have response data (user was created), show success
+      if (authResponseData?.user) {
+        if (authResponseData?.token) {
+          localStorage.setItem(
+            LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY,
+            authResponseData.token
+          );
+          toast.success("Registrasi berhasil! Anda telah masuk.");
+        } else {
+          // No token = email verification required
+          toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
+          form.reset();
+        }
+        return;
       }
+
+      // Fallback: if we got here without error, assume success with email verification
+      toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
+      form.reset();
     } catch (error) {
       // Handle non-auth errors
+      console.error('[REGISTER] Exception:', error);
       toast.error((error as Error).message);
     }
   };
