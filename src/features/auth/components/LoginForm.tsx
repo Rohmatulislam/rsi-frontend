@@ -1,37 +1,66 @@
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
-import { Input } from "~/components/ui/input"
-import { Button } from "~/components/ui/button"
-import { Controller } from "react-hook-form"
-import { Field, FieldError, FieldLabel } from "~/components/ui/field"
-import { useLoginForm } from "../hook/useLoginForm"
-import { authClient } from "~/lib/auth-client"
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { Controller } from "react-hook-form";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
+import { useLoginForm } from "../hook/useLoginForm";
+import { Eye, EyeOff, Mail, Lock, LogIn, Loader2 } from "lucide-react";
+import { cn } from "~/lib/utils";
 
 export const LoginForm = () => {
-  const { data: session } = authClient.useSession();
   const { form, onSubmit } = useLoginForm();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (data: Parameters<typeof onSubmit>[0]) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(data);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Sign in {session?.user.name}</CardTitle>
-        <CardDescription>
-          Masukkan email dan kata sandi Anda untuk masuk ke akun Anda
+    <Card className="w-full max-w-md shadow-xl border-0 bg-card/95 backdrop-blur-sm">
+      <CardHeader className="space-y-1 pb-6">
+        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+          <LogIn className="w-6 h-6 text-primary" />
+        </div>
+        <CardTitle className="text-2xl font-bold text-center">Selamat Datang</CardTitle>
+        <CardDescription className="text-center">
+          Masuk ke akun Anda untuk melanjutkan
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="space-y-5" onSubmit={form.handleSubmit(handleSubmit)}>
+          {/* Email Field */}
           <Controller
             control={form.control}
             name="email"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                  placeholder="name@example.com"
-                />
+                <FieldLabel htmlFor={field.name} className="text-sm font-medium">
+                  Alamat Email
+                </FieldLabel>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="email"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="nama@email.com"
+                    className={cn(
+                      "pl-10 h-11 transition-all",
+                      fieldState.invalid && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  />
+                </div>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -39,18 +68,49 @@ export const LoginForm = () => {
             )}
           />
 
+          {/* Password Field */}
           <Controller
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                  type="password"
-                />
+                <div className="flex items-center justify-between">
+                  <FieldLabel htmlFor={field.name} className="text-sm font-medium">
+                    Kata Sandi
+                  </FieldLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Lupa kata sandi?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Masukkan kata sandi"
+                    className={cn(
+                      "pl-10 pr-10 h-11 transition-all",
+                      fieldState.invalid && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -58,28 +118,34 @@ export const LoginForm = () => {
             )}
           />
 
-          <div className="flex justify-end">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-primary hover:underline"
-            >
-              Lupa kata sandi?
-            </Link>
-          </div>
-
-          <Button className="w-full" type="submit">
-            Sign in
+          {/* Submit Button */}
+          <Button
+            className="w-full h-11 text-base font-semibold mt-6"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Memproses...
+              </>
+            ) : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" />
+                Masuk
+              </>
+            )}
           </Button>
         </form>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="border-t pt-6">
         <p className="text-sm text-muted-foreground text-center w-full">
-          Don&apos;t have an account?{""}{" "}
-          <Link href={"/register"} className="text-primary underline">
-            Register
+          Belum punya akun?{" "}
+          <Link href="/register" className="text-primary font-semibold hover:underline">
+            Daftar sekarang
           </Link>
         </p>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
