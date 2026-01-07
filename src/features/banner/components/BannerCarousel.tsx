@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useGetActiveBanners } from "../api/getActiveBanners";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Phone } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
 import { getImageSrc } from "~/lib/utils";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+
+// IGD Emergency Phone Number
+const IGD_PHONE = "0370-671011";
 
 export const BannerCarousel = () => {
     const t = useTranslations("About");
@@ -110,6 +113,19 @@ export const BannerCarousel = () => {
                                 <p className="text-sm md:text-lg drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 line-clamp-3 md:line-clamp-none">
                                     {currentBanner.description}
                                 </p>
+                            )}
+
+                            {/* IGD Phone Number - Show when banner is IGD related */}
+                            {currentBanner.title?.toLowerCase().includes('igd') && (
+                                <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-250">
+                                    <a
+                                        href={`tel:${IGD_PHONE}`}
+                                        className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full font-bold text-sm md:text-base transition-all shadow-lg hover:shadow-xl"
+                                    >
+                                        <Phone className="h-4 w-4 md:h-5 md:w-5 animate-pulse" />
+                                        <span>Hubungi IGD: {IGD_PHONE}</span>
+                                    </a>
+                                </div>
                             )}
 
                             {currentBanner.link && (

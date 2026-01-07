@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Navbar } from "~/components/layout/Navbar";
+import { TopBar } from "~/components/layout/TopBar";
 import { Footer } from "~/components/layout/Footer";
 import { MobileBottomNav } from "~/components/shared/MobileBottomNav";
 import { ChatBot } from "~/components/shared/ChatBot";
@@ -122,6 +123,7 @@ export default async function RootLayout({
       <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
         <Providers>
           <NextIntlClientProvider locale={locale} messages={messages}>
+            <TopBar />
             <Navbar />
             <main className="min-h-screen">
               {children}
