@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube, Heart } from "lucide-react";
 import logo from "~/assets/logo.png";
 import { useTranslations } from "next-intl";
+import { VisitorCounter } from "~/features/home/components/VisitorCounter";
 
 const contactInfo = {
     phone: "087865733233",
@@ -65,6 +66,11 @@ export const Footer = () => {
                         <p className="text-slate-400 text-sm leading-relaxed">
                             {t("description")}
                         </p>
+
+                        <div className="py-2 border-y border-slate-800">
+                            <VisitorCounter />
+                        </div>
+
                         {/* Social Links */}
                         <div className="flex gap-3">
                             {socialLinks.map((social) => (
