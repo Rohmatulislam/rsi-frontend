@@ -4,8 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient, getErrorMessage } from "~/lib/auth-client";
 import { toast } from "sonner";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
+import { useRouter } from "next/navigation";
 
 export const useRegisterForm = () => {
+  const router = useRouter();
   const form = useForm<RegisterFormSchema>({
     defaultValues: {
       name: "",
@@ -43,17 +45,17 @@ export const useRegisterForm = () => {
             authResponseData.token
           );
           toast.success("Registrasi berhasil! Anda telah masuk.");
+          router.push("/");
         } else {
           // No token = email verification required
-          toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
-          form.reset();
+          // Redirect to check-email page
+          router.push(`/check-email?email=${encodeURIComponent(data.email)}`);
         }
         return;
       }
 
       // Fallback: if we got here without error, assume success with email verification
-      toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
-      form.reset();
+      router.push(`/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
       // Handle non-auth errors
       console.error('[REGISTER] Exception:', error);
