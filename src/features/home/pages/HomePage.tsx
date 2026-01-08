@@ -4,6 +4,7 @@ import { RecommendedDoctorsSection } from "../components/RecommendedDoctorsSecti
 import { BannerCarousel } from "~/features/banner/components/BannerCarousel";
 import { ServiceCardsSection } from "../components/ServiceCardsSection";
 import { ArticlesSection } from "../components/ArticlesSection";
+import { PartnershipSection } from "../components/PartnershipSection";
 import Link from "next/link";
 
 const HomePage = () => {
@@ -15,6 +16,7 @@ const HomePage = () => {
         <About />
         <RecommendedDoctorsSection />
         <ArticlesSection />
+        <PartnershipSection />
       </div>
     </div>
   )
