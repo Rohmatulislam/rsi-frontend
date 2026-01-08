@@ -74,9 +74,9 @@ export const FAQPage = () => {
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="jam-2">
-                                    <AccordionTrigger>Apakah IGD buka 24 jam?</AccordionTrigger>
+                                    <AccordionTrigger>Apakah UGD buka 24 jam?</AccordionTrigger>
                                     <AccordionContent>
-                                        Ya, Instalasi Gawat Darurat (IGD), Laboratorium, Farmasi, dan Radiologi kami beroperasi 24 jam setiap hari, termasuk hari libur nasional.
+                                        Ya, Unit Gawat Darurat (UGD), Laboratorium, Farmasi, dan Radiologi kami beroperasi 24 jam setiap hari, termasuk hari libur nasional.
                                     </AccordionContent>
                                 </AccordionItem>
                             </div>

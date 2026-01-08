@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 // IGD Emergency Phone Number
-const IGD_PHONE = "0370-671011";
+const IGD_PHONE = "087864331678";
 
 export const BannerCarousel = () => {
     const t = useTranslations("About");

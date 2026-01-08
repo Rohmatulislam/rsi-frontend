@@ -44,8 +44,8 @@ export const ContactPage = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-sm uppercase text-muted-foreground mb-1">Telepon</h4>
-                                        <p className="text-slate-900 dark:text-white font-mono text-lg">(0370) 623498</p>
-                                        <p className="text-xs text-muted-foreground mt-1">Layanan Informasi 24 Jam</p>
+                                        <p className="text-slate-900 dark:text-white font-mono text-lg">0878-6433-1678 (UGD)</p>
+                                        <p className="text-xs text-muted-foreground mt-1">Informasi: (0370) 623498</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
@@ -65,7 +65,7 @@ export const ContactPage = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-sm uppercase text-muted-foreground mb-1">Jam Operasional</h4>
-                                        <p className="text-slate-900 dark:text-white">IGD & Rawat Inap: 24 Jam</p>
+                                        <p className="text-slate-900 dark:text-white">UGD & Rawat Inap: 24 Jam</p>
                                         <p className="text-slate-900 dark:text-white">Poliklinik: 08.00 - 21.00</p>
                                         <p className="text-slate-900 dark:text-white">Kantor: 08.00 - 16.00</p>
                                     </div>

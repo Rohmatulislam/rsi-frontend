@@ -1,17 +1,33 @@
 "use client";
 
 import { ServiceHero } from "~/features/services";
-import { Phone, Ambulance, Clock, Activity, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Phone, Ambulance, Clock, Activity, AlertCircle, CheckCircle2, UserCheck } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
+
+const UGD_PHONE = "087864331678";
+const AMBULANCE_PHONE = "087872154493";
+
+const ACTIVE_DOCTORS = [
+    "dr. Lina Efiantari",
+    "dr. Restu Ardi Safiru",
+    "dr. Emira Alifia",
+    "dr. M. Imam Setiawan",
+    "dr. Farida Pratiwi",
+    "dr. M. Miftahul Hadi",
+    "dr. Baiq Febri Aryani",
+    "dr. Tri Wira Jati Kusuma H",
+    "dr. M. Abdizil Ikram",
+    "dr. L. Anugrah Nugraha"
+];
 
 export const IGDPage = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <ServiceHero
                 badge="LAYANAN DARURAT 24 JAM"
-                title="Instalasi Gawat Darurat"
+                title="Unit Gawat Darurat"
                 highlightText="Respon Cepat & Tepat"
                 subtitle="Siap melayani kasus kegawatdaruratan medis 24 jam sehari, 7 hari seminggu dengan tim medis terlatih di RSI Siti Hajar Mataram."
             />
@@ -28,13 +44,17 @@ export const IGDPage = () => {
                             </div>
 
                             <div className="flex flex-col md:flex-row gap-4 justify-center">
-                                <Button size="lg" className="h-16 text-lg bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 dark:shadow-none animate-pulse">
-                                    <Phone className="mr-2 h-6 w-6" />
-                                    IGD: (0370) 623498
+                                <Button asChild size="lg" className="h-16 text-lg bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 dark:shadow-none animate-pulse">
+                                    <a href={`https://wa.me/${UGD_PHONE.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer">
+                                        <Phone className="mr-2 h-6 w-6" />
+                                        UGD: {UGD_PHONE}
+                                    </a>
                                 </Button>
-                                <Button size="lg" variant="outline" className="h-16 text-lg border-2 border-red-200 hover:bg-red-50 text-red-700 dark:text-red-400 dark:border-red-900 dark:hover:bg-red-950/50">
-                                    <Ambulance className="mr-2 h-6 w-6" />
-                                    Ambulans: (0370) 623498
+                                <Button asChild variant="outline" size="lg" className="h-16 text-lg border-2 border-red-200 hover:bg-red-50 text-red-700 dark:text-red-400 dark:border-red-900 dark:hover:bg-red-950/50">
+                                    <a href={`tel:${AMBULANCE_PHONE}`}>
+                                        <Ambulance className="mr-2 h-6 w-6" />
+                                        Ambulans: {AMBULANCE_PHONE}
+                                    </a>
                                 </Button>
                             </div>
 
@@ -106,7 +126,7 @@ export const IGDPage = () => {
 
                         {/* Triage System Info */}
                         <section className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800">
-                            <h2 className="text-2xl font-bold mb-4">Sistem Triase IGD</h2>
+                            <h2 className="text-2xl font-bold mb-4">Sistem Triase UGD</h2>
                             <p className="text-muted-foreground mb-6">
                                 Kami menggunakan sistem triase untuk memprioritaskan pasien berdasarkan tingkat kegawatdaruratan penyakitnya, bukan berdasarkan urutan kedatangan.
                             </p>
@@ -149,33 +169,55 @@ export const IGDPage = () => {
                         {/* Flow */}
                         <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-100 dark:border-blue-900">
                             <CardHeader>
-                                <CardTitle className="text-blue-900 dark:text-blue-100">Alur Pelayanan IGD</CardTitle>
+                                <CardTitle className="text-blue-900 dark:text-blue-100 text-xl flex items-center gap-2">
+                                    <Activity className="h-5 w-5 text-blue-600" />
+                                    Alur Pelayanan UGD
+                                </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0">1</div>
-                                    <p className="text-sm pt-1">Datang ke IGD (Drop Zone)</p>
+                                {[
+                                    "Datang ke UGD",
+                                    "Pemeriksaan triase oleh perawat",
+                                    "Pemeriksaan dokter",
+                                    "Persetujuan tindakan",
+                                    "Pendaftaran administrasi (keluarga)",
+                                    "Observasi/rawat inap/rujuk/pulang"
+                                ].map((step, index) => (
+                                    <div key={index} className="flex gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0 text-sm">
+                                            {index + 1}
+                                        </div>
+                                        <p className="text-sm pt-1 leading-relaxed text-blue-900 dark:text-blue-200">{step}</p>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+
+                        {/* Doctors List */}
+                        <Card className="border-indigo-100 dark:border-indigo-900">
+                            <CardHeader className="bg-indigo-50/50 dark:bg-indigo-950/20">
+                                <CardTitle className="text-indigo-900 dark:text-indigo-100 text-xl flex items-center gap-2">
+                                    <UserCheck className="h-5 w-5 text-indigo-600" />
+                                    Dokter Jaga Aktif
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="divide-y divide-indigo-50 dark:divide-indigo-900">
+                                    {ACTIVE_DOCTORS.map((doctor, index) => (
+                                        <div key={index} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{doctor}</p>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0">2</div>
-                                    <p className="text-sm pt-1">Pemeriksaan Triase oleh Perawat</p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0">3</div>
-                                    <p className="text-sm pt-1">Pendaftaran Administrasi (Keluarga)</p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0">4</div>
-                                    <p className="text-sm pt-1">Pemeriksaan Dokter & Tindakan</p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300 shrink-0">5</div>
-                                    <p className="text-sm pt-1">Observasi / Rawat Inap / Pulang</p>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-b-xl border-t">
+                                    <p className="text-[10px] text-slate-500 text-center uppercase tracking-wider font-semibold">
+                                        Siaga Melayani 24 Jam
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* Insurance */}
+                        {/* Insurance - Simplified */}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Asuransi Rekanan</CardTitle>
@@ -184,14 +226,11 @@ export const IGDPage = () => {
                                 <div className="flex flex-wrap gap-2">
                                     <Badge variant="outline">BPJS Kesehatan</Badge>
                                     <Badge variant="outline">BPJS Ketenagakerjaan</Badge>
-                                    <Badge variant="outline">Prudential</Badge>
-                                    <Badge variant="outline">Allianz</Badge>
-                                    <Badge variant="outline">Manulife</Badge>
-                                    <Badge variant="outline">Admedika</Badge>
                                     <Badge variant="outline">Jasa Raharja</Badge>
+                                    <Badge variant="outline">Asuransi Swasta Lainnya</Badge>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-4">
-                                    *Pastikan membawa kartu identitas dan kartu asuransi saat berobat.
+                                <p className="text-xs text-muted-foreground mt-4 italic">
+                                    *Rujukan tidak diperlukan untuk kasus kegawatdaruratan.
                                 </p>
                             </CardContent>
                         </Card>
