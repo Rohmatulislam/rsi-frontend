@@ -5,6 +5,7 @@ import * as z from "zod";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -102,6 +103,9 @@ export function PartnerModal({ open, onClose, partner }: PartnerModalProps) {
                     <DialogTitle>
                         {partner ? "Edit Mitra" : "Tambah Mitra"}
                     </DialogTitle>
+                    <DialogDescription>
+                        {partner ? "Perbarui informasi mitra kerja sama rsi." : "Tambahkan mitra kerja sama baru rsi."}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>

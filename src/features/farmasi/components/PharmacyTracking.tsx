@@ -88,7 +88,7 @@ export const PharmacyTracking = ({
                                 <p className="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2 text-center">Estimasi Selesai</p>
                                 <p className="text-2xl font-black text-slate-900">
                                     {['SELESAI', 'COMPLETED', 'READY'].includes(status.status) ? 'READY' :
-                                        ['PROSES', 'PROCESSING', 'VERIFIED'].includes(status.status) ? '10-15m' : '25-30m'}
+                                        ['PROSES', 'PROCESSING', 'VERIFIED'].includes(status.status) ? '10-30m' : '30-60m'}
                                 </p>
                             </div>
                         </div>
