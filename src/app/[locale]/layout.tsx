@@ -33,9 +33,17 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: ["/favicon.ico"],
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -86,8 +94,10 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "Hospital",
               "name": "RSI Siti Hajar Mataram",
+              "alternateName": "Rumah Sakit Islam Siti Hajar Mataram",
+              "logo": "https://rsisitihajarmataram.co.id/logo.png",
               "image": "https://rsisitihajarmataram.co.id/logo.png",
-              "@id": "",
+              "@id": "https://rsisitihajarmataram.co.id",
               "url": "https://rsisitihajarmataram.co.id",
               "telephone": "087865733233",
               "address": {
