@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Button } from "~/components/ui/button";
-import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin, ClipboardList, Download, Printer } from "lucide-react";
+import { CheckCircle2, X, Clock, Calendar, Clock4, MapPin, ClipboardList, Download, Printer, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { Stethoscope } from "lucide-react";
 import { QRCodeSVG } from 'qrcode.react';
@@ -89,6 +89,21 @@ export const SuccessStep = ({
     };
 
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+  const handleShareWhatsApp = () => {
+    const message = `*Konfirmasi Booking RSI Siti Hajar*\n\n` +
+      `Halo, ini detail booking Rumah Sakit saya:\n\n` +
+      `*Kode Booking:* ${bookingCode}\n` +
+      `*Pasien:* ${patientName}\n` +
+      `*RM:* ${noRM || '-'}\n` +
+      `*Dokter:* ${doctorName}\n` +
+      `*Poliklinik:* ${poliName}\n` +
+      `*Jadwal:* ${appointmentDate ? new Date(appointmentDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} | ${appointmentTime} WIB\n\n` +
+      `_Tunjukkan pesan ini atau QR Code di loket pendaftaran. Terimakasih._`;
+
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
   };
 
   if (isClosing) {
@@ -263,6 +278,13 @@ export const SuccessStep = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col w-full gap-2">
+        <Button
+          className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all font-bold"
+          onClick={handleShareWhatsApp}
+        >
+          <MessageCircle className="h-4 w-4 mr-2" />
+          Bagikan ke WhatsApp
+        </Button>
         <Button
           className="w-full rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700"
           onClick={() => {

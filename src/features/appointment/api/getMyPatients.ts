@@ -10,10 +10,12 @@ export interface MyPatient {
     lastAppointment: string;
     appointments: {
         id: string;
+        bookingCode?: string; // Menambahkan booking code
         appointmentDate: string;
         status: string;
         reason: string;
         doctor: {
+            id?: string; // Menambahkan doctor id
             name: string;
             specialization: string;
             imageUrl: string;

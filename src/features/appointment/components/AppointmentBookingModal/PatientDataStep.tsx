@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Textarea } from "~/components/ui/textarea";
 import { AppointmentFormData, PatientSearchState } from "../../services/appointmentService";
 import Image from "next/image";
-import { Stethoscope } from "lucide-react";
+import { Stethoscope, Calendar, Clock, MapPin, Wallet, ClipboardCheck, CheckCircle2, AlertCircle } from "lucide-react";
 import { useGetPaymentMethods } from "~/features/doctor/api/getPaymentMethods";
 
 interface PatientDataStepProps {
@@ -35,34 +35,56 @@ export const PatientDataStep = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-        <div className="h-12 w-12 rounded-full overflow-hidden shrink-0">
-          {doctor?.imageUrl ? (
-            <Image
-              src={doctor.imageUrl}
-              alt={doctor?.name || "Dokter"}
-              width={48}
-              height={48}
-              className="object-cover w-full h-full"
-              unoptimized
-            />
-          ) : (
-            <div className="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
-              <Stethoscope className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-            </div>
-          )}
+      {/* Step Header: Booking Summary Dashboard */}
+      <div className="bg-primary/5 rounded-2xl border border-primary/20 overflow-hidden shadow-sm">
+        <div className="bg-primary/10 px-4 py-2 border-b border-primary/20 flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
+            <ClipboardCheck className="h-3 w-3" /> Ringkasan Pesanan
+          </span>
+          <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+            Sudah Benar?
+          </span>
         </div>
-        <div>
-          <p className="font-bold text-slate-900 dark:text-white">{doctor?.name || "Dokter Umum"}</p>
-          <p className="text-sm text-muted-foreground">{doctor?.specialization || "Umum"}</p>
-          {formData.poliName && (
-            <p className="text-sm font-medium text-primary mt-1">→ {formData.poliName}</p>
-          )}
-          {formData.date && formData.time && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {new Date(formData.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} | {formData.time}
-            </p>
-          )}
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl overflow-hidden shrink-0 border border-primary/20">
+              {doctor?.imageUrl ? (
+                <Image
+                  src={doctor.imageUrl}
+                  alt={doctor?.name || "Dokter"}
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                  <Stethoscope className="h-5 w-5 text-primary" />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-sm text-foreground truncate">{doctor?.name || "Dokter Umum"}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{doctor?.specialization || "Umum"}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-3 md:pt-0 md:border-l md:pl-4 border-primary/10">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                <MapPin className="h-3 w-3" /> Unit/Poli
+              </div>
+              <p className="text-xs font-semibold text-foreground truncate">{formData.poliName || '-'}</p>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                <Calendar className="h-3 w-3" /> Jadwal
+              </div>
+              <p className="text-xs font-semibold text-foreground truncate">
+                {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}, {formData.time}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -92,44 +114,127 @@ export const PatientDataStep = ({
 
       {formData.patientType === 'old' ? (
         <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-          <div className="space-y-2">
-            <Label>Nomor Rekam Medis (No. RM)</Label>
-            <Input
-              placeholder="Contoh: 123456"
-              value={formData.mrNumber}
-              onChange={(e) => {
-                setFormData({ ...formData, mrNumber: e.target.value });
-                // Reset search state saat nilai berubah
-                if (patientSearch.found || patientSearch.error) {
-                  setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
-                }
-              }}
-              onBlur={() => {
-                // Auto-search saat input kehilangan focus (jika sudah ada minimal 3 karakter)
-                if (formData.mrNumber && formData.mrNumber.length >= 3 && !patientSearch.found && !patientSearch.loading) {
-                  searchPatient(formData.mrNumber);
-                }
-              }}
-              className="h-12 rounded-xl"
-            />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Cari Data Pasien</Label>
+              <div className="flex bg-muted p-1 rounded-lg text-[10px] font-bold uppercase tracking-tight">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
+                  }}
+                  className={`px-3 py-1 rounded-md transition-all ${!formData.mrNumber.startsWith('NIK-') ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
+                >
+                  No. RM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
+                  }}
+                  className={`px-3 py-1 rounded-md transition-all ${formData.mrNumber.startsWith('NIK-') ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
+                >
+                  NIK KTP
+                </button>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <Input
+                placeholder={formData.nik && formData.nik.length > 0 && formData.patientType === 'old' ? "Masukkan 16 digit NIK" : "Masukkan Nomor Rekam Medis (RM)"}
+                value={formData.patientType === 'old' && formData.nik && formData.nik.length > 0 ? formData.nik : formData.mrNumber}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length <= 16) {
+                    // Jika 16 digit, kita asumsikan ini NIK
+                    if (val.length === 16 && /^\d+$/.test(val)) {
+                      setFormData({ ...formData, nik: val, mrNumber: "" });
+                    } else {
+                      setFormData({ ...formData, mrNumber: val, nik: "" });
+                    }
+                  }
+
+                  // Reset search state saat nilai berubah
+                  if (patientSearch.found || patientSearch.error) {
+                    setPatientSearch({ loading: false, found: false, patientData: null, error: "" });
+                  }
+                }}
+                onBlur={() => {
+                  const identifier = formData.nik || formData.mrNumber;
+                  if (identifier && identifier.length >= 3 && !patientSearch.found && !patientSearch.loading) {
+                    searchPatient(identifier);
+                  }
+                }}
+                className="h-12 rounded-xl pr-12 text-lg font-medium tracking-wide"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within:text-primary transition-colors">
+                <Clock className="h-5 w-5" />
+              </div>
+            </div>
+
             {patientSearch.loading && (
-              <p className="text-sm text-muted-foreground">🔍 Mencari data pasien...</p>
-            )}
-            {patientSearch.found && patientSearch.patientData && (
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <p className="text-sm font-medium text-green-800 dark:text-green-200">✓ Pasien ditemukan: {patientSearch.patientData.nm_pasien}</p>
-                {patientSearch.patientData.no_peserta && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">No. BPJS: {patientSearch.patientData.no_peserta}</p>
-                )}
+              <div className="flex items-center gap-2 p-2 animate-pulse">
+                <div className="h-2 w-2 rounded-full bg-primary animate-bounce" />
+                <p className="text-xs font-semibold text-primary uppercase tracking-wider">Mencari data di database SIMRS...</p>
               </div>
             )}
-            {patientSearch.error && (
-              <p className="text-sm text-red-500">⚠️ {patientSearch.error}</p>
+
+            {patientSearch.found && patientSearch.patientData && (
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-200 dark:border-emerald-800/30 animate-in zoom-in-95 duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200 shadow-sm">
+                    <span className="text-emerald-700 dark:text-emerald-300 font-black text-xl">
+                      {patientSearch.patientData.nm_pasien?.charAt(0)}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="font-black text-emerald-900 dark:text-emerald-100 uppercase tracking-tight truncate">{patientSearch.patientData.nm_pasien}</p>
+                      <div className="flex items-center gap-1 bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[9px] font-black">
+                        <CheckCircle2 className="h-2.5 w-2.5" /> AKTIF
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mt-2 border-t border-emerald-200/50 pt-2">
+                      <div className="flex flex-col">
+                        <span className="text-[8px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest">No. RM</span>
+                        <span className="text-xs font-mono font-bold text-emerald-950 dark:text-emerald-50">{patientSearch.patientData.no_rkm_medis}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[8px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest">NIK KTP</span>
+                        <span className="text-xs font-mono font-bold text-emerald-950 dark:text-emerald-50">{patientSearch.patientData.no_ktp || '-'}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[8px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest">Tgl Lahir</span>
+                        <span className="text-xs font-bold">{new Date(patientSearch.patientData.tgl_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                      </div>
+                      {patientSearch.patientData.no_tlp && (
+                        <div className="flex flex-col">
+                          <span className="text-[8px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest">Kontak</span>
+                          <span className="text-xs font-bold">{patientSearch.patientData.no_tlp}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
+
+            {patientSearch.error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-800/30 flex items-center gap-2 text-red-600 dark:text-red-400">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <p className="text-xs font-bold uppercase tracking-wide">{patientSearch.error}</p>
+              </div>
+            )}
+
             {!patientSearch.loading && !patientSearch.found && !patientSearch.error && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Masukkan nomor rekam medis Anda untuk mencari data
-              </p>
+              <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-muted/30 p-3 rounded-xl border border-dashed border-muted">
+                <div className="mt-0.5 p-1 bg-muted rounded-md shrink-0">
+                  <Stethoscope className="h-3 w-3" />
+                </div>
+                <p className="leading-relaxed">
+                  Gunakan <span className="font-bold text-foreground">NIK KTP (16 digit)</span> atau <span className="font-bold text-foreground">Nomor RM</span> Anda. Data akan terisi otomatis jika sudah pernah terdaftar di RSI Siti Hajar.
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -144,6 +249,11 @@ export const PatientDataStep = ({
                 const value = e.target.value.replace(/\D/g, "");
                 if (value.length <= 16) {
                   setFormData({ ...formData, nik: value });
+                }
+              }}
+              onBlur={() => {
+                if (formData.nik && formData.nik.length === 16 && !patientSearch.found && !patientSearch.loading) {
+                  searchPatient(formData.nik);
                 }
               }}
               className="rounded-xl"
@@ -341,12 +451,15 @@ export const PatientDataStep = ({
         const isAutoFilled = !formData.bpjsNumber && noPesertaDariPasien;
 
         return (
-          <div className="space-y-4 p-4 border-2 border-green-200 bg-green-50 dark:bg-green-900/20 rounded-xl">
-            <h4 className="font-semibold text-green-900 dark:text-green-100">Data BPJS</h4>
+          <div className="space-y-4 p-4 border-2 border-green-200 bg-green-50 dark:bg-green-900/20 rounded-xl animate-in slide-in-from-left-2 duration-300">
+            <h4 className="font-semibold text-green-900 dark:text-green-100 flex items-center gap-2 text-sm">
+              <div className="w-1.5 h-4 bg-green-500 rounded-full" />
+              Data BPJS Kesehatan
+            </h4>
 
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label>No. Kartu BPJS <span className="text-red-500">*</span></Label>
+                <Label className="text-xs">No. Kartu BPJS <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="0001234567890"
                   value={displayValue}
@@ -356,33 +469,89 @@ export const PatientDataStep = ({
                       setFormData({ ...formData, bpjsNumber: value });
                     }
                   }}
-                  className="h-12 rounded-xl"
+                  className="h-10 rounded-xl text-sm"
                   maxLength={13}
                 />
-                {displayValue && displayValue.length !== 13 && (
-                  <p className="text-xs text-red-500">Nomor BPJS harus 13 digit angka</p>
-                )}
                 {isAutoFilled ? (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Diambil dari data pasien ({noPesertaDariPasien})</p>
+                  <p className="text-[10px] text-green-600 dark:text-green-400 font-medium">✓ Terisi otomatis ({noPesertaDariPasien})</p>
                 ) : (
-                  <p className="text-xs text-muted-foreground mt-1">13 digit nomor kartu BPJS Kesehatan</p>
+                  <p className="text-[10px] text-muted-foreground italic">Masukkan 13 digit nomor kartu</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label>No. Rujukan (Opsional)</Label>
+                <Label className="text-xs">No. Rujukan (Opsional)</Label>
                 <Input
-                  placeholder="Nomor surat rujukan dari faskes tingkat 1"
+                  placeholder="Nomor rujukan dari faskes"
                   value={formData.bpjsRujukan}
                   onChange={(e) => setFormData({ ...formData, bpjsRujukan: e.target.value })}
-                  className="h-12 rounded-xl"
+                  className="h-10 rounded-xl text-sm"
                 />
-                <p className="text-xs text-muted-foreground">Nomor rujukan dari Puskesmas/Klinik</p>
               </div>
             </div>
           </div>
         );
       })()}
+
+      {/* PERSETUJUAN SEBAGAI BAGIAN DARI FORM */}
+      <div className="space-y-4 p-5 border-2 border-yellow-200 dark:border-yellow-900/40 bg-yellow-50/50 dark:bg-yellow-900/10 rounded-2xl animate-in fade-in duration-500">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-2 h-6 bg-yellow-400 rounded-full" />
+          <h4 className="font-bold text-yellow-900 dark:text-yellow-100 text-sm italic">
+            Konfirmasi Akhir & Persetujuan
+          </h4>
+        </div>
+
+        <div className="space-y-4">
+          <label className="flex items-start gap-4 p-3 rounded-xl hover:bg-yellow-100/50 transition-colors cursor-pointer group">
+            <div className="pt-0.5">
+              <input
+                type="checkbox"
+                checked={formData.consentTerms}
+                onChange={(e) => setFormData({ ...formData, consentTerms: e.target.checked })}
+                className="h-5 w-5 rounded-md border-yellow-400 text-primary focus:ring-primary/50 transition-all"
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 group-hover:text-primary transition-colors">Syarat & Ketentuan</p>
+              <p className="text-[11px] text-yellow-800/70 dark:text-yellow-200/50 italic">Saya menyetujui seluruh aturan pendaftaran di RSI Siti Hajar.</p>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-4 p-3 rounded-xl hover:bg-yellow-100/50 transition-colors cursor-pointer group">
+            <div className="pt-0.5">
+              <input
+                type="checkbox"
+                checked={formData.consentPrivacy}
+                onChange={(e) => setFormData({ ...formData, consentPrivacy: e.target.checked })}
+                className="h-5 w-5 rounded-md border-yellow-400 text-primary focus:ring-primary/50 transition-all"
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 group-hover:text-primary transition-colors">Kebijakan Privasi</p>
+              <p className="text-[11px] text-yellow-800/70 dark:text-yellow-200/50 italic">Data saya akan dijaga kerahasiaannya dengan standar medis.</p>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-4 p-3 rounded-xl hover:bg-yellow-100/50 transition-colors cursor-pointer group border border-dashed border-yellow-400/30">
+            <div className="pt-0.5">
+              <input
+                type="checkbox"
+                checked={formData.consentFee}
+                onChange={(e) => setFormData({ ...formData, consentFee: e.target.checked })}
+                className="h-5 w-5 rounded-md border-yellow-400 text-primary focus:ring-primary/50 transition-all"
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 group-hover:text-primary transition-colors">Biaya Pemeriksaan</p>
+              <p className="text-[11px] text-yellow-800/70 dark:text-yellow-200/50">
+                Bersedia membayar biaya konsultasi estimasi <span className="font-bold text-yellow-900">Rp {doctor?.consultation_fee?.toLocaleString('id-ID') || '0'}</span>
+                {formData.paymentName?.toLowerCase().includes('bpjs') && ' (Ditanggung BPJS)'}
+              </p>
+            </div>
+          </label>
+        </div>
+      </div>
     </div>
   );
 };

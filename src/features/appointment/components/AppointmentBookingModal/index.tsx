@@ -75,99 +75,75 @@ export const AppointmentBookingModal = ({
 
   const handleNext = async () => {
     // Validation before moving to next step
-    if (step === 1 && !formData.poliId) {
-      toast.error("Pilih poliklinik terlebih dahulu");
-      return;
-    }
-
-    if (step === 2 && (!formData.date || !formData.time)) {
-      if (!formData.date) {
-        toast.error("Pilih tanggal kunjungan terlebih dahulu");
-      } else if (!formData.time) {
-        toast.error("Pilih waktu kunjungan terlebih dahulu");
-      }
-      return;
-    }
-
-    // Step 1 (pilih poliklinik) to Step 2 (pilih jadwal)
     if (step === 1) {
+      if (!formData.poliId) {
+        toast.error("Pilih poliklinik terlebih dahulu");
+        return;
+      }
+      if (!formData.date || !formData.time) {
+        if (!formData.date) {
+          toast.error("Pilih tanggal kunjungan terlebih dahulu");
+        } else if (!formData.time) {
+          toast.error("Pilih waktu kunjungan terlebih dahulu");
+        }
+        return;
+      }
       setStep(2);
       return;
     }
 
-    // Step 2 (pilih jadwal) to Step 3 (data pasien)
+    // Step 2 (data pasien & konfirmasi) to Step 3 (post/submit)
     if (step === 2) {
-      setStep(3);
-      return;
-    }
-
-    // Step 3 (data pasien) to Step 4 (konfirmasi)
-    if (step === 3) {
       if (formData.patientType === "old") {
         if (!formData.mrNumber) {
           toast.error("Nomor RM wajib diisi untuk pasien lama");
           return;
         }
-        // Search patient data saat lanjut ke step 4 dari step 3
-        // Ini akan mengisi patientSearch.patientData yang dibutuhkan untuk auto-fill No. BPJS
         await searchPatient(formData.mrNumber);
-      }
-      if (formData.patientType === "new") {
+      } else {
         if (!formData.nik || !formData.fullName || !formData.phone || !formData.birthDate || !formData.gender || !formData.religion) {
           toast.error("Semua field wajib diisi untuk pasien baru");
           return;
         }
-        // Validate NIK (16 digits)
         if (formData.nik.length !== 16) {
           toast.error("NIK harus 16 digit");
           return;
         }
-        // Validate phone number
         if (formData.phone.length < 10) {
           toast.error("Nomor telepon tidak valid");
           return;
         }
       }
 
-      // Validate keluhan (required, min 10 characters)
       if (!formData.keluhan || formData.keluhan.trim().length < 10) {
         toast.error("Keluhan minimal 10 karakter");
         return;
       }
 
-      // Validate payment method selection
       if (!formData.paymentType) {
         toast.error("Pilih metode pembayaran terlebih dahulu");
         return;
       }
 
-      // Search patient data when moving to step 4 (verification)
-      if (formData.patientType === "old") {
-        await searchPatient(formData.mrNumber);
-      }
-    }
-
-    // Step 4: Validate consents
-    if (step === 4) {
-      if (!formData.consentTerms || !formData.consentPrivacy || !formData.consentFee) {
-        toast.error("Anda harus menyetujui semua persetujuan");
-        return;
-      }
-
-      // Validate BPJS if selected (check if paymentName contains BPJS-related keywords)
       const isBpjsPayment = formData.paymentName?.toLowerCase().includes('bpjs') ||
         formData.paymentName?.toLowerCase().includes('jkn') ||
         formData.paymentName?.toLowerCase().includes('kis');
       if (isBpjsPayment) {
-        // Cek apakah bpjsNumber sudah diisi (bisa dari input manual atau dari patientData.no_peserta)
         const bpjsNumber = formData.bpjsNumber || patientSearch.patientData?.no_peserta;
         if (!bpjsNumber) {
           toast.error("Nomor BPJS wajib diisi");
           return;
         }
       }
+
+      if (!formData.consentTerms || !formData.consentPrivacy || !formData.consentFee) {
+        toast.error("Anda harus menyetujui semua persetujuan");
+        return;
+      }
+
+      // Show final confirm before submit
+      setShowConfirm(true);
     }
-    setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -180,15 +156,6 @@ export const AppointmentBookingModal = ({
     switch (step) {
       case 1:
         return (
-          <PoliSelectionStep
-            formData={formData}
-            setFormData={setFormData}
-            handleNext={handleNext}
-            doctor={doctor}
-          />
-        );
-      case 2:
-        return (
           <AppointmentScheduleStep
             formData={formData}
             setFormData={setFormData}
@@ -197,7 +164,7 @@ export const AppointmentBookingModal = ({
             doctor={doctor}
           />
         );
-      case 3:
+      case 2:
         return (
           <PatientDataStep
             formData={formData}
@@ -208,16 +175,7 @@ export const AppointmentBookingModal = ({
             doctor={doctor}
           />
         );
-      case 4:
-        return (
-          <ConfirmationStep
-            formData={formData}
-            setFormData={setFormData}
-            patientSearch={patientSearch}
-            doctor={doctor}
-          />
-        );
-      case 5:
+      case 3:
         return <SuccessStep
           bookingCode={bookingCode}
           appointmentDate={formData.date}
@@ -228,7 +186,6 @@ export const AppointmentBookingModal = ({
           noRM={patientSearch.patientData?.no_rkm_medis || formData.mrNumber}
           serviceItemName={formData.serviceItemName}
           onClose={() => {
-            // Use setTimeout to prevent update during render
             setTimeout(() => {
               setShouldResetAfterClose(true);
               setIsOpen(false);
@@ -290,7 +247,7 @@ export const AppointmentBookingModal = ({
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              {step === 5 ? (
+              {step === 3 ? (
                 <span className="text-green-600 flex items-center gap-2">
                   <CheckCircle2 className="h-6 w-6" /> Booking Berhasil
                 </span>
@@ -299,11 +256,22 @@ export const AppointmentBookingModal = ({
               )}
             </DialogTitle>
             <DialogDescription>
-              {step === 5
+              {step === 3
                 ? "Pendaftaran Anda telah berhasil diproses ke SIMRS."
-                : `Langkah ${step} dari 5 - ${step === 1 ? "Pilih Poliklinik" : step === 2 ? "Pilih Jadwal" : step === 3 ? "Data Pasien" : step === 4 ? "Konfirmasi Booking" : "Selesai"}`
+                : `Langkah ${step} dari 2 - ${step === 1 ? "Pilih Jadwal" : "Data Pasien & Konfirmasi"}`
               }
             </DialogDescription>
+            {step < 3 && (
+              <div className="flex items-center gap-2 mt-4">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-2 flex-1 rounded-full transition-all duration-300 ${i <= step ? 'bg-primary' : 'bg-muted'
+                      }`}
+                  />
+                ))}
+              </div>
+            )}
           </DialogHeader>
 
           <div className="py-6">
@@ -311,7 +279,7 @@ export const AppointmentBookingModal = ({
           </div>
 
           {/* FOOTER ACTIONS */}
-          {step < 5 && (
+          {step < 3 && (
             <DialogFooter className="flex flex-row justify-between gap-2 sm:justify-between">
               {step > 1 ? (
                 <Button variant="outline" onClick={handleBack} disabled={loading} className="w-1/2 sm:w-auto">
@@ -321,20 +289,17 @@ export const AppointmentBookingModal = ({
                 <div /> // Spacer
               )}
 
-              {step < 4 ? (
-                <Button onClick={handleNext} disabled={
-                  step === 1 ? !formData.poliId :
-                    step === 2 ? !formData.date || !formData.time :
-                      false
-                } className="w-1/2 sm:w-auto">
+              {step === 1 ? (
+                <Button onClick={handleNext} disabled={!formData.poliId || !formData.date || !formData.time} className="w-1/2 sm:w-auto">
                   Lanjut <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button
-                  onClick={() => setShowConfirm(true)}
+                  onClick={handleNext}
                   disabled={loading}
                   className="w-1/2 sm:w-auto min-w-[140px]"
                 >
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Konfirmasi Booking
                 </Button>
               )}
@@ -351,90 +316,89 @@ export const AppointmentBookingModal = ({
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>Apakah Anda yakin data yang Anda masukkan sudah benar?</p>
-                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg space-y-2 text-sm">
-                  <p className="font-semibold text-slate-900 dark:text-slate-100">Detail Booking:</p>
-                  <p><span className="text-muted-foreground">Dokter:</span> {doctor?.name || '-'}</p>
-                  <p><span className="text-muted-foreground">Poliklinik:</span> {formData.poliName}</p>
-                  <p><span className="text-muted-foreground">Tanggal:</span> {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : '-'}</p>
-                  <p><span className="text-muted-foreground">Waktu:</span> {formData.time}</p>
+                <div className="mt-4 overflow-hidden border border-slate-200 dark:border-slate-800 rounded-xl">
+                  <div className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Ringkasan Janji Temu</p>
+                  </div>
+                  <div className="p-4 space-y-3 text-sm">
+                    {/* Sesi & Dokter */}
+                    <div className="grid grid-cols-2 gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Dokter</p>
+                        <p className="font-semibold">{doctor?.name || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Unit / Poli</p>
+                        <p className="font-semibold">{formData.poliName}</p>
+                      </div>
+                    </div>
+
+                    {/* Waktu & Jadwal */}
+                    <div className="grid grid-cols-2 gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Jadwal</p>
+                        <p className="font-semibold">
+                          {formData.date ? new Date(formData.date).toLocaleDateString('id-ID', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          }) : '-'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Waktu Kedatangan</p>
+                        <p className="font-semibold">{formData.time} WIB</p>
+                      </div>
+                    </div>
+
+                    {/* Pasien & Kontak */}
+                    <div className="grid grid-cols-2 gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Pasien</p>
+                        <p className="font-semibold truncate">
+                          {formData.patientType === 'old'
+                            ? (patientSearch.patientData?.nm_pasien || formData.mrNumber)
+                            : formData.fullName}
+                        </p>
+                        <p className="text-[10px] text-primary font-medium">{formData.patientType === 'old' ? 'Pasien Lama' : 'Pasien Baru'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Kontak</p>
+                        <p className="font-semibold">{formData.phone || '-'}</p>
+                      </div>
+                    </div>
+
+                    {/* Pembayaran & Keluhan */}
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Metode Pembayaran</p>
+                        <p className="font-semibold text-emerald-600 dark:text-emerald-400">{formData.paymentName || 'Belum dipilih'}</p>
+                      </div>
+                      {formData.keluhan && (
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Keluhan / Catatan</p>
+                          <p className="text-xs italic text-slate-600 dark:text-slate-400 line-clamp-2">"{formData.keluhan}"</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-4 text-yellow-600 dark:text-yellow-400 font-medium">
-                  ⚠️ Data booking akan langsung diproses ke sistem SIMRS dan tidak dapat diubah.
+                <p className="mt-4 text-[11px] text-yellow-600 dark:text-yellow-400 font-medium leading-relaxed bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
+                  ⚠️ Data booking akan langsung diproses ke sistem SIMRS dan tidak dapat diubah kembali. Pastikan semua data di atas sudah benar.
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          {/* Consent Checkboxes */}
-          <div className="space-y-3 p-4 border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
-            <h4 className="font-semibold text-yellow-900 dark:text-yellow-100 text-sm">
-              Persetujuan <span className="text-red-500">*</span>
-            </h4>
-
-            <div className="space-y-2">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="alert-consent-terms"
-                  checked={formData.consentTerms}
-                  onChange={(e) => setFormData({ ...formData, consentTerms: e.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-gray-300"
-                />
-                <label htmlFor="alert-consent-terms" className="text-sm text-yellow-900 dark:text-yellow-100">
-                  Saya menyetujui Syarat & Ketentuan yang berlaku
-                </label>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="alert-consent-privacy"
-                  checked={formData.consentPrivacy}
-                  onChange={(e) => setFormData({ ...formData, consentPrivacy: e.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-gray-300"
-                />
-                <label htmlFor="alert-consent-privacy" className="text-sm text-yellow-900 dark:text-yellow-100">
-                  Saya menyetujui Kebijakan Privasi rumah sakit
-                </label>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="alert-consent-fee"
-                  checked={formData.consentFee}
-                  onChange={(e) => setFormData({ ...formData, consentFee: e.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-gray-300"
-                />
-                <label htmlFor="alert-consent-fee" className="text-sm text-yellow-900 dark:text-yellow-100">
-                  Saya bersedia membayar biaya konsultasi sebesar{' '}
-                  <span className="font-bold">
-                    Rp {doctor?.consultation_fee?.toLocaleString('id-ID') || '0'}
-                  </span>
-                  {formData.paymentName?.toLowerCase().includes('bpjs') && ' (ditanggung BPJS)'}
-                </label>
-              </div>
-            </div>
-          </div>
-
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Periksa Kembali</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (!formData.consentTerms || !formData.consentPrivacy || !formData.consentFee) {
-                  toast.error("Mohon centang semua persetujuan terlebih dahulu");
-                  return;
-                }
-                console.log('Sebelum submit - formData:', formData);
                 setShowConfirm(false);
                 handleSubmit();
               }}
-              disabled={loading || !formData.consentTerms || !formData.consentPrivacy || !formData.consentFee}
+              disabled={loading}
               className="bg-primary hover:bg-primary/90"
             >
               {loading ? (
@@ -443,7 +407,7 @@ export const AppointmentBookingModal = ({
                   Memproses...
                 </>
               ) : (
-                "Ya, Lanjutkan Booking"
+                "Ya, Buat Janji Temu Sekarang"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

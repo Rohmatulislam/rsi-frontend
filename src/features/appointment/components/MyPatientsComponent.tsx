@@ -17,7 +17,9 @@ import {
     CheckCircle2,
     AlertCircle,
     CalendarDays,
-    ArrowRight
+    ArrowRight,
+    History as HistoryIcon,
+    MessageCircle
 } from "lucide-react";
 import { useMyPatients } from "../api/getMyPatients";
 import { useCancelAppointment } from "../api/cancelAppointment";
@@ -34,6 +36,7 @@ import {
     DialogClose,
 } from "~/components/ui/dialog";
 import Link from "next/link";
+import { QRCodeSVG } from 'qrcode.react';
 import { RescheduleModal } from "./RescheduleModal";
 
 export const MyPatientsComponent = () => {
@@ -42,11 +45,30 @@ export const MyPatientsComponent = () => {
     const cancelMutation = useCancelAppointment();
     const [expandedPatient, setExpandedPatient] = useState<string | null>(null);
     const [cancellingId, setCancellingId] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     const [rescheduleData, setRescheduleData] = useState<{
         appointmentId: string;
         doctorName: string;
         currentDate: string;
     } | null>(null);
+
+    const handleShareWhatsApp = (appointment: any, patientName: string) => {
+        const date = new Date(appointment.appointmentDate);
+        const dateStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        const message = `*Konfirmasi Booking RSI Siti Hajar*\n\n` +
+            `Halo, ini detail booking Rumah Sakit saya:\n\n` +
+            `*Kode Booking:* ${appointment.bookingCode || '-'}\n` +
+            `*Pasien:* ${patientName}\n` +
+            `*Dokter:* ${appointment.doctor.name}\n` +
+            `*Poliklinik:* ${appointment.poliName || appointment.doctor.specialization || '-'}\n` +
+            `*Jadwal:* ${dateStr} | ${timeStr} WIB\n\n` +
+            `_Tunjukkan pesan ini di loket pendaftaran. Terimakasih._`;
+
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank');
+    };
 
     const handleCancelBooking = async (appointmentId: string, doctorName: string) => {
         setCancellingId(appointmentId);
@@ -227,7 +249,7 @@ export const MyPatientsComponent = () => {
         <div className="space-y-6">
             {/* Dashboard Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Total Patients */}
+                {/* ... existing stats ... */}
                 <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
@@ -238,10 +260,7 @@ export const MyPatientsComponent = () => {
                             <Users className="h-6 w-6 text-primary" />
                         </div>
                     </div>
-                    <p className="text-muted-foreground text-xs mt-2">Pasien yang Anda daftarkan</p>
                 </div>
-
-                {/* Total Bookings */}
                 <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
@@ -252,10 +271,7 @@ export const MyPatientsComponent = () => {
                             <Calendar className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                         </div>
                     </div>
-                    <p className="text-muted-foreground text-xs mt-2">Semua janji temu</p>
                 </div>
-
-                {/* Upcoming */}
                 <div className="rounded-xl bg-card border border-border p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
@@ -266,220 +282,235 @@ export const MyPatientsComponent = () => {
                             <CalendarClock className="h-6 w-6 text-accent" />
                         </div>
                     </div>
-                    <p className="text-muted-foreground text-xs mt-2">Jadwal yang belum berlangsung</p>
                 </div>
+            </div>
+
+            {/* Tab Switcher */}
+            <div className="flex p-1 bg-muted rounded-2xl border border-border">
+                <button
+                    onClick={() => setActiveTab('upcoming')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'upcoming'
+                        ? 'bg-background text-primary shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                >
+                    <CalendarClock className="h-4 w-4" />
+                    Akan Datang ({upcomingAppointments})
+                </button>
+                <button
+                    onClick={() => setActiveTab('past')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'past'
+                        ? 'bg-background text-primary shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                >
+                    <HistoryIcon className="h-4 w-4" />
+                    Riwayat Selesai
+                </button>
             </div>
 
             {/* Section Title */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-bold text-foreground">Daftar Pasien</h2>
-                    <p className="text-sm text-muted-foreground">Klik untuk melihat detail janji temu</p>
+                    <h2 className="text-xl font-bold text-foreground">
+                        {activeTab === 'upcoming' ? 'Janji Temu Aktif' : 'Riwayat Pemeriksaan'}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                        {activeTab === 'upcoming'
+                            ? 'Daftar janji temu yang akan berlangsung'
+                            : 'Daftar rekam medis dan janji temu yang sudah berlalu'}
+                    </p>
                 </div>
             </div>
 
             {/* Patient List */}
             <div className="space-y-4">
-                {data.patients.map((patient) => (
-                    <div
-                        key={patient.patientId}
-                        className="rounded-xl border border-border bg-card overflow-hidden shadow-sm"
-                    >
-                        {/* Patient Header */}
+                {data.patients.map((patient) => {
+                    // Filter appointments based on active tab
+                    const filteredAppointments = patient.appointments.filter(a => {
+                        const isUpcoming = new Date(a.appointmentDate) > new Date() && (a.status === 'scheduled' || a.status === 'CONFIRMED');
+                        return activeTab === 'upcoming' ? isUpcoming : !isUpcoming;
+                    });
+
+                    if (filteredAppointments.length === 0) return null;
+
+                    return (
                         <div
-                            className="p-5 cursor-pointer hover:bg-muted/50 transition-colors"
-                            onClick={() => setExpandedPatient(
-                                expandedPatient === patient.patientId ? null : patient.patientId
-                            )}
+                            key={patient.patientId}
+                            className="rounded-xl border border-border bg-card overflow-hidden shadow-sm"
                         >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    {/* Avatar */}
-                                    <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
-                                        {patient.patientName.charAt(0).toUpperCase()}
-                                    </div>
-                                    {/* Info */}
-                                    <div>
-                                        <h3 className="font-bold text-lg text-foreground">{patient.patientName}</h3>
-                                        <div className="flex items-center gap-3 mt-1">
-                                            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-                                                <FileText className="h-3.5 w-3.5" />
-                                                No. RM: {patient.patientId}
-                                            </span>
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                                                {patient.appointmentsCount} booking
-                                            </span>
+                            {/* Patient Header */}
+                            <div
+                                className="p-5 cursor-pointer hover:bg-muted/50 transition-colors"
+                                onClick={() => setExpandedPatient(
+                                    expandedPatient === patient.patientId ? null : patient.patientId
+                                )}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
+                                            {patient.patientName.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg text-foreground">{patient.patientName}</h3>
+                                            <div className="flex items-center gap-3 mt-1">
+                                                <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                                                    <FileText className="h-3.5 w-3.5" />
+                                                    No. RM: {patient.patientId}
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                                    {filteredAppointments.length} janji temu
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                {/* Expand Icon */}
-                                <div className={`p-2 rounded-full transition-all duration-200 ${expandedPatient === patient.patientId ? 'bg-primary/10 rotate-180' : 'bg-muted'}`}>
-                                    <ChevronDown className={`h-5 w-5 ${expandedPatient === patient.patientId ? 'text-primary' : 'text-muted-foreground'}`} />
+                                    <div className={`p-2 rounded-full transition-all duration-200 ${expandedPatient === patient.patientId ? 'bg-primary/10 rotate-180' : 'bg-muted'}`}>
+                                        <ChevronDown className={`h-5 w-5 ${expandedPatient === patient.patientId ? 'text-primary' : 'text-muted-foreground'}`} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Expanded Appointments */}
-                        {expandedPatient === patient.patientId && (
-                            <div className="border-t border-border bg-muted/30 p-5">
-                                <div className="space-y-4">
-                                    {patient.appointments.map((appointment) => {
-                                        const statusConfig = getStatusConfig(appointment.status);
-                                        const dateInfo = formatDate(appointment.appointmentDate);
-                                        const StatusIcon = statusConfig.icon;
+                            {/* Expanded Appointments */}
+                            {expandedPatient === patient.patientId && (
+                                <div className="border-t border-border bg-muted/30 p-5">
+                                    <div className="space-y-4">
+                                        {[...filteredAppointments].sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime()).map((appointment) => {
+                                            const statusConfig = getStatusConfig(appointment.status);
+                                            const dateInfo = formatDate(appointment.appointmentDate);
+                                            const StatusIcon = statusConfig.icon;
+                                            const isUpcoming = new Date(appointment.appointmentDate) > new Date();
 
-                                        return (
-                                            <div
-                                                key={appointment.id}
-                                                className={`rounded-xl bg-card border-2 ${statusConfig.borderClass} p-4 shadow-sm`}
-                                            >
-                                                {/* Appointment Header */}
-                                                <div className="flex items-start justify-between mb-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                                                            <Stethoscope className="h-6 w-6 text-foreground" />
+                                            return (
+                                                <div
+                                                    key={appointment.id}
+                                                    className={`relative group rounded-xl bg-card border-2 ${statusConfig.borderClass} p-4 shadow-sm transition-all hover:shadow-md`}
+                                                >
+                                                    {/* Next Up Badge */}
+                                                    {isUpcoming && activeTab === 'upcoming' && (
+                                                        <div className="absolute -top-3 -right-2 bg-accent text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg transform rotate-2">
+                                                            SEGERA
                                                         </div>
-                                                        <div>
-                                                            <h4 className="font-semibold text-foreground">{appointment.doctor.name}</h4>
-                                                            <p className="text-sm text-muted-foreground">{appointment.doctor.specialization || 'Dokter Umum'}</p>
-                                                        </div>
-                                                    </div>
-                                                    {/* Status Badge */}
-                                                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgClass} ${statusConfig.textClass} text-sm font-semibold`}>
-                                                        <StatusIcon className="h-4 w-4" />
-                                                        {statusConfig.label}
-                                                    </div>
-                                                </div>
+                                                    )}
 
-                                                {/* Doctor Leave/Study Warning */}
-                                                {(appointment.doctor.isOnLeave || appointment.doctor.isStudying) && (
-                                                    <div className="mb-4 p-4 rounded-xl bg-orange-50 border-2 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/30 flex items-start gap-3 shadow-sm animate-pulse-subtle">
-                                                        <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
-                                                        <div>
-                                                            <p className="font-bold text-orange-800 dark:text-orange-300">
-                                                                Dokter Sedang {appointment.doctor.isOnLeave ? 'Cuti' : 'Berhalangan'}
-                                                            </p>
-                                                            <p className="text-sm text-orange-700 dark:text-orange-400 mt-1 leading-relaxed">
-                                                                {appointment.doctor.name} saat ini sedang {appointment.doctor.isOnLeave ? 'Cuti' : 'menjalani masa pendidikan'}.
-                                                                Jadwal pemeriksaan Anda kemungkinan besar akan mengalami perubahan.
-                                                                Mohon hubungi bagian Pendaftaran untuk konfirmasi atau melakukan perubahan jadwal.
-                                                            </p>
-                                                            <Button variant="outline" size="sm" className="mt-3 bg-white hover:bg-orange-100 border-orange-200 text-orange-700 h-8 text-xs font-bold" asChild>
-                                                                <Link href="https://wa.me/628123456789" target="_blank">
-                                                                    Hubungi CS via WA
-                                                                </Link>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {appointment.reason && (
-                                                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg">
-                                                        <div className="flex items-start gap-2">
-                                                            <Activity className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                                                    {/* Appointment Header */}
+                                                    <div className="flex items-start justify-between mb-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+                                                                <Stethoscope className="h-6 w-6 text-foreground" />
+                                                            </div>
                                                             <div>
-                                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Pemeriksaan / Keluhan</p>
-                                                                <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{appointment.reason}</p>
+                                                                <h4 className="font-semibold text-foreground">{appointment.doctor.name}</h4>
+                                                                <p className="text-sm text-muted-foreground">{appointment.doctor.specialization || 'Dokter Umum'}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgClass} ${statusConfig.textClass} text-sm font-semibold`}>
+                                                            <StatusIcon className="h-4 w-4" />
+                                                            {statusConfig.label}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Booking Code Display */}
+                                                    <div className="flex items-center justify-between p-2.5 mb-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
+                                                        <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Kode Booking</span>
+                                                        <span className="text-sm font-bold font-mono text-primary flex items-center gap-2">
+                                                            {appointment.bookingCode || 'REG-XXXX'}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Doctor Warning UI ... */}
+                                                    {(appointment.doctor.isOnLeave || appointment.doctor.isStudying) && (
+                                                        <div className="mb-4 p-4 rounded-xl bg-orange-50 border-2 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/30 flex items-start gap-3 shadow-sm">
+                                                            <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+                                                            <div>
+                                                                <p className="font-bold text-orange-800 dark:text-orange-300 text-sm">Dokter Berhalangan</p>
+                                                                <p className="text-[12px] text-orange-700 dark:text-orange-400 mt-1">Harap hubungi CS untuk penyesuaian jadwal.</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Date & Waktu ... */}
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                                        <div className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50 border border-border">
+                                                            <Calendar className="h-4 w-4 text-primary" />
+                                                            <div>
+                                                                <p className="text-[10px] text-muted-foreground font-medium uppercase">Tanggal</p>
+                                                                <p className="text-xs font-bold">{dateInfo.date}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50 border border-border">
+                                                            <Clock className="h-4 w-4 text-emerald-600" />
+                                                            <div>
+                                                                <p className="text-[10px] text-muted-foreground font-medium uppercase">Jam</p>
+                                                                <p className="text-xs font-bold">{dateInfo.time} WIB ({dateInfo.relative})</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                )}
 
-                                                {/* Date & Time Info */}
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                                                        <Calendar className="h-5 w-5 text-primary" />
-                                                        <div>
-                                                            <p className="text-xs text-muted-foreground font-medium">Tanggal</p>
-                                                            <p className="font-semibold text-foreground">{dateInfo.date}</p>
-                                                            <p className="text-xs text-muted-foreground">{dateInfo.day}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                                                        <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                                        <div>
-                                                            <p className="text-xs text-muted-foreground font-medium">Waktu</p>
-                                                            <p className="font-semibold text-foreground">{dateInfo.time} WIB</p>
-                                                            <p className="text-xs text-accent font-semibold">{dateInfo.relative}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Action Buttons */}
-                                                {canCancel(appointment.appointmentDate, appointment.status) && (
-                                                    <div className="flex gap-2 pt-3 border-t border-border">
-                                                        {/* Reschedule Button */}
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="flex-1"
-                                                            onClick={() => setRescheduleData({
-                                                                appointmentId: appointment.id,
-                                                                doctorName: appointment.doctor.name,
-                                                                currentDate: `${dateInfo.day}, ${dateInfo.date} pukul ${dateInfo.time}`
-                                                            })}
-                                                        >
-                                                            <CalendarClock className="h-4 w-4 mr-2" />
-                                                            Ubah Jadwal
-                                                        </Button>
-
-                                                        {/* Cancel Button */}
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
+                                                    {/* Action Buttons */}
+                                                    <div className="flex flex-wrap gap-2 pt-3 border-t border-border">
+                                                        {activeTab === 'upcoming' && (
+                                                            <>
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="flex-1 text-destructive border-destructive/50 hover:bg-destructive/10"
-                                                                    disabled={cancellingId === appointment.id}
+                                                                    className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 h-9 px-3"
+                                                                    onClick={() => handleShareWhatsApp(appointment, patient.patientName)}
                                                                 >
-                                                                    {cancellingId === appointment.id ? (
-                                                                        <>
-                                                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                                            Membatalkan...
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <XCircle className="h-4 w-4 mr-2" />
-                                                                            Batalkan
-                                                                        </>
-                                                                    )}
+                                                                    <MessageCircle className="h-4 w-4 mr-2" />
+                                                                    WA
                                                                 </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="sm:max-w-md">
-                                                                <DialogHeader>
-                                                                    <DialogTitle className="flex items-center gap-2 text-destructive">
-                                                                        <AlertCircle className="h-5 w-5" />
-                                                                        Batalkan Booking?
-                                                                    </DialogTitle>
-                                                                    <DialogDescription className="pt-2">
-                                                                        Apakah Anda yakin ingin membatalkan janji temu dengan <strong className="text-foreground">{appointment.doctor.name}</strong> pada <strong className="text-foreground">{dateInfo.date}</strong>?
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <DialogFooter className="gap-2 sm:gap-0">
-                                                                    <DialogClose asChild>
-                                                                        <Button variant="outline">Kembali</Button>
-                                                                    </DialogClose>
-                                                                    <DialogClose asChild>
+                                                                {canCancel(appointment.appointmentDate, appointment.status) && (
+                                                                    <>
                                                                         <Button
-                                                                            onClick={() => handleCancelBooking(appointment.id, appointment.doctor.name)}
-                                                                            variant="destructive"
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            className="h-9 px-3"
+                                                                            onClick={() => setRescheduleData({
+                                                                                appointmentId: appointment.id,
+                                                                                doctorName: appointment.doctor.name,
+                                                                                currentDate: `${dateInfo.day}, ${dateInfo.date} pukul ${dateInfo.time}`
+                                                                            })}
                                                                         >
-                                                                            Ya, Batalkan
+                                                                            Ubah
                                                                         </Button>
-                                                                    </DialogClose>
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
+                                                                        <Dialog>
+                                                                            <DialogTrigger asChild>
+                                                                                <Button variant="outline" size="sm" className="h-9 px-3 text-destructive border-destructive/30">
+                                                                                    Batal
+                                                                                </Button>
+                                                                            </DialogTrigger>
+                                                                            <DialogContent className="sm:max-w-md">
+                                                                                <DialogHeader>
+                                                                                    <DialogTitle>Batalkan Booking?</DialogTitle>
+                                                                                    <DialogDescription>Yakin ingin membatalkan?</DialogDescription>
+                                                                                </DialogHeader>
+                                                                                <DialogFooter>
+                                                                                    <DialogClose asChild><Button variant="outline">Tidak</Button></DialogClose>
+                                                                                    <DialogClose asChild><Button variant="destructive" onClick={() => handleCancelBooking(appointment.id, appointment.doctor.name)}>Ya, Batalkan</Button></DialogClose>
+                                                                                </DialogFooter>
+                                                                            </DialogContent>
+                                                                        </Dialog>
+                                                                    </>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                        {activeTab === 'past' && (
+                                                            <Button variant="outline" size="sm" className="h-9 px-3" asChild>
+                                                                <Link href={`/doctors/${appointment.doctor.id || ''}`}>
+                                                                    Booking Ulang
+                                                                </Link>
+                                                            </Button>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Reschedule Modal */}

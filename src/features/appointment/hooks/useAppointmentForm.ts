@@ -3,11 +3,12 @@ import { AppointmentFormData, PatientSearchState, PatientData, AvailableDate } f
 import { useCreateAppointment } from '../api/createAppointment';
 import { toast } from "sonner";
 
-export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: { id: string, name: string }, initialPoliId?: string) => {
-  // Jika poli sudah ditentukan atau dokter hanya memiliki 1 poliklinik, langsung lanjut ke jadwal
-  const hasFixedPoli = initialPoliId || (doctor?.categories && doctor.categories.length === 1);
-  const initialStep = hasFixedPoli ? 2 : 1;
-  const [step, setStep] = useState(initialStep);
+export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: string, name: string }, initialPoliId?: string) => {
+  // Simplifikasi alur: 3 Langkah utama
+  // Langkah 1: Jadwal (Poli + Tanggal + Waktu)
+  // Langkah 2: Data & Konfirmasi (Form + Summary + Persetujuan)
+  // Langkah 3: Selesai (Success)
+  const [step, setStep] = useState(1);
   const [bookingCode, setBookingCode] = useState('');
 
   // Tentukan poli awal
@@ -63,37 +64,128 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
   const createAppointmentMutation = useCreateAppointment();
   const loading = createAppointmentMutation.isPending;
 
-  // Search patient by RM number
-  const searchPatient = async (mrNumber: string) => {
-    if (!mrNumber || mrNumber.length < 3) {
+  // Persistence Key
+  const DRAFT_KEY = `booking_draft_${doctor?.id || 'unknown'}`;
+
+  // NEW: Auto-fill for New Patient using User Profile data
+  useEffect(() => {
+    // Only auto-fill if user is logged in AND it's a new paitent type
+    // AND the form fields for these are still empty (to avoid overwriting manual changes or drafts)
+    if (user && formData.patientType === 'new' && !formData.nik && !formData.fullName) {
+      console.log('✨ [AUTO-FILL] Populating form with user profile data');
+
+      setFormData(prev => ({
+        ...prev,
+        nik: (user as any).nik || prev.nik,
+        fullName: user.name || prev.fullName,
+        phone: (user as any).phoneNumber || (user as any).phone || prev.phone,
+        email: user.email || prev.email,
+        address: (user as any).address || prev.address,
+        birthDate: (user as any).birthDate || prev.birthDate,
+        gender: (user as any).gender || prev.gender,
+      }));
+    }
+  }, [user, formData.patientType]);
+
+  // Load draft on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const { step: savedStep, formData: savedData } = JSON.parse(savedDraft);
+
+        // Only load if it's not a success step (step 3)
+        if (savedStep < 3) {
+          setStep(savedStep);
+          setFormData(prev => ({ ...prev, ...savedData }));
+
+          // Re-search patient if mrNumber was saved
+          if (savedData.mrNumber && savedData.patientType === 'old') {
+            searchPatient(savedData.mrNumber);
+          }
+        }
+      } catch (e) {
+        console.error('Error loading booking draft:', e);
+      }
+    }
+  }, [DRAFT_KEY, doctor?.id]);
+
+  // Save draft on changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Don't save if in success step
+    if (step < 3) {
+      const draft = {
+        step,
+        formData: {
+          ...formData,
+          consentTerms: false, // Don't persist consents for safety
+          consentPrivacy: false,
+          consentFee: false,
+        },
+        timestamp: new Date().getTime()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }
+  }, [formData, step, DRAFT_KEY]);
+
+  const clearDraft = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+  };
+
+  // Search patient by RM number or NIK
+  const searchPatient = async (identifier: string) => {
+    if (!identifier || identifier.length < 3) {
       setPatientSearch({ loading: false, found: false, patientData: null, error: '' });
       return;
     }
 
-    console.log('🔍 [SEARCH] Starting patient search for RM:', mrNumber);
+    // Determine type based on length (NIK is 16 digits, RM is typically 6 or less)
+    const isNIK = identifier.length >= 15; // NIK is exact 16, but 15+ is a safe bet for detection
+    const typeLabel = isNIK ? 'NIK' : 'RM';
+
+    console.log(`🔍 [SEARCH] Starting patient search for ${typeLabel}:`, identifier);
     setPatientSearch({ loading: true, found: false, patientData: null, error: '' });
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2000/api';
-      const url = `${baseUrl}/appointments/search-patient/${mrNumber}`;
+      const endpoint = isNIK ? 'search-patient-nik' : 'search-patient';
+      const url = `${baseUrl}/appointments/${endpoint}/${identifier}`;
       console.log('🔍 [SEARCH] Fetching URL:', url);
 
       const response = await fetch(url);
-      console.log('🔍 [SEARCH] Response status:', response.status);
-
       const data = await response.json();
-      console.log('🔍 [SEARCH] Response data:', data);
 
       if (data.found) {
-        console.log('✅ [SEARCH] Patient found:', data.patient.nm_pasien);
+        console.log(`✅ [SEARCH] Patient found via ${typeLabel}:`, data.patient.nm_pasien);
         setPatientSearch({
           loading: false,
           found: true,
           patientData: data.patient as PatientData,
           error: '',
         });
+
+        // Auto-fill form data with patient data
+        setFormData(prev => ({
+          ...prev,
+          mrNumber: data.patient.no_rkm_medis || prev.mrNumber,
+          nik: data.patient.no_ktp || prev.nik,
+          fullName: data.patient.nm_pasien || prev.fullName,
+          phone: data.patient.no_tlp || prev.phone,
+          email: data.patient.email || prev.email,
+          address: data.patient.alamat || prev.address,
+          birthDate: data.patient.tgl_lahir || prev.birthDate,
+          gender: (data.patient.jk === 'L' || data.patient.jk === 'P' ? data.patient.jk : '') as 'L' | 'P' | '',
+          religion: data.patient.agama || prev.religion,
+          bpjsNumber: data.patient.no_peserta || prev.bpjsNumber,
+        }));
       } else {
-        console.warn('⚠️ [SEARCH] Patient not found:', data.message);
+        console.warn(`⚠️ [SEARCH] Patient not found via ${typeLabel}:`, data.message);
         setPatientSearch({
           loading: false,
           found: false,
@@ -103,10 +195,6 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
       }
     } catch (error) {
       console.error('❌ [SEARCH] Error occurred:', error);
-      console.error('❌ [SEARCH] Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-      });
       setPatientSearch({
         loading: false,
         found: false,
@@ -243,6 +331,7 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
       patientData: null,
       error: '',
     });
+    clearDraft();
   };
 
   const handleSubmit = async () => {
@@ -271,7 +360,7 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
       bookingTime: formData.time, // Include the selected time
       patientType: formData.patientType,
       paymentType: formData.paymentType,
-      createdByUserId: userId || null, // Track user yang membuat booking
+      createdByUserId: user?.id || null, // Track user yang membuat booking
       serviceItemId: formData.serviceItemId,
       serviceItemName: formData.serviceItemName,
     };
@@ -299,6 +388,9 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
       formData.paymentName?.toLowerCase().includes('kis');
     if (isBpjsPayment && formData.bpjsNumber) {
       payload.bpjsNumber = formData.bpjsNumber;
+      if (formData.bpjsRujukan) {
+        payload.bpjsRujukan = formData.bpjsRujukan;
+      }
     }
 
     // Add keluhan if provided
@@ -318,7 +410,8 @@ export const useAppointmentForm = (doctor: any, userId?: string, serviceItem?: {
       onSuccess: (data: any) => {
         toast.dismiss(loadingToast); // Remove loading toast
         setBookingCode(data.bookingCode || "REG-XXXX");
-        setStep(5); // Step 5 for success page after confirmation
+        setStep(3); // Step 3 for success page after confirmation/submission
+        clearDraft(); // Success! Clear the draft.
         toast.success(data.message || "Janji temu berhasil dibuat!", {
           duration: 5000,
         });
