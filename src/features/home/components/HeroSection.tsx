@@ -25,6 +25,7 @@ const HeroImage = () => {
         alt="Hero Image"
         unoptimized
         fill
+        sizes="100vw"
         className="object-cover "
       />
       <div className="absolute inset-0 bg-slate-900/20 w-full h-full"></div>

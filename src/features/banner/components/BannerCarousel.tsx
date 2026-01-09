@@ -9,8 +9,8 @@ import { getImageSrc } from "~/lib/utils";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-// IGD Emergency Phone Number
-const IGD_PHONE = "087864331678";
+// UGD Emergency Phone Number
+const UGD_PHONE = "087864331678";
 
 export const BannerCarousel = () => {
     const t = useTranslations("About");
@@ -115,15 +115,15 @@ export const BannerCarousel = () => {
                                 </p>
                             )}
 
-                            {/* IGD Phone Number - Show when banner is IGD related */}
-                            {currentBanner.title?.toLowerCase().includes('igd') && (
+                            {/* UGD Phone Number - Show when banner is related to emergency */}
+                            {(currentBanner.title?.toLowerCase().includes('igd') || currentBanner.title?.toLowerCase().includes('ugd')) && (
                                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-250">
                                     <a
-                                        href={`tel:${IGD_PHONE}`}
+                                        href={`tel:${UGD_PHONE}`}
                                         className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full font-bold text-sm md:text-base transition-all shadow-lg hover:shadow-xl"
                                     >
                                         <Phone className="h-4 w-4 md:h-5 md:w-5 animate-pulse" />
-                                        <span>Hubungi IGD: {IGD_PHONE}</span>
+                                        <span>Hubungi UGD: {UGD_PHONE}</span>
                                     </a>
                                 </div>
                             )}

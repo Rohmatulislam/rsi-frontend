@@ -49,6 +49,8 @@ export const DoctorModal = ({
     kd_dokter: "",
     description: "",
     isActive: true,
+    isStudying: false,
+    isOnLeave: false,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -78,6 +80,8 @@ export const DoctorModal = ({
         kd_dokter: doctor.kd_dokter ?? "",
         description: doctor.description ?? "",
         isActive: doctor.isActive ?? true,
+        isStudying: doctor.isStudying ?? false,
+        isOnLeave: (doctor as any).isOnLeave ?? false,
       }));
     } else {
       setFormData({
@@ -101,14 +105,24 @@ export const DoctorModal = ({
         kd_dokter: "",
         description: "",
         isActive: true,
+        isStudying: false,
+        isOnLeave: false,
       });
     }
   }, [isEdit, doctor]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked :
-      type === 'number' ? (value === '' ? 0 : Number(value)) : value;
+
+    let val: any = value;
+    if (type === 'checkbox') {
+      val = (e.target as HTMLInputElement).checked;
+    } else if (type === 'number') {
+      val = value === '' ? 0 : Number(value);
+    } else if (name === 'isActive' || name === 'isStudying' || name === 'isOnLeave' || name === 'is_executive' || name === 'bpjs') {
+      // Convert "true"/"false" strings to actual booleans
+      val = value === 'true';
+    }
 
     setFormData(prev => ({
       ...prev,
@@ -161,7 +175,6 @@ export const DoctorModal = ({
           finalFormData.imageUrl = result.imageUrl;
         }
       } catch (error) {
-        console.error("Auto-upload failed:", error);
         // We might want to show an alert or continue with old data
       } finally {
         setIsAutoUploading(false);
@@ -293,17 +306,41 @@ export const DoctorModal = ({
               </select>
             </div>
 
-            <div>
-              <Label htmlFor="isActive">Active?</Label>
+            <div className="md:col-span-2">
+              <Label htmlFor="doctorStatus">Status Dokter</Label>
               <select
-                id="isActive"
-                name="isActive"
-                value={formData.isActive ? "true" : "false"}
-                onChange={handleChange}
+                id="doctorStatus"
+                name="doctorStatus"
+                value={
+                  !formData.isActive ? "inactive" :
+                    formData.isOnLeave ? "on_leave" :
+                      formData.isStudying ? "studying" : "active"
+                }
+                onChange={(e) => {
+                  const status = e.target.value;
+                  let newValues: any = {};
+                  switch (status) {
+                    case "active":
+                      newValues = { isActive: true, isStudying: false, isOnLeave: false };
+                      break;
+                    case "studying":
+                      newValues = { isActive: true, isStudying: true, isOnLeave: false };
+                      break;
+                    case "on_leave":
+                      newValues = { isActive: true, isStudying: false, isOnLeave: true };
+                      break;
+                    case "inactive":
+                      newValues = { isActive: false, isStudying: false, isOnLeave: false };
+                      break;
+                  }
+                  setFormData(prev => ({ ...prev, ...newValues }));
+                }}
                 className="w-full p-2 border rounded"
               >
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="active">✅ Aktif</option>
+                <option value="studying">📚 Sedang Pendidikan</option>
+                <option value="on_leave">🏖️ Sedang Cuti</option>
+                <option value="inactive">❌ Non-Aktif</option>
               </select>
             </div>
 

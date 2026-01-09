@@ -14,7 +14,10 @@ import { Button } from "~/components/ui/button";
 
 export default function AdminDoctorsPage() {
     const { data: doctors, isLoading } = useGetDoctorsList({
-        input: { limit: 1000 }
+        input: {
+            limit: 1000,
+            includeInactive: true
+        }
     });
 
     const { mutate: sync, isPending: isSyncing } = useSyncDoctors();
@@ -59,8 +62,11 @@ export default function AdminDoctorsPage() {
                     return;
                 }
 
-                // Skip empty strings (except for optional fields that can be empty)
-                if (value !== "" && value !== undefined && value !== null) {
+                // Ensure booleans are always included if they exist in the data
+                const isStatusField = key === "isActive" || key === "isStudying" || key === "isOnLeave" || key === "is_executive" || key === "bpjs";
+                const isBoolean = typeof value === 'boolean';
+
+                if (isStatusField || isBoolean || (value !== "" && value !== undefined && value !== null)) {
                     cleanedData[key] = value;
                 } else if (value === "" && (key === "phone" || key === "bio" || key === "education" ||
                     key === "certifications" || key === "description" || key === "imageUrl" ||
@@ -197,10 +203,23 @@ export default function AdminDoctorsPage() {
                                         {formatCurrency(doc.consultation_fee)}
                                     </td>
                                     <td className="p-4">
-                                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${doc.is_executive ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'
-                                            }`}>
-                                            {doc.is_executive ? 'Executive' : 'Regular'}
-                                        </span>
+                                        {!doc.isActive ? (
+                                            <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700">
+                                                Non-Aktif
+                                            </span>
+                                        ) : (doc as any).isOnLeave ? (
+                                            <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700">
+                                                Cuti
+                                            </span>
+                                        ) : doc.isStudying ? (
+                                            <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">
+                                                Pendidikan
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                                                Aktif
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="p-4 text-right">
                                         <div className="flex justify-end gap-2">

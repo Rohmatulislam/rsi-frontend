@@ -138,7 +138,7 @@ export const DoctorListPage = () => {
                                 value={specializationFilter}
                                 onChange={(e) => setSpecializationFilter(e.target.value)}
                             >
-                                <option value="all">Semua Spesialisasi</option>
+                                <option value="all">Semua Dokter</option>
                                 {specializations.map((spec, index) => (
                                     <option key={index} value={spec || ''}>
                                         {spec || 'Tidak Diketahui'}

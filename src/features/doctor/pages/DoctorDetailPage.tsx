@@ -163,14 +163,24 @@ const DoctorDetailPage = () => {
                                     </div>
 
                                     <div className="pt-2">
-                                        <AppointmentBookingModal
-                                            doctor={doctor}
-                                            trigger={
-                                                <Button className="w-full rounded-xl py-6 font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" size="lg">
-                                                    Buat Janji Temu
-                                                </Button>
-                                            }
-                                        />
+                                        {doctor.isStudying || (doctor as any).isOnLeave ? (
+                                            <Button
+                                                className="w-full rounded-xl py-6 font-bold text-lg opacity-50 cursor-not-allowed"
+                                                size="lg"
+                                                disabled
+                                            >
+                                                {doctor.isStudying ? "Sedang Pendidikan" : "Sedang Cuti"}
+                                            </Button>
+                                        ) : (
+                                            <AppointmentBookingModal
+                                                doctor={doctor}
+                                                trigger={
+                                                    <Button className="w-full rounded-xl py-6 font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" size="lg">
+                                                        Buat Janji Temu
+                                                    </Button>
+                                                }
+                                            />
+                                        )}
                                         <p className="text-xs text-center text-muted-foreground mt-3">
                                             Dijamin aman & terpercaya
                                         </p>

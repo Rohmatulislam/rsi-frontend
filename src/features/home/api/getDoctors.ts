@@ -34,6 +34,8 @@ export type DoctorDto = {
     kd_dokter: string | null;
     description: string | null;
     isActive: boolean;
+    isStudying: boolean | null;
+    isOnLeave: boolean | null;
     schedules: {
         id: string;
         dayOfWeek: number;

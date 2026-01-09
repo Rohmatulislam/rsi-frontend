@@ -21,6 +21,8 @@ export interface CreateDoctorDto {
   kd_dokter?: string;
   description?: string;
   isActive?: boolean;
+  isStudying?: boolean;
+  isOnLeave?: boolean;
 }
 
 export interface UpdateDoctorDto {
@@ -44,4 +46,6 @@ export interface UpdateDoctorDto {
   kd_dokter?: string;
   description?: string;
   isActive?: boolean;
+  isStudying?: boolean;
+  isOnLeave?: boolean;
 }

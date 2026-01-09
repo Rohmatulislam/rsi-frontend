@@ -17,6 +17,9 @@ export interface MyPatient {
             name: string;
             specialization: string;
             imageUrl: string;
+            isActive?: boolean;
+            isStudying?: boolean;
+            isOnLeave?: boolean;
         };
         notes: string;
     }[];

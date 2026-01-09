@@ -45,6 +45,7 @@ export const ContactPage = () => {
                                     <div>
                                         <h4 className="font-bold text-sm uppercase text-muted-foreground mb-1">Telepon</h4>
                                         <p className="text-slate-900 dark:text-white font-mono text-lg">0878-6433-1678 (UGD)</p>
+                                        <p className="text-slate-700 dark:text-slate-300 font-mono text-md">0878-7215-4493 (Ambulans)</p>
                                         <p className="text-xs text-muted-foreground mt-1">Informasi: (0370) 623498</p>
                                     </div>
                                 </div>

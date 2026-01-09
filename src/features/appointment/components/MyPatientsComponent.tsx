@@ -351,6 +351,28 @@ export const MyPatientsComponent = () => {
                                                     </div>
                                                 </div>
 
+                                                {/* Doctor Leave/Study Warning */}
+                                                {(appointment.doctor.isOnLeave || appointment.doctor.isStudying) && (
+                                                    <div className="mb-4 p-4 rounded-xl bg-orange-50 border-2 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/30 flex items-start gap-3 shadow-sm animate-pulse-subtle">
+                                                        <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="font-bold text-orange-800 dark:text-orange-300">
+                                                                Dokter Sedang {appointment.doctor.isOnLeave ? 'Cuti' : 'Berhalangan'}
+                                                            </p>
+                                                            <p className="text-sm text-orange-700 dark:text-orange-400 mt-1 leading-relaxed">
+                                                                {appointment.doctor.name} saat ini sedang {appointment.doctor.isOnLeave ? 'Cuti' : 'menjalani masa pendidikan'}.
+                                                                Jadwal pemeriksaan Anda kemungkinan besar akan mengalami perubahan.
+                                                                Mohon hubungi bagian Pendaftaran untuk konfirmasi atau melakukan perubahan jadwal.
+                                                            </p>
+                                                            <Button variant="outline" size="sm" className="mt-3 bg-white hover:bg-orange-100 border-orange-200 text-orange-700 h-8 text-xs font-bold" asChild>
+                                                                <Link href="https://wa.me/628123456789" target="_blank">
+                                                                    Hubungi CS via WA
+                                                                </Link>
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+
                                                 {appointment.reason && (
                                                     <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg">
                                                         <div className="flex items-start gap-2">

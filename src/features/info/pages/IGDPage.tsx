@@ -6,23 +6,62 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 
+import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
+import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
+
 const UGD_PHONE = "087864331678";
 const AMBULANCE_PHONE = "087872154493";
 
-const ACTIVE_DOCTORS = [
-    "dr. Lina Efiantari",
-    "dr. Restu Ardi Safiru",
-    "dr. Emira Alifia",
-    "dr. M. Imam Setiawan",
-    "dr. Farida Pratiwi",
-    "dr. M. Miftahul Hadi",
-    "dr. Baiq Febri Aryani",
-    "dr. Tri Wira Jati Kusuma H",
-    "dr. M. Abdizil Ikram",
-    "dr. L. Anugrah Nugraha"
+const UGD_DOCTOR_NAMES = [
+    "Lina Efiantari",
+    "Restu Ardi Safiru",
+    "Emira Alifia",
+    "M. Imam Setiawan",
+    "Farida Pratiwi",
+    "M. Miftahul Hadi",
+    "Baiq Febri Aryani",
+    "Tri Wira Jati Kusuma H",
+    "M. Abdizil Ikram",
+    "L. Anugrah Nugraha"
 ];
 
 export const IGDPage = () => {
+    const { data: allDoctors, isLoading } = useGetDoctorsList({
+        input: {
+            limit: 500,
+            showAll: true
+        },
+    });
+
+    const ugdDoctors = allDoctors?.filter(doctor => {
+        const docName = doctor.name.toLowerCase();
+        return UGD_DOCTOR_NAMES.some(targetName => {
+            const target = targetName.toLowerCase();
+            // Try exact match
+            if (docName.includes(target)) return true;
+
+            // Handle M. -> Muhammad / Muhamad
+            if (target.startsWith('m. ')) {
+                const rest = target.substring(3);
+                if (docName.includes('muhammad ' + rest) || docName.includes('muhamad ' + rest)) return true;
+                // Also handle M. M. or similar
+                if (docName.includes('m. m. ' + rest.substring(rest.indexOf(' ') + 1))) return true;
+            }
+
+            // Handle L. -> Lalu
+            if (target.startsWith('l. ')) {
+                const rest = target.substring(3);
+                if (docName.includes('lalu ' + rest)) return true;
+            }
+
+            // Keyword based for complex names
+            const keywords = target.split(' ').filter(k => k.length > 2);
+            if (keywords.length >= 2 && keywords.every(k => docName.includes(k))) return true;
+
+            return false;
+        });
+    }) || [];
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <ServiceHero
@@ -124,6 +163,39 @@ export const IGDPage = () => {
                             </div>
                         </section>
 
+                        {/* Doctors Section - Full Width inside col-span-2 */}
+                        <section>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                                    <UserCheck className="text-indigo-600 h-8 w-8" />
+                                    Dokter Jaga Aktif
+                                </h2>
+                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
+                                    Siaga 24 Jam
+                                </Badge>
+                            </div>
+
+                            {isLoading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {[...Array(4)].map((_, i) => (
+                                        <DoctorCardSkeleton key={i} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    {ugdDoctors.length > 0 ? (
+                                        ugdDoctors.map((doctor) => (
+                                            <DoctorCard key={doctor.id} doctor={doctor} hideSchedule={true} />
+                                        ))
+                                    ) : (
+                                        <Card className="col-span-full p-12 text-center border-dashed">
+                                            <p className="text-muted-foreground">Informasi dokter jaga sedang dimuat atau tidak tersedia.</p>
+                                        </Card>
+                                    )}
+                                </div>
+                            )}
+                        </section>
+
                         {/* Triage System Info */}
                         <section className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800">
                             <h2 className="text-2xl font-bold mb-4">Sistem Triase UGD</h2>
@@ -193,27 +265,31 @@ export const IGDPage = () => {
                             </CardContent>
                         </Card>
 
-                        {/* Doctors List */}
-                        <Card className="border-indigo-100 dark:border-indigo-900">
-                            <CardHeader className="bg-indigo-50/50 dark:bg-indigo-950/20">
-                                <CardTitle className="text-indigo-900 dark:text-indigo-100 text-xl flex items-center gap-2">
-                                    <UserCheck className="h-5 w-5 text-indigo-600" />
-                                    Dokter Jaga Aktif
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                                <div className="divide-y divide-indigo-50 dark:divide-indigo-900">
-                                    {ACTIVE_DOCTORS.map((doctor, index) => (
-                                        <div key={index} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{doctor}</p>
-                                        </div>
-                                    ))}
+                        {/* Operational Card */}
+                        <Card className="bg-slate-900 text-white overflow-hidden">
+                            <CardContent className="p-6">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="p-3 bg-red-600 rounded-xl">
+                                        <Clock className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold">Waktu Operasional</h4>
+                                        <p className="text-slate-400 text-sm">Buka Setiap Hari</p>
+                                    </div>
                                 </div>
-                                <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-b-xl border-t">
-                                    <p className="text-[10px] text-slate-500 text-center uppercase tracking-wider font-semibold">
-                                        Siaga Melayani 24 Jam
-                                    </p>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                                        <span>Senin - Minggu</span>
+                                        <Badge className="bg-red-600">24 Jam</Badge>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                                        <span>Hari Libur Nasional</span>
+                                        <Badge className="bg-red-600">24 Jam</Badge>
+                                    </div>
                                 </div>
+                                <p className="text-xs text-slate-500 mt-4 italic">
+                                    *Tim medis kami siaga penuh 24 jam untuk melayani keadaan darurat Anda.
+                                </p>
                             </CardContent>
                         </Card>
 

@@ -11,6 +11,8 @@ type GetDoctorsInput = {
     sort?: DoctorSortBy;
     isExecutive?: boolean;
     search?: string;
+    showAll?: boolean;
+    includeInactive?: boolean;
 };
 
 type GetDoctorsResponse = DoctorDto[];

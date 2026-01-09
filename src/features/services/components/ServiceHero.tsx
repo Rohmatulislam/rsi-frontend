@@ -24,6 +24,7 @@ export const ServiceHero = ({
                 src={heroImage}
                 alt={title}
                 fill
+                sizes="100vw"
                 className="object-cover"
                 priority
                 unoptimized

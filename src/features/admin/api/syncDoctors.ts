@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 
 export const syncDoctors = async () => {
-    const response = await axiosInstance.post<{ message: string }>("/doctors/sync");
+    const response = await axiosInstance.post<{ message: string; status: string }>("/doctors/sync");
     return response.data;
 };
 
@@ -11,9 +11,9 @@ export const useSyncDoctors = () => {
 
     return useMutation({
         mutationFn: syncDoctors,
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["doctors-list"] });
-            alert("Doctors synced successfully!");
+            alert(data.message);
         },
         onError: (error) => {
             alert("Failed to sync doctors: " + error.message);
