@@ -24,6 +24,7 @@ export interface DoctorCardProps {
     jam_mulai: string;
     jam_selesai: string;
     kuota: number | null;
+    consultation_fee?: number;
   }[];
   consultation_fee?: number | null;
   rating?: number | null;

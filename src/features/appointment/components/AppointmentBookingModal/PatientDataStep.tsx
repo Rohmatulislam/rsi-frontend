@@ -545,7 +545,14 @@ export const PatientDataStep = ({
             <div className="space-y-1">
               <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 group-hover:text-primary transition-colors">Biaya Pemeriksaan</p>
               <p className="text-[11px] text-yellow-800/70 dark:text-yellow-200/50">
-                Bersedia membayar biaya konsultasi estimasi <span className="font-bold text-yellow-900">Rp {doctor?.consultation_fee?.toLocaleString('id-ID') || '0'}</span>
+                Bersedia membayar biaya konsultasi estimasi <span className="font-bold text-yellow-900">
+                  Rp {(() => {
+                    // Temukan tarif dari scheduleDetails berdasarkan poli yang dipilih
+                    const selectedSchedule = doctor?.scheduleDetails?.find((s: any) => s.kd_poli === formData.poliId);
+                    const fee = selectedSchedule?.consultation_fee || doctor?.consultation_fee || 0;
+                    return fee.toLocaleString('id-ID');
+                  })()}
+                </span>
                 {formData.paymentName?.toLowerCase().includes('bpjs') && ' (Ditanggung BPJS)'}
               </p>
             </div>

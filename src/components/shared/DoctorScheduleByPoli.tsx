@@ -80,9 +80,19 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
           key={poliName}
           className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"
         >
-          <h3 className="font-semibold text-primary mb-3 text-sm uppercase tracking-wide">
-            {poliName}
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-primary text-sm uppercase tracking-wide">
+              {poliName}
+            </h3>
+            {schedules[0]?.consultation_fee !== undefined && schedules[0].consultation_fee > 0 && (
+              <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">Biaya</span>
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-300">
+                  Rp {schedules[0].consultation_fee.toLocaleString('id-ID')}
+                </span>
+              </div>
+            )}
+          </div>
 
           <div className="space-y-2">
             {schedules.map((schedule, index) => {

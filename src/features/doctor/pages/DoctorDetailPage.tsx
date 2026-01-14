@@ -155,7 +155,28 @@ const DoctorDetailPage = () => {
                                                 <div>
                                                     <p className="text-xs text-muted-foreground uppercase font-bold">Biaya Konsultasi</p>
                                                     <div className="text-xl font-black text-primary mt-1">
-                                                        {doctor.consultation_fee ? formatCurrency(doctor.consultation_fee) : "Hubungi Kami"}
+                                                        {(() => {
+                                                            const fees = doctor.scheduleDetails
+                                                                ? Array.from(new Set(doctor.scheduleDetails.map((s: any) => s.consultation_fee).filter((f: any) => f !== undefined && f > 0)))
+                                                                : [];
+
+                                                            if (fees.length === 0) {
+                                                                return doctor.consultation_fee ? formatCurrency(doctor.consultation_fee) : "Hubungi Kami";
+                                                            }
+
+                                                            if (fees.length === 1) {
+                                                                return formatCurrency(fees[0] as number);
+                                                            }
+
+                                                            const minFee = Math.min(...(fees as number[]));
+                                                            const maxFee = Math.max(...(fees as number[]));
+
+                                                            if (minFee === maxFee) {
+                                                                return formatCurrency(minFee);
+                                                            }
+
+                                                            return `Mulai ${formatCurrency(minFee)}`;
+                                                        })()}
                                                     </div>
                                                 </div>
                                             </div>

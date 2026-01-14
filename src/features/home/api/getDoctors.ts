@@ -52,6 +52,7 @@ export type DoctorDto = {
         jam_mulai: string;
         jam_selesai: string;
         kuota: number | null;
+        consultation_fee?: number;
     }[];
 };
 
