@@ -249,11 +249,11 @@ export const RegisterForm = () => {
           {/* Terms */}
           <p className="text-xs text-muted-foreground text-center mt-4">
             Dengan mendaftar, Anda menyetujui{" "}
-            <Link href="/terms" className="text-primary hover:underline">
+            <Link href="/syarat-ketentuan" className="text-primary hover:underline">
               Syarat & Ketentuan
             </Link>{" "}
             dan{" "}
-            <Link href="/privacy" className="text-primary hover:underline">
+            <Link href="/kebijakan-privasi" className="text-primary hover:underline">
               Kebijakan Privasi
             </Link>
           </p>
