@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "~/navigation";
 import { usePathname } from "next/navigation";
 import { Home, Stethoscope, ClipboardList, Calendar, User } from "lucide-react";
 import { cn } from "~/lib/utils";
@@ -40,12 +40,15 @@ const navItems = [
 export const MobileBottomNav = () => {
     const pathname = usePathname();
 
+    // Strip locale prefix from pathname for comparison (e.g., /id/doctors -> /doctors)
+    const pathWithoutLocale = pathname.replace(/^\/(id|en)/, '') || '/';
+
     // Check if current path matches or starts with the nav item href
     const isActive = (href: string) => {
         if (href === "/") {
-            return pathname === "/";
+            return pathWithoutLocale === "/" || pathWithoutLocale === "";
         }
-        return pathname.startsWith(href);
+        return pathWithoutLocale.startsWith(href);
     };
 
     return (
