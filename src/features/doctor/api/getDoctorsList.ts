@@ -13,6 +13,7 @@ type GetDoctorsInput = {
     search?: string;
     showAll?: boolean;
     includeInactive?: boolean;
+    poliCode?: string;
 };
 
 type GetDoctorsResponse = DoctorDto[];

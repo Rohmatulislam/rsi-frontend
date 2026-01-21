@@ -2,6 +2,7 @@ import { Clock, MapPin, Stethoscope, User, Wallet } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
 
 export interface DoctorCardProps {
   id: string;
@@ -44,6 +45,18 @@ export const DoctorCard = ({
   const filteredScheduleDetails = doctor.scheduleDetails?.filter(schedule =>
     schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
   );
+
+  // Determine relevant poli context (useful if navigated from Poli Detail)
+  // If scheduleDetails is present, we likely have a poli context
+  const primarySchedule = filteredScheduleDetails?.[0];
+  const contextPoliId = primarySchedule?.kd_poli;
+
+  // Real-time info from primary schedule
+  const sisaQuota = primarySchedule?.kuota !== undefined && primarySchedule?.kuota !== null
+    ? (primarySchedule as any).sisa_kuota
+    : null;
+
+  const isToday = (primarySchedule as any)?.is_today;
 
   const groupedSchedules = filteredScheduleDetails?.reduce((acc, schedule) => {
     const poliName = schedule.nm_poli || `Poli ${doctor.specialization || 'Umum'}`;
@@ -164,6 +177,24 @@ export const DoctorCard = ({
               </div>
             )}
 
+            {/* Real-time Status Badge (Active Schedule) */}
+            {isToday && sisaQuota !== null && !doctor.isOnLeave && !doctor.isStudying && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border-0">
+                  Praktek Hari Ini
+                </Badge>
+                {sisaQuota > 0 ? (
+                  <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-full border-emerald-200 text-emerald-700 dark:border-emerald-800 dark:text-emerald-400">
+                    Sisa Kuota: {sisaQuota}
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="text-[10px] px-2 py-0.5 rounded-full">
+                    Kuota Penuh
+                  </Badge>
+                )}
+              </div>
+            )}
+
             {/* Status Label for UGD/24h */}
             {hideSchedule && !doctor.isStudying && doctor.isActive && (
               <div className="flex items-center gap-1.5 mt-2">
@@ -219,11 +250,17 @@ export const DoctorCard = ({
             {(!doctor.isStudying && !doctor.isOnLeave && ((doctor.scheduleDetails && doctor.scheduleDetails.some(schedule =>
               schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
             )) || (doctor.schedules && doctor.schedules.length > 0))) ? (
-              <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all mt-3" asChild>
-                <Link href={`/doctor/${doctor.slug}`}>
-                  Lihat Jadwal & Booking
-                </Link>
-              </Button>
+              <div className="mt-3">
+                <AppointmentBookingModal
+                  doctor={doctor}
+                  initialPoliId={contextPoliId}
+                  trigger={
+                    <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all">
+                      Daftar Sekarang
+                    </Button>
+                  }
+                />
+              </div>
             ) : (
               <Button className="w-full rounded-lg font-semibold text-sm shadow-sm transition-all mt-3 opacity-50 cursor-not-allowed" disabled>
                 {doctor.isStudying ? "Sedang Pendidikan" : doctor.isOnLeave ? "Sedang Cuti" : "Jadwal Belum Tersedia"}

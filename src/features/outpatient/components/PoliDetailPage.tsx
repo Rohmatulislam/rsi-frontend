@@ -17,8 +17,9 @@ interface PoliDetailPageProps {
 
 export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
     const { data: item, isLoading: itemLoading, error } = useGetServiceItemById(id);
+    // Fetch doctors filtered by this poli code (id)
     const { data: allDoctors, isLoading: doctorsLoading } = useGetDoctorsList({
-        input: { limit: 1000 } as any,
+        input: { limit: 1000, poliCode: id } as any,
     });
 
     if (itemLoading) {
