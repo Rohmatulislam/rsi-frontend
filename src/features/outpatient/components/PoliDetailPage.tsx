@@ -6,11 +6,12 @@ import { useGetPoliQueue } from "~/features/outpatient/api/getPoliQueue";
 import { ServiceHero, ServiceSection } from "~/features/services";
 import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 import { Button } from "~/components/ui/button";
-import { ArrowLeft, Stethoscope, Clock, MapPin, Phone, Users } from "lucide-react";
+import { ArrowLeft, Stethoscope, Clock, MapPin, Phone, Users, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { ServiceCTA } from "~/features/services/components/ServiceCTA";
 import { ServicePageSkeleton } from "~/components/shared/ServicePageSkeleton";
 import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
+import { useState, useEffect, useRef } from "react";
 
 interface PoliDetailPageProps {
     id: string;
@@ -129,15 +130,18 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
 
                         {/* Queue Info (Right - 1 Col) */}
                         <div className="flex flex-col h-full">
-                            <div className="bg-card border rounded-2xl p-6 h-full shadow-lg">
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <span className="relative flex h-3 w-3">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                    </span>
-                                    Live Antrian
-                                </h3>
-                                <QueueInfoCard poliId={id} />
+                            <div className="bg-card border rounded-2xl p-6 h-full shadow-lg relative overflow-hidden">
+                                {/* Header with Sound Toggle */}
+                                <div className="flex items-center justify-between mb-4 relative z-10">
+                                    <h3 className="text-xl font-bold flex items-center gap-2">
+                                        <span className="relative flex h-3 w-3">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                        </span>
+                                        Live Antrian
+                                    </h3>
+                                </div>
+                                <QueueInfoCard poliId={id} poliName={item.name} />
                             </div>
                         </div>
                     </div>
@@ -232,8 +236,37 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
     );
 };
 
-const QueueInfoCard = ({ poliId }: { poliId: string }) => {
+const QueueInfoCard = ({ poliId, poliName }: { poliId: string, poliName: string }) => {
     const { data: queue, isLoading, error } = useGetPoliQueue(poliId);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+    const lastCalledQueue = useRef<string | null>(null);
+
+    // TTS Logic
+    useEffect(() => {
+        if (!queue || !isAudioEnabled || !queue.current || queue.current === '-') return;
+
+        // Check if queue has changed
+        if (lastCalledQueue.current !== queue.current) {
+            lastCalledQueue.current = queue.current;
+
+            // Normalize poli name (remove 'Poli' prefix if exists for better speech)
+            const spokenPoliName = poliName.replace(/^Poli\s+/i, '');
+
+            // Format text to speech
+            const textToSpeak = `Nomor Antrean... ${queue.current.split('').join(' ')}... Silakan masuk ke Poli ${spokenPoliName}`;
+
+            if ('speechSynthesis' in window) {
+                // Cancel previous speech if any
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID'; // Indonesian
+                utterance.rate = 0.9; // Slightly slower
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    }, [queue?.current, isAudioEnabled, poliName]);
 
     if (isLoading) return (
         <>
@@ -259,7 +292,19 @@ const QueueInfoCard = ({ poliId }: { poliId: string }) => {
     );
 
     return (
-        <div className="flex flex-col h-full justify-between">
+        <div className="flex flex-col h-full justify-between relative">
+            <div className="absolute top-0 right-0 z-20">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`rounded-full h-8 w-8 ${isAudioEnabled ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted'}`}
+                    onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+                    title={isAudioEnabled ? "Matikan Suara Panggilan" : "Aktifkan Suara Panggilan"}
+                >
+                    {isAudioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </Button>
+            </div>
+
             <div className="text-center py-4 border-b border-dashed">
                 <p className="text-sm text-muted-foreground mb-1">Sedang Memeriksa</p>
                 <div className="flex items-center justify-center gap-2 mb-2">
