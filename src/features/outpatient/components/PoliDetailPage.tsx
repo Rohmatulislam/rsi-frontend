@@ -118,7 +118,7 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                             <div className="rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-slate-800">
                                 <div className="relative aspect-video bg-black">
                                     <iframe
-                                        src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}`}
+                                        src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}?loop=1&playlist=${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}`}
                                         title={`Video ${item.name}`}
                                         className="absolute inset-0 w-full h-full"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
