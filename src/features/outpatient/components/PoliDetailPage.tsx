@@ -108,10 +108,46 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                 subtitle={item.description || `Layanan konsultasi dan pemeriksaan ${item.name} dengan dokter spesialis berpengalaman.`}
             />
 
-            {/* Info Section */}
+            {/* Live Service Section (Video + Queue) */}
+            <section className="py-8 bg-black/5 dark:bg-black/20">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Video Section (Left - 2 Cols) */}
+                        <div className="lg:col-span-2">
+                            <div className="rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-slate-800">
+                                <div className="relative aspect-video bg-black">
+                                    <iframe
+                                        src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}`}
+                                        title={`Video ${item.name}`}
+                                        className="absolute inset-0 w-full h-full"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Queue Info (Right - 1 Col) */}
+                        <div className="flex flex-col h-full">
+                            <div className="bg-card border rounded-2xl p-6 h-full shadow-lg">
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                    <span className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                    Live Antrian
+                                </h3>
+                                <QueueInfoCard poliId={id} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Info Section (Hours & Location) */}
             <section className="py-12 bg-slate-50 dark:bg-slate-900/30">
                 <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-card border rounded-2xl p-6 flex items-start gap-4">
                             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                 <Clock className="h-6 w-6" />
@@ -137,31 +173,9 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-card border rounded-2xl p-6 flex items-start gap-4 h-full">
-                            <QueueInfoCard poliId={id} />
-                        </div>
                     </div>
                 </div>
             </section>
-
-            {/* Video Section (if available) - Temporary default video added */}
-            {(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA") && (
-                <section className="py-8 bg-black/5 dark:bg-black/20">
-                    <div className="container mx-auto px-4">
-                        <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-slate-800">
-                            <div className="relative aspect-video bg-black">
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}`}
-                                    title={`Video ${item.name}`}
-                                    className="absolute inset-0 w-full h-full"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            )}
 
             {/* Doctors Section */}
             <ServiceSection
@@ -223,56 +237,62 @@ const QueueInfoCard = ({ poliId }: { poliId: string }) => {
 
     if (isLoading) return (
         <>
-            <div className="h-12 w-12 rounded-xl bg-muted/50 animate-pulse" />
-            <div className="space-y-2 flex-1">
-                <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                <div className="h-3 w-32 bg-muted/50 animate-pulse rounded" />
+            <div className="h-12 w-12 rounded-xl bg-muted/50 animate-pulse mb-4" />
+            <div className="space-y-4 flex-1">
+                <div className="h-8 w-3/4 bg-muted/50 animate-pulse rounded" />
+                <div className="h-4 w-1/2 bg-muted/50 animate-pulse rounded" />
+                <div className="h-10 w-full bg-muted/50 animate-pulse rounded" />
             </div>
         </>
     );
 
     if (error || !queue) return (
-        <>
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Users className="h-6 w-6" />
+        <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-4">
+                <Users className="h-8 w-8" />
             </div>
-            <div>
-                <h4 className="font-bold mb-2">Antrian Langsung</h4>
-                <p className="text-sm text-muted-foreground">
-                    Data antrian belum tersedia
-                </p>
-            </div>
-        </>
+            <h4 className="font-bold mb-2">Data Belum Tersedia</h4>
+            <p className="text-sm text-muted-foreground">
+                Silakan hubungi petugas untuk informasi antrian.
+            </p>
+        </div>
     );
 
     return (
-        <>
-            <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 relative">
-                <Users className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                </span>
-            </div>
-            <div className="flex-1">
-                <h4 className="font-bold mb-1 flex items-center gap-2">
-                    Antrian Saat Ini
-                    <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
-                        Live
-                    </span>
-                </h4>
-                <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-slate-800 dark:text-white">
+        <div className="flex flex-col h-full justify-between">
+            <div className="text-center py-4 border-b border-dashed">
+                <p className="text-sm text-muted-foreground mb-1">Sedang Memeriksa</p>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-5xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tighter">
                         {queue.current}
                     </span>
-                    <span className="text-sm text-muted-foreground">
-                        / {queue.total} Pasien
-                    </span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                    {queue.remaining} orang menunggu giliran
+                {queue.currentDoctor && queue.currentDoctor !== '-' && (
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-2 mt-2">
+                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Dokter</p>
+                        <p className="font-medium text-emerald-800 dark:text-emerald-300 line-clamp-2">
+                            {queue.currentDoctor}
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="bg-muted/30 rounded-xl p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Total Pasien</p>
+                    <span className="text-xl font-bold">{queue.total}</span>
+                </div>
+                <div className="bg-muted/30 rounded-xl p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Sisa Antrian</p>
+                    <span className="text-xl font-bold">{queue.remaining}</span>
+                </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-dashed">
+                <p className="text-xs text-center text-muted-foreground">
+                    Diperbarui otomatis setiap 30 detik
                 </p>
             </div>
-        </>
+        </div>
     );
 }

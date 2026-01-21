@@ -6,6 +6,7 @@ interface QueueInfo {
     served: number;
     current: string;
     remaining: number;
+    currentDoctor?: string;
 }
 
 export const useGetPoliQueue = (id: string) => {
