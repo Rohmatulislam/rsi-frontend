@@ -10,6 +10,7 @@ const LoginPage = () => {
   const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
+    console.log("🏁 LoginPage Mounted - Version: Fix-Token-Race-Condition");
     // Only redirect if session has a valid user object with required fields
     // This prevents false redirects when the API returns errors or empty data
     if (session?.user?.id && session?.user?.email) {
