@@ -40,11 +40,14 @@ export const useLoginForm = () => {
         return;
       }
 
+      console.log("Login Response Data:", authResponseData);
+
       if (authResponseData?.token) {
         localStorage.setItem(
           LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY,
           authResponseData.token
         );
+        console.log("Token saved to localStorage:", authResponseData.token ? "YES" : "NO");
         //handle success
         toast.success("Login berhasil!");
 

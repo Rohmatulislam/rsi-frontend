@@ -16,6 +16,9 @@ axiosInstance.interceptors.request.use(
       const token = localStorage.getItem(LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log(`Axios: Attached token to request ${config.url}`);
+      } else {
+        console.warn(`Axios: No token found in localStorage for ${config.url}`);
       }
     }
     return config;
