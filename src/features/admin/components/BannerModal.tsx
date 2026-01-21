@@ -1,5 +1,5 @@
-"use client";
 
+import { axiosInstance } from "~/lib/axios";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Banner, CreateBannerDto } from "~/features/banner/services/bannerService";
@@ -107,17 +107,18 @@ export const BannerModal = ({ open, onClose, banner }: BannerModalProps) => {
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to upload image");
+        try {
+            const { data } = await axiosInstance.post("/upload", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return data.url;
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to upload image";
+            throw new Error(errorMessage);
         }
-
-        const data = await response.json();
-        return data.url;
     };
 
     const onSubmit = async (data: CreateBannerDto) => {
@@ -176,8 +177,8 @@ export const BannerModal = ({ open, onClose, banner }: BannerModalProps) => {
                                     setValue("imageUrl", watch("imageUrl") || "");
                                 }}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${!imageFile
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                                     }`}
                             >
                                 Paste URL
@@ -186,8 +187,8 @@ export const BannerModal = ({ open, onClose, banner }: BannerModalProps) => {
                                 type="button"
                                 onClick={() => document.getElementById("image-upload")?.click()}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${imageFile
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                                     }`}
                             >
                                 Upload File
