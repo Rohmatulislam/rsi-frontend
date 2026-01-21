@@ -2,10 +2,11 @@
 
 import { useGetServiceItemById } from "~/features/services/api/getServiceItemById";
 import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
+import { useGetPoliQueue } from "~/features/outpatient/api/getPoliQueue";
 import { ServiceHero, ServiceSection } from "~/features/services";
 import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 import { Button } from "~/components/ui/button";
-import { ArrowLeft, Stethoscope, Clock, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, Stethoscope, Clock, MapPin, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import { ServiceCTA } from "~/features/services/components/ServiceCTA";
 import { ServicePageSkeleton } from "~/components/shared/ServicePageSkeleton";
@@ -14,6 +15,13 @@ import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 interface PoliDetailPageProps {
     id: string;
 }
+
+// Helper to extract YouTube ID
+const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+};
 
 export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
     const { data: item, isLoading: itemLoading, error } = useGetServiceItemById(id);
@@ -129,21 +137,31 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-card border rounded-2xl p-6 flex items-start gap-4">
-                            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                <Phone className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h4 className="font-bold mb-2">Informasi</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    (0370) 671 358<br />
-                                    Ext. Poliklinik
-                                </p>
-                            </div>
+                        <div className="bg-card border rounded-2xl p-6 flex items-start gap-4 h-full">
+                            <QueueInfoCard poliId={id} />
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* Video Section (if available) */}
+            {item.videoUrl && (
+                <section className="py-8 bg-black/5 dark:bg-black/20">
+                    <div className="container mx-auto px-4">
+                        <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-slate-800">
+                            <div className="relative aspect-video bg-black">
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl)}`}
+                                    title={`Video ${item.name}`}
+                                    className="absolute inset-0 w-full h-full"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Doctors Section */}
             <ServiceSection
@@ -199,3 +217,62 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
         </div>
     );
 };
+
+const QueueInfoCard = ({ poliId }: { poliId: string }) => {
+    const { data: queue, isLoading, error } = useGetPoliQueue(poliId);
+
+    if (isLoading) return (
+        <>
+            <div className="h-12 w-12 rounded-xl bg-muted/50 animate-pulse" />
+            <div className="space-y-2 flex-1">
+                <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                <div className="h-3 w-32 bg-muted/50 animate-pulse rounded" />
+            </div>
+        </>
+    );
+
+    if (error || !queue) return (
+        <>
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Users className="h-6 w-6" />
+            </div>
+            <div>
+                <h4 className="font-bold mb-2">Antrian Langsung</h4>
+                <p className="text-sm text-muted-foreground">
+                    Data antrian belum tersedia
+                </p>
+            </div>
+        </>
+    );
+
+    return (
+        <>
+            <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 relative">
+                <Users className="h-6 w-6" />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+            </div>
+            <div className="flex-1">
+                <h4 className="font-bold mb-1 flex items-center gap-2">
+                    Antrian Saat Ini
+                    <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                        Live
+                    </span>
+                </h4>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-800 dark:text-white">
+                        {queue.current}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                        / {queue.total} Pasien
+                    </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                    {queue.remaining} orang menunggu giliran
+                </p>
+            </div>
+        </>
+    );
+}
