@@ -9,6 +9,7 @@ export interface ServiceItem {
     price: number | null;
     features: string | null;
     imageUrl: string | null;
+    videoUrl: string | null;
     isActive: boolean;
     order: number;
     serviceId: string;

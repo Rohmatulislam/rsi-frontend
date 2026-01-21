@@ -30,6 +30,7 @@ export interface ServiceItemDto {
     features?: string;
     icon?: string;
     imageUrl?: string;
+    videoUrl?: string | null;
     isActive: boolean;
     order: number;
     createdAt: string;

@@ -144,14 +144,14 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                 </div>
             </section>
 
-            {/* Video Section (if available) */}
-            {item.videoUrl && (
+            {/* Video Section (if available) - Temporary default video added */}
+            {(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA") && (
                 <section className="py-8 bg-black/5 dark:bg-black/20">
                     <div className="container mx-auto px-4">
                         <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-slate-800">
                             <div className="relative aspect-video bg-black">
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl)}`}
+                                    src={`https://www.youtube.com/embed/${getYouTubeId(item.videoUrl || "https://www.youtube.com/watch?v=FlI7shjrsqA")}`}
                                     title={`Video ${item.name}`}
                                     className="absolute inset-0 w-full h-full"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
