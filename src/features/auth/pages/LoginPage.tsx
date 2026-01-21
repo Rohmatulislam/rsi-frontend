@@ -17,17 +17,7 @@ const LoginPage = () => {
     }
   }, [session, router]);
 
-  // Check if user has a token in localStorage - if so and no valid session, clear it
-  useEffect(() => {
-    if (!isPending && !session?.user) {
-      // No valid session, clear any stale tokens
-      const token = localStorage.getItem(LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY);
-      if (token) {
-        console.log("Clearing stale auth token");
-        localStorage.removeItem(LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY);
-      }
-    }
-  }, [isPending, session]);
+  // Logic pembersihan token dihapus untuk mencegah race condition saat login berhasil
 
   if (isPending) {
     return (
