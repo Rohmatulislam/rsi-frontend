@@ -141,7 +141,7 @@ export default async function RootLayout({
             <Footer />
             <MobileBottomNav />
             <ChatBot />
-            <Toaster />
+            <Toaster richColors position="top-right" expand={true} />
           </NextIntlClientProvider>
         </Providers>
       </body>

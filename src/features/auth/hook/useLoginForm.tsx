@@ -5,10 +5,12 @@ import { authClient, getErrorMessage } from "~/lib/auth-client";
 import { toast } from "sonner";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export const useLoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginFormSchema>({
     defaultValues: {
@@ -19,6 +21,7 @@ export const useLoginForm = () => {
   });
 
   const onSubmit = async (data: LoginFormSchema) => {
+    setServerError(null);
     try {
       const { error, data: authResponseData } = await authClient.signIn.email({
         email: data.email,
@@ -26,32 +29,27 @@ export const useLoginForm = () => {
       });
 
       //handle auth errors
-      //handle auth errors
       if (error) {
-        console.error("Login Error Received:", error); // Debugging
+        console.error("Login Error Received:", error);
 
         if (error.code === "EMAIL_NOT_VERIFIED") {
-          // Trigger resend email verification
           await authClient.sendVerificationEmail({
             email: data.email,
             callbackURL: "/",
           });
-          toast.info("Email belum diverifikasi. Tautan verifikasi baru telah dikirim ke email Anda.");
+          const msg = "Email belum diverifikasi. Tautan verifikasi baru telah dikirim ke email Anda.";
+          toast.info(msg);
+          setServerError(msg);
           return;
         }
 
-        // Generic error handling
-        const message = error.message || getErrorMessage(error.code || "UNKNOWN");
-        const displayMessage = message === "Terjadi kesalahan, silakan coba lagi" && error.message
-          ? error.message
-          : getErrorMessage(error.code || "UNKNOWN");
+        const mappedMsg = getErrorMessage(error.code || "UNKNOWN");
+        const finalMsg = (error.code && mappedMsg !== "Terjadi kesalahan, silakan coba lagi")
+          ? mappedMsg
+          : (error.message || "Gagal masuk. Periksa email dan kata sandi Anda.");
 
-        // Prefer mapped message, fallback to error.message
-        if (error.code && getErrorMessage(error.code) !== "Terjadi kesalahan, silakan coba lagi") {
-          toast.error(getErrorMessage(error.code));
-        } else {
-          toast.error(error.message || "Gagal masuk. Periksa email dan kata sandi Anda.");
-        }
+        toast.error(finalMsg);
+        setServerError(finalMsg);
         return;
       }
 
@@ -76,10 +74,12 @@ export const useLoginForm = () => {
       }
     } catch (error) {
       // handle non-auth errors
-      toast.error((error as Error).message);
+      const msg = (error as Error).message;
+      toast.error(msg);
+      setServerError(msg);
     }
   };
 
-  return { form, onSubmit };
+  return { form, onSubmit, serverError };
 };
 

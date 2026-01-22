@@ -8,11 +8,11 @@ import { Button } from "~/components/ui/button";
 import { Controller } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import { useLoginForm } from "../hook/useLoginForm";
-import { Eye, EyeOff, Mail, Lock, LogIn, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, LogIn, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "~/lib/utils";
 
 export const LoginForm = () => {
-  const { form, onSubmit } = useLoginForm();
+  const { form, onSubmit, serverError } = useLoginForm();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,6 +38,14 @@ export const LoginForm = () => {
       </CardHeader>
       <CardContent>
         <form className="space-y-5" onSubmit={form.handleSubmit(handleSubmit)}>
+          {serverError && (
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top-1">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <p className="text-xs font-medium leading-relaxed">
+                {serverError}
+              </p>
+            </div>
+          )}
           {/* Email Field */}
           <Controller
             control={form.control}
