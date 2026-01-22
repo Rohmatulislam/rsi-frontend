@@ -74,7 +74,7 @@ export default function AdminDashboardPage() {
     const { data: recentBookings, isLoading: bookingsLoading } = useGetRecentBookings(10);
 
     // Format date for display
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString: any) => {
         const date = new Date(dateString);
         if (period === "day") {
             return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
