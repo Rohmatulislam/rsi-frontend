@@ -26,16 +26,31 @@ export const useLoginForm = () => {
       });
 
       //handle auth errors
-      if (error?.code) {
+      //handle auth errors
+      if (error) {
+        console.error("Login Error Received:", error); // Debugging
+
         if (error.code === "EMAIL_NOT_VERIFIED") {
           // Trigger resend email verification
           await authClient.sendVerificationEmail({
             email: data.email,
-            callbackURL: "/", // Optional: redirect after clicking the link in email
+            callbackURL: "/",
           });
           toast.info("Email belum diverifikasi. Tautan verifikasi baru telah dikirim ke email Anda.");
-        } else {
+          return;
+        }
+
+        // Generic error handling
+        const message = error.message || getErrorMessage(error.code || "UNKNOWN");
+        const displayMessage = message === "Terjadi kesalahan, silakan coba lagi" && error.message
+          ? error.message
+          : getErrorMessage(error.code || "UNKNOWN");
+
+        // Prefer mapped message, fallback to error.message
+        if (error.code && getErrorMessage(error.code) !== "Terjadi kesalahan, silakan coba lagi") {
           toast.error(getErrorMessage(error.code));
+        } else {
+          toast.error(error.message || "Gagal masuk. Periksa email dan kata sandi Anda.");
         }
         return;
       }
