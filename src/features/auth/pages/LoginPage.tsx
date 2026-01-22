@@ -20,17 +20,13 @@ const LoginPage = () => {
 
   // Logic pembersihan token dihapus untuk mencegah race condition saat login berhasil
 
-  if (isPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center w-full">
-        <div className="animate-pulse text-muted-foreground">Memuat...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex min-h-screen items-center justify-center w-full">
-      <LoginForm />
+    <div className="flex min-h-screen items-center justify-center w-full relative">
+      {isPending ? (
+        <div className="animate-pulse text-muted-foreground absolute">Memuat...</div>
+      ) : (
+        <LoginForm />
+      )}
     </div>
   );
 };
