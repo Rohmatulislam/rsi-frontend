@@ -1,13 +1,16 @@
+import { useState, useEffect, useRef } from "react";
 import { useGetQueueStatus } from "../api/getQueueStatus";
-import { Users, UserCheck, Timer, RefreshCcw, AlertCircle } from "lucide-react";
+import { Users, UserCheck, Timer, RefreshCcw, AlertCircle, Volume2, VolumeX } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Badge } from "~/components/ui/badge";
-import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { cn, formatQueueNumber } from "~/lib/utils";
 
 interface QueueStatusCardProps {
     doctorCode: string;
     poliCode: string;
+    poliName?: string;
     date?: string;
     className?: string;
 }
@@ -15,14 +18,43 @@ interface QueueStatusCardProps {
 export const QueueStatusCard = ({
     doctorCode,
     poliCode,
+    poliName = "Poliklinik",
     date = new Date().toISOString().split('T')[0],
     className
 }: QueueStatusCardProps) => {
+    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+    const lastCalledQueue = useRef<number | null>(null);
+
     const { data, isLoading, isError, refetch, isFetching } = useGetQueueStatus({
         doctorCode,
         poliCode,
         date,
     });
+
+    // TTS Logic
+    useEffect(() => {
+        if (!data || !isAudioEnabled || !data.currentNumber || data.currentNumber === 0) return;
+
+        // Check if queue has changed
+        if (lastCalledQueue.current !== data.currentNumber) {
+            lastCalledQueue.current = data.currentNumber;
+
+            // Normalize poli name
+            const spokenPoliName = poliName.replace(/^Poli\s+/i, '');
+            const formattedNumber = formatQueueNumber(data.currentNumber);
+
+            // Format text to speech
+            const textToSpeak = `Nomor Antrean... ${formattedNumber.split('').join(' ')}... Silakan masuk ke Poli ${spokenPoliName}`;
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    }, [data?.currentNumber, isAudioEnabled, poliName]);
 
     if (isLoading) {
         return <Skeleton className="h-[120px] w-full rounded-2xl" />;
@@ -53,13 +85,24 @@ export const QueueStatusCard = ({
                         <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Live Status Antrean</span>
                     </div>
-                    <button
-                        onClick={() => refetch()}
-                        disabled={isFetching}
-                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                        <RefreshCcw className={cn("h-3.5 w-3.5 text-slate-400", isFetching && "animate-spin")} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`h-8 w-8 rounded-lg ${isAudioEnabled ? 'text-primary bg-primary/10' : 'text-slate-400'}`}
+                            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+                            title={isAudioEnabled ? "Matikan Suara" : "Aktifkan Suara"}
+                        >
+                            {isAudioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                        </Button>
+                        <button
+                            onClick={() => refetch()}
+                            disabled={isFetching}
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                            <RefreshCcw className={cn("h-3.5 w-3.5 text-slate-400", isFetching && "animate-spin")} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="p-5 grid grid-cols-3 gap-4">
@@ -67,7 +110,7 @@ export const QueueStatusCard = ({
                         <p className="text-[10px] font-bold text-slate-400 uppercase">Dipanggil</p>
                         <div className="flex items-baseline gap-1">
                             <span className="text-3xl font-black text-primary tracking-tighter">
-                                {noQueue ? '-' : data.currentNumber}
+                                {noQueue ? '-' : formatQueueNumber(data.currentNumber)}
                             </span>
                         </div>
                     </div>

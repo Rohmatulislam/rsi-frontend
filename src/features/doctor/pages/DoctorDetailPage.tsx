@@ -111,7 +111,22 @@ const DoctorDetailPage = () => {
 
                                 <div className="prose prose-slate dark:prose-invert max-w-none">
                                     <p className="text-muted-foreground leading-relaxed">
-                                        Dokter spesialis yang berdedikasi tinggi dengan pengalaman luas dalam menangani berbagai kasus medis. Beliau dikenal ramah dan komunikatif dalam melayani pasien.
+                                        {(() => {
+                                            const bioData = doctor.description || doctor.bio;
+                                            if (!bioData) return "Dokter spesialis yang berdedikasi tinggi dengan pengalaman luas dalam menangani berbagai kasus medis. Beliau dikenal ramah dan komunikatif dalam melayani pasien.";
+
+                                            try {
+                                                // Handle potential stringified JSON array from legacy data
+                                                if (typeof bioData === 'string' && bioData.startsWith('[')) {
+                                                    const parsed = JSON.parse(bioData);
+                                                    if (Array.isArray(parsed)) return parsed.join(' ');
+                                                }
+                                            } catch (e) {
+                                                // Fallback to raw string if parsing fails
+                                            }
+
+                                            return bioData;
+                                        })()}
                                     </p>
                                 </div>
                             </div>
@@ -129,6 +144,7 @@ const DoctorDetailPage = () => {
                                 <QueueStatusCard
                                     doctorCode={doctor.kd_dokter}
                                     poliCode={doctor.scheduleDetails[0].kd_poli}
+                                    poliName={doctor.scheduleDetails[0].nm_poli}
                                     className="mb-6"
                                 />
                             )}

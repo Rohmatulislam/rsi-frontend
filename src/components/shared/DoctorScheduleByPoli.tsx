@@ -1,5 +1,6 @@
 import { Clock, Calendar } from "lucide-react";
 import { DoctorDto } from "~/features/home/api/getDoctors";
+import { cn } from "~/lib/utils";
 
 interface DoctorScheduleByPoliProps {
   doctor: DoctorDto;
@@ -17,37 +18,30 @@ const hariMapping: Record<string, string> = {
 };
 
 // Fungsi untuk mendapatkan tanggal terdekat berdasarkan hari dalam seminggu
-const getNextDateForDay = (dayOfWeekIndex: number): string => {
+const getNextDateForDay = (dayOfWeekIndex: number): { date: string, isToday: boolean } => {
   const today = new Date();
   const currentDay = today.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
 
-  // Mapping dari nama hari ke indeks hari
-  const dayMap: Record<string, number> = {
-    'MINGGU': 0,
-    'SENIN': 1,
-    'SELASA': 2,
-    'RABU': 3,
-    'KAMIS': 4,
-    'JUMAT': 5,
-    'SABTU': 6,
-    'AKHAD': 6
-  };
-
   // Hitung selisih hari
   let daysToAdd = dayOfWeekIndex - currentDay;
-  if (daysToAdd <= 0) {
-    daysToAdd += 7; // Jika hari ini atau kemarin, cari minggu depan
+  if (daysToAdd < 0) {
+    daysToAdd += 7; // Jika hari sudah lewat dalam seminggu ini
   }
 
   const date = new Date(today);
   date.setDate(today.getDate() + daysToAdd);
 
+  const isToday = daysToAdd === 0;
+
   // Format ke DD MMMM YYYY (contoh: 14 Desember 2024)
-  return date.toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
+  return {
+    date: date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }),
+    isToday
+  };
 };
 
 export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
@@ -98,47 +92,51 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
             {schedules.map((schedule, index) => {
               const dayName = hariMapping[schedule.hari_kerja] || schedule.hari_kerja;
 
-              // Dapatkan tanggal terdekat untuk hari ini
+              // Dapatkan tanggal dan status hari ini
               const dayMap: Record<string, number> = {
-                'MINGGU': 0,
-                'SENIN': 1,
-                'SELASA': 2,
-                'RABU': 3,
-                'KAMIS': 4,
-                'JUMAT': 5,
-                'SABTU': 6,
-                'AKHAD': 6
+                'MINGGU': 0, 'SENIN': 1, 'SELASA': 2, 'RABU': 3, 'KAMIS': 4, 'JUMAT': 5, 'SABTU': 6, 'AKHAD': 0
               };
 
-              const nextDate = getNextDateForDay(dayMap[schedule.hari_kerja]);
+              const { date: nextDate, isToday } = getNextDateForDay(dayMap[schedule.hari_kerja] ?? -1);
 
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-100 dark:border-slate-600"
+                  className={cn(
+                    "flex items-center justify-between py-2.5 px-3 rounded-lg border transition-all",
+                    isToday
+                      ? "bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-sm"
+                      : "bg-slate-50 dark:bg-slate-700/30 border-slate-100 dark:border-slate-600"
+                  )}
                 >
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      <Calendar className={cn("h-4 w-4", isToday ? "text-primary" : "text-slate-500")} />
+                      <span className={cn("text-sm font-bold", isToday ? "text-primary" : "text-slate-700 dark:text-slate-200")}>
                         {dayName}
+                        {isToday && (
+                          <span className="ml-2 text-[10px] bg-primary text-white px-1.5 py-0.5 rounded-md uppercase tracking-tighter">Hari Ini</span>
+                        )}
                       </span>
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1 font-medium">
                       {nextDate}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                      <span className="text-sm font-mono text-slate-600 dark:text-slate-300">
+                      <Clock className={cn("h-4 w-4", isToday ? "text-primary" : "text-slate-500")} />
+                      <span className={cn("text-sm font-mono font-bold", isToday ? "text-primary" : "text-slate-600 dark:text-slate-300")}>
                         {schedule.jam_mulai} - {schedule.jam_selesai}
                       </span>
                     </div>
 
                     {schedule.kuota !== null && (
-                      <span className="text-xs bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-full">
+                      <span className={cn(
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                        isToday ? "bg-primary/20 text-primary" : "bg-slate-200 dark:bg-slate-600 text-slate-700"
+                      )}>
                         Kuota: {schedule.kuota}
                       </span>
                     )}

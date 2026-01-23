@@ -1,5 +1,5 @@
 import { Clock, MapPin, Stethoscope, User, Wallet } from "lucide-react";
-import Link from "next/link";
+import { Link } from "~/navigation";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { AppointmentBookingModal } from "~/features/appointment/components/AppointmentBookingModal";
@@ -246,26 +246,42 @@ export const DoctorCard = ({
               </div>
             </div>
 
-            {/* Cek apakah dokter memiliki jadwal aktif dan tidak sedang studi/cuti */}
-            {(!doctor.isStudying && !doctor.isOnLeave && ((doctor.scheduleDetails && doctor.scheduleDetails.some(schedule =>
-              schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
-            )) || (doctor.schedules && doctor.schedules.length > 0))) ? (
-              <div className="mt-3">
-                <AppointmentBookingModal
-                  doctor={doctor}
-                  initialPoliId={contextPoliId}
-                  trigger={
-                    <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all">
-                      Daftar Sekarang
+            {/* Action Buttons */}
+            <div className="mt-4 flex flex-col gap-2">
+              <div className="flex gap-2">
+                {doctor.slug ? (
+                  <Link href={`/doctor/${doctor.slug}`} className="flex-1">
+                    <Button variant="outline" className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all h-10 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                      Detail
                     </Button>
-                  }
-                />
+                  </Link>
+                ) : (
+                  <Button variant="outline" className="flex-1 rounded-lg font-semibold text-sm shadow-sm h-10 opacity-50 cursor-not-allowed" disabled>
+                    Detail
+                  </Button>
+                )}
+
+                <div className="flex-[2]">
+                  {(!doctor.isStudying && !doctor.isOnLeave && ((doctor.scheduleDetails && doctor.scheduleDetails.some(schedule =>
+                    schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+                  )) || (doctor.schedules && doctor.schedules.length > 0))) ? (
+                    <AppointmentBookingModal
+                      doctor={doctor}
+                      initialPoliId={contextPoliId}
+                      trigger={
+                        <Button className="w-full rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all h-10">
+                          Daftar Sekarang
+                        </Button>
+                      }
+                    />
+                  ) : (
+                    <Button className="w-full rounded-lg font-semibold text-sm shadow-sm transition-all h-10 opacity-50 cursor-not-allowed" disabled title={doctor.isStudying ? "Sedang Pendidikan" : doctor.isOnLeave ? "Sedang Cuti" : "Jadwal Belum Tersedia"}>
+                      {doctor.isStudying ? "Pendidikan" : doctor.isOnLeave ? "Cuti" : "Tutup"}
+                    </Button>
+                  )}
+                </div>
               </div>
-            ) : (
-              <Button className="w-full rounded-lg font-semibold text-sm shadow-sm transition-all mt-3 opacity-50 cursor-not-allowed" disabled>
-                {doctor.isStudying ? "Sedang Pendidikan" : doctor.isOnLeave ? "Sedang Cuti" : "Jadwal Belum Tersedia"}
-              </Button>
-            )}
+            </div>
           </div>
         </>
       )}

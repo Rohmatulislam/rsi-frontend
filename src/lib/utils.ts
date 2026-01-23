@@ -13,6 +13,11 @@ export const formatCurrency = (number: number) => {
   }).format(number);
 };
 
+export const formatQueueNumber = (num: number | string | undefined | null) => {
+  if (!num && num !== 0) return "-";
+  return num.toString().padStart(3, "0");
+};
+
 export function getImageSrc(src: string | null | undefined): string {
   if (!src) return '/images/placeholder-article.jpg'; // Ensure this exists or use a generic online placeholder if preferred
   if (src.startsWith('http') || src.startsWith('data:')) return src;
