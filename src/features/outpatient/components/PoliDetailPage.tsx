@@ -26,9 +26,16 @@ const getYouTubeId = (url: string) => {
 
 export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
     const { data: item, isLoading: itemLoading, error } = useGetServiceItemById(id);
-    // Fetch doctors filtered by this poli code (id)
+    // Check if this is a SIMRS code (usually short) or a local CUID (long, starts with 'c')
+    const isSimrsCode = id.length <= 10 && !id.startsWith('cl');
+
+    // Fetch doctors - if it's a SIMRS code, filter in backend, otherwise fetch all and filter in frontend
     const { data: allDoctors, isLoading: doctorsLoading } = useGetDoctorsList({
-        input: { limit: 1000, poliCode: id } as any,
+        input: {
+            limit: 1000,
+            poliCode: isSimrsCode ? id : undefined,
+            showAll: !isSimrsCode // Show all if we're doing frontend filtering by specialization
+        } as any,
     });
 
     if (itemLoading) {
@@ -56,14 +63,17 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
         item.name.toLowerCase().includes('eksekutif') ||
         item.name.toLowerCase().includes('executive');
 
-    // Extract base specialty from item name (remove "Eksekutif", "Ekskutif", etc.)
+    // Extract base specialty from item name (remove "Poliklinik", "Poli", "Eksekutif", "Spesialis", etc.)
     const baseSpecialty = item.name
-        .replace(/eksekutif|ekskutif|executive/gi, '')
+        .replace(/poliklinik|poli|eksekutif|ekskutif|executive|spesialis/gi, '')
         .replace(/umum\/pks/gi, '')
         .trim();
 
     // Filter doctors by matching specialization
     const filteredDoctors = allDoctors?.filter(doc => {
+        // If we already filtered by poliCode in the backend, these are already correct
+        if (isSimrsCode) return true;
+
         const docSpec = doc.specialization?.toLowerCase() || '';
         const specToMatch = baseSpecialty.toLowerCase();
 

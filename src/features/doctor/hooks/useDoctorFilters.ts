@@ -102,9 +102,24 @@ export const useDoctorFilters = (allDoctors: any[] | undefined) => {
             const matchesSearch = doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 doctorSpecialization.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // Specialization filter
-            const matchesSpecialization = specializationFilter === "all" ||
-                doctorSpecialization === specializationFilter;
+            // Specialization filter - use partial matching to handle "Poliklinik X" vs "Spesialis X"
+            let matchesSpecialization = specializationFilter === "all";
+            if (!matchesSpecialization) {
+                // Clean up the filter term (remove common prefixes)
+                const cleanFilter = specializationFilter
+                    .replace(/poliklinik|poli|spesialis/gi, '')
+                    .trim()
+                    .toLowerCase();
+                const cleanSpec = doctorSpecialization
+                    .replace(/spesialis/gi, '')
+                    .trim()
+                    .toLowerCase();
+
+                // Match if either contains the other, or exact match
+                matchesSpecialization = doctorSpecialization === specializationFilter ||
+                    cleanSpec.includes(cleanFilter) ||
+                    cleanFilter.includes(cleanSpec);
+            }
 
             // Type filter
             let matchesType = true;
