@@ -25,11 +25,12 @@ import { useCreateMcuBooking } from "../api";
 interface McuBookingModalProps {
     package: McuPackage;
     trigger?: React.ReactNode;
+    selectedExams?: string[];
 }
 
-type Step = "date" | "patient" | "confirm" | "success";
+type Step = "exams" | "date" | "patient" | "confirm" | "success";
 
-export const McuBookingModal = ({ package: pkg, trigger }: McuBookingModalProps) => {
+export const McuBookingModal = ({ package: pkg, trigger, selectedExams }: McuBookingModalProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState<Step>("date");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +69,7 @@ export const McuBookingModal = ({ package: pkg, trigger }: McuBookingModalProps)
 
 
     const resetForm = () => {
-        setStep("date");
+        setStep("exams");
         setFormData({
             date: undefined,
             timeSlot: "",
@@ -233,28 +234,50 @@ export const McuBookingModal = ({ package: pkg, trigger }: McuBookingModalProps)
 
                 {/* Step Indicator */}
                 <div className="flex items-center justify-center gap-2 py-4">
-                    {["date", "patient", "confirm"].map((s, i) => (
+                    {["exams", "date", "patient", "confirm"].map((s, i) => (
                         <div key={s} className="flex items-center gap-2">
                             <div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step === s || (step === "success" && s === "confirm")
                                     ? "bg-primary text-white"
-                                    : i < ["date", "patient", "confirm"].indexOf(step)
+                                    : i < ["exams", "date", "patient", "confirm"].indexOf(step)
                                         ? "bg-green-500 text-white"
                                         : "bg-slate-200 text-slate-500"
                                     }`}
                             >
-                                {i < ["date", "patient", "confirm"].indexOf(step) ? (
+                                {i < ["exams", "date", "patient", "confirm"].indexOf(step) ? (
                                     <CheckCircle2 className="h-4 w-4" />
                                 ) : (
                                     i + 1
                                 )}
                             </div>
-                            {i < 2 && <div className="w-8 h-0.5 bg-slate-200" />}
+                            {i < 3 && <div className="w-8 h-0.5 bg-slate-200" />}
                         </div>
                     ))}
                 </div>
 
                 {/* Step Content */}
+                {step === "exams" && (
+                    <div className="space-y-4 py-4">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="h-2 w-2 rounded-full bg-primary" />
+                            <h4 className="font-bold text-sm">Daftar Pemeriksaan</h4>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2 max-h-[40vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-primary/10">
+                            {(selectedExams || (pkg.features ? pkg.features.split(',') : [])).map((item: string, idx: number) => {
+                                const name = item.split('|')[0].trim();
+                                return (
+                                    <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/40">
+                                        <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                                        <span className="text-sm font-medium">{name}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/10 text-xs text-primary/80 leading-relaxed font-medium">
+                            Catatan: Daftar di atas adalah item pemeriksaan utama yang termasuk dalam paket ini. Konsultasikan dengan petugas kami jika Anda memerlukan tambahan item pemeriksaan.
+                        </div>
+                    </div>
+                )}
                 {step === "date" && (
                     <McuDateStep formData={formData} setFormData={setFormData} />
                 )}
@@ -277,14 +300,28 @@ export const McuBookingModal = ({ package: pkg, trigger }: McuBookingModalProps)
 
                 {/* Footer Navigation */}
                 <DialogFooter className="flex-row gap-2 sm:gap-2">
-                    {step !== "date" && step !== "success" && (
+                    {step !== "exams" && step !== "success" && (
                         <Button
                             variant="outline"
-                            onClick={() => setStep(step === "confirm" ? "patient" : "date")}
+                            onClick={() => {
+                                const steps: Step[] = ["exams", "date", "patient", "confirm"];
+                                const currentIdx = steps.indexOf(step);
+                                if (currentIdx > 0) setStep(steps[currentIdx - 1]);
+                            }}
                             disabled={isSubmitting}
                         >
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Kembali
+                        </Button>
+                    )}
+
+                    {step === "exams" && (
+                        <Button
+                            className="flex-1"
+                            onClick={() => setStep("date")}
+                        >
+                            Lanjut Pilih Tanggal
+                            <ArrowRight className="h-4 w-4 ml-1" />
                         </Button>
                     )}
 

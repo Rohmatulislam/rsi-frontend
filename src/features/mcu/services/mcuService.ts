@@ -56,13 +56,16 @@ export interface MCUItemResult {
  * MCU (Medical Check Up) Feature Types
  */
 
-// MCU Package from SIMRS Khanza
+// MCU Package from SIMRS Khanza or Local DB
 export interface McuPackage {
     id: string;
     name: string;
     price: number;
     category: string;
     poliCode?: string;
+    features?: string;
+    source?: 'local' | 'simrs';
+    description?: string;
 }
 
 // API Response wrapper
