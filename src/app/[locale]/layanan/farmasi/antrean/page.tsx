@@ -50,7 +50,7 @@ export default function PharmacyQueuePage() {
         }
     };
 
-    const speakPatient = useCallback((data: any) => {
+    const speakPatient = useCallback((data: any, repeatCount: number = 1) => {
         if (!window.speechSynthesis) return;
 
         const utterance = new SpeechSynthesisUtterance();
@@ -71,13 +71,21 @@ export default function PharmacyQueuePage() {
             });
         };
         utterance.onend = () => {
-            setIsCalling(false);
-            setTimeout(() => {
-                if (voiceQueue.current.length > 0) {
-                    const next = voiceQueue.current.shift();
-                    speakPatient(next);
-                }
-            }, 3000);
+            // Check if we need to repeat (call 3 times total)
+            if (repeatCount < 3) {
+                setTimeout(() => {
+                    speakPatient(data, repeatCount + 1);
+                }, 1500); // 1.5 second pause between repeats
+            } else {
+                // All 3 calls done, move to next patient in queue
+                setIsCalling(false);
+                setTimeout(() => {
+                    if (voiceQueue.current.length > 0) {
+                        const next = voiceQueue.current.shift();
+                        speakPatient(next, 1); // Start fresh with count 1
+                    }
+                }, 3000);
+            }
         };
 
         window.speechSynthesis.speak(utterance);
