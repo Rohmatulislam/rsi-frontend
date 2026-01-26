@@ -82,8 +82,12 @@ export default function PharmacyQueuePage() {
 
     useEffect(() => {
         fetchQueue();
-        const backendUrl = API_URL.replace('/api', '');
-        const newSocket = io(`${backendUrl}/pharmacy`, { transports: ['websocket'] });
+        const backendUrl = API_URL.replace(/\/api\/?$/, '');
+        const newSocket = io(`${backendUrl}/pharmacy`, {
+            transports: ['websocket'],
+            reconnectionAttempts: 5,
+            timeout: 10000
+        });
 
         newSocket.on('connect', () => {
             setIsConnected(true);
@@ -344,8 +348,8 @@ function TabButton({ active, onClick, label }: any) {
         <button
             onClick={onClick}
             className={`px-8 py-3 rounded-[1.2rem] text-sm font-black transition-all ${active
-                    ? 'bg-white text-slate-900 shadow-md'
-                    : 'text-slate-500 hover:text-slate-900'
+                ? 'bg-white text-slate-900 shadow-md'
+                : 'text-slate-500 hover:text-slate-900'
                 }`}
         >
             {label}
