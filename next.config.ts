@@ -4,6 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   /* config options here */
   // For development, allow access from local network - will be overridden by command line
   images: {
