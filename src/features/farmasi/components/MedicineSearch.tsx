@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Loader2, Package, Info } from "lucide-react";
+import { Search, Loader2, Package, Info, ShoppingCart } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { Badge } from "~/components/ui/badge";
-import { useSearchMedicines } from "../api/searchMedicines";
+import { Button } from "~/components/ui/button";
+import { useSearchMedicines, Medicine } from "../api/searchMedicines";
+import { useCart } from "../context/CartContext";
 import { useDebounce } from "~/hooks/use-debounce";
 
 export const MedicineSearch = () => {
     const [query, setQuery] = useState("");
     const debouncedQuery = useDebounce(query, 500);
     const { data: results, isLoading, isFetched } = useSearchMedicines(debouncedQuery);
+    const { addToCart } = useCart();
 
     return (
         <div className="bg-white dark:bg-slate-900 border rounded-[2.5rem] p-8 md:p-12 shadow-xl border-primary/10 mb-12">
@@ -37,7 +40,7 @@ export const MedicineSearch = () => {
 
             {isFetched && results && results.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2">
-                    {results.map((item) => (
+                    {results.map((item: Medicine) => (
                         <div key={item.id} className="p-5 border rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between group hover:border-primary/30 transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -48,11 +51,21 @@ export const MedicineSearch = () => {
                                     <p className="text-xs text-muted-foreground">{item.category} • {item.unit}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <Badge variant={Number(item.total_stock) > 0 ? "default" : "destructive"}>
-                                    {Number(item.total_stock) > 0 ? `Stok: ${item.total_stock}` : "Kosong"}
-                                </Badge>
-                                <p className="text-[10px] text-muted-foreground mt-1">Rp {Number(item.price).toLocaleString('id-ID')}</p>
+                            <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                    <Badge variant={Number(item.total_stock) > 0 ? "default" : "destructive"}>
+                                        {Number(item.total_stock) > 0 ? `Stok: ${item.total_stock}` : "Kosong"}
+                                    </Badge>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Rp {Number(item.price).toLocaleString('id-ID')}</p>
+                                </div>
+                                <Button
+                                    size="sm"
+                                    onClick={() => addToCart(item)}
+                                    disabled={Number(item.total_stock) <= 0}
+                                    className="rounded-xl h-10 px-4"
+                                >
+                                    <ShoppingCart className="h-4 w-4" />
+                                </Button>
                             </div>
                         </div>
                     ))}
