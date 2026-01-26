@@ -91,20 +91,33 @@ export default function PharmacyQueuePage() {
         window.speechSynthesis.speak(utterance);
     }, []);
 
-    // Test sound function
-    const testSound = useCallback(() => {
+    // Test sound function - calls 3 times like real patient calls
+    const testSound = useCallback((repeatCount: number = 1) => {
         if (!window.speechSynthesis) {
             toast.error('Browser tidak mendukung Text-to-Speech');
             return;
         }
+
+        if (repeatCount === 1) {
+            toast.info(`🔊 Memainkan suara test (3x panggilan)...`);
+        }
+
         const testUtterance = new SpeechSynthesisUtterance();
         testUtterance.text = 'Nomor resep 1 2 3 4, atas nama Pasien Test, silakan ambil obat di loket Farmasi.';
         testUtterance.lang = 'id-ID';
         testUtterance.rate = 0.85;
         testUtterance.pitch = 1.1;
 
-        testUtterance.onstart = () => toast.info('🔊 Memainkan suara test...');
-        testUtterance.onend = () => toast.success('✅ Test suara selesai!');
+        testUtterance.onend = () => {
+            if (repeatCount < 3) {
+                toast.info(`🔊 Panggilan ke-${repeatCount + 1}...`);
+                setTimeout(() => {
+                    testSound(repeatCount + 1);
+                }, 1500); // 1.5 second pause between repeats
+            } else {
+                toast.success('✅ Test suara selesai (3x panggilan)!');
+            }
+        };
         testUtterance.onerror = () => toast.error('❌ Gagal memutar suara');
 
         window.speechSynthesis.speak(testUtterance);
@@ -199,7 +212,7 @@ export default function PharmacyQueuePage() {
                     <div className="flex items-center gap-4">
                         {/* Test Sound Button */}
                         <button
-                            onClick={testSound}
+                            onClick={() => testSound()}
                             className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold text-sm"
                         >
                             <Volume2 className="w-5 h-5" />
