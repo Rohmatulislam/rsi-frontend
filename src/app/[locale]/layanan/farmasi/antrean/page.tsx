@@ -24,12 +24,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2000/api';
 
 export default function PharmacyQueuePage() {
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [activeTab, setActiveTab] = useState<'waiting' | 'done'>('waiting');
+    const [activeTab, setActiveTab] = useState<'waiting' | 'done'>('done'); // Default to 'done' tab
     const [queueData, setQueueData] = useState<ReadyPrescription[]>([]);
     const [latestCalled, setLatestCalled] = useState<ReadyPrescription | null>(null);
     const [isCalling, setIsCalling] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
+    const [isAutoScroll, setIsAutoScroll] = useState(true); // Auto-scroll enabled by default
     const voiceQueue = useRef<any[]>([]);
+    const tableContainerRef = useRef<HTMLDivElement>(null);
+    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Statistics
     const stats = {
@@ -80,6 +83,25 @@ export default function PharmacyQueuePage() {
         window.speechSynthesis.speak(utterance);
     }, []);
 
+    // Test sound function
+    const testSound = useCallback(() => {
+        if (!window.speechSynthesis) {
+            toast.error('Browser tidak mendukung Text-to-Speech');
+            return;
+        }
+        const testUtterance = new SpeechSynthesisUtterance();
+        testUtterance.text = 'Nomor resep 1 2 3 4, atas nama Pasien Test, silakan ambil obat di loket Farmasi.';
+        testUtterance.lang = 'id-ID';
+        testUtterance.rate = 0.85;
+        testUtterance.pitch = 1.1;
+
+        testUtterance.onstart = () => toast.info('🔊 Memainkan suara test...');
+        testUtterance.onend = () => toast.success('✅ Test suara selesai!');
+        testUtterance.onerror = () => toast.error('❌ Gagal memutar suara');
+
+        window.speechSynthesis.speak(testUtterance);
+    }, []);
+
     useEffect(() => {
         fetchQueue();
         const backendUrl = API_URL.replace(/\/api\/?$/, '');
@@ -113,6 +135,35 @@ export default function PharmacyQueuePage() {
         return () => { newSocket.disconnect(); };
     }, [speakPatient]);
 
+    // Auto-scroll effect
+    useEffect(() => {
+        if (isAutoScroll && tableContainerRef.current) {
+            const container = tableContainerRef.current;
+
+            scrollIntervalRef.current = setInterval(() => {
+                if (!container) return;
+
+                const { scrollTop, scrollHeight, clientHeight } = container;
+                const maxScroll = scrollHeight - clientHeight;
+
+                if (scrollTop >= maxScroll - 5) {
+                    // Reached bottom, reset to top after a brief pause
+                    setTimeout(() => {
+                        if (container) container.scrollTop = 0;
+                    }, 1500); // 1.5 second pause at bottom before resetting
+                } else {
+                    container.scrollTop += 1; // Smooth 1px scroll down
+                }
+            }, 30); // ~33fps
+        }
+
+        return () => {
+            if (scrollIntervalRef.current) {
+                clearInterval(scrollIntervalRef.current);
+            }
+        };
+    }, [isAutoScroll, queueData]);
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] font-plus-jakarta-sans antialiased text-slate-800">
             {/* Background Decor */}
@@ -137,15 +188,27 @@ export default function PharmacyQueuePage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4 bg-white p-2 pr-6 rounded-2xl shadow-sm border border-slate-100">
-                        <div className={`p-4 rounded-xl ${isConnected ? 'bg-emerald-50' : 'bg-red-50'}`}>
-                            <Activity className={`w-6 h-6 ${isConnected ? 'text-emerald-500' : 'text-red-500'} ${isConnected ? 'animate-pulse' : ''}`} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Server Status</p>
-                            <p className={`text-lg font-black ${isConnected ? 'text-emerald-600' : 'text-red-600'}`}>
-                                {isConnected ? 'STABLE CONNECTED' : 'DISCONNECTED'}
-                            </p>
+                    <div className="flex items-center gap-4">
+                        {/* Test Sound Button */}
+                        <button
+                            onClick={testSound}
+                            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold text-sm"
+                        >
+                            <Volume2 className="w-5 h-5" />
+                            Test Suara
+                        </button>
+
+                        {/* Server Status */}
+                        <div className="flex items-center gap-4 bg-white p-2 pr-6 rounded-2xl shadow-sm border border-slate-100">
+                            <div className={`p-4 rounded-xl ${isConnected ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                                <Activity className={`w-6 h-6 ${isConnected ? 'text-emerald-500' : 'text-red-500'} ${isConnected ? 'animate-pulse' : ''}`} />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Server Status</p>
+                                <p className={`text-lg font-black ${isConnected ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    {isConnected ? 'STABLE CONNECTED' : 'DISCONNECTED'}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -228,17 +291,29 @@ export default function PharmacyQueuePage() {
                             <TabButton active={activeTab === 'waiting'} onClick={() => setActiveTab('waiting')} label={`Dalam Antrean (${stats.waiting})`} />
                             <TabButton active={activeTab === 'done'} onClick={() => setActiveTab('done')} label={`Sudah Selesai (${stats.done})`} />
                         </div>
+
+                        {/* Auto-scroll Toggle */}
+                        <button
+                            onClick={() => setIsAutoScroll(!isAutoScroll)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${isAutoScroll
+                                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                                : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                                }`}
+                        >
+                            <ChevronRight className={`w-4 h-4 transition-transform ${isAutoScroll ? 'animate-bounce' : ''}`} />
+                            {isAutoScroll ? 'Auto-Scroll ON' : 'Auto-Scroll OFF'}
+                        </button>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div ref={tableContainerRef} className="overflow-x-auto max-h-[400px] overflow-y-auto scroll-smooth">
                         <table className="w-full text-left border-separate border-spacing-y-3">
-                            <thead>
+                            <thead className="sticky top-0 z-10 bg-white">
                                 <tr className="text-slate-400 text-sm font-bold uppercase tracking-widest">
-                                    <th className="px-6 py-4">No. Resep</th>
-                                    <th className="px-6 py-4">Nama Pasien</th>
-                                    <th className="px-6 py-4 text-center">Tipe Obat</th>
-                                    <th className="px-6 py-4 text-center">Jam Resep</th>
-                                    <th className="px-6 py-4 text-right">Status</th>
+                                    <th className="px-6 py-4 bg-white">No. Resep</th>
+                                    <th className="px-6 py-4 bg-white">Nama Pasien</th>
+                                    <th className="px-6 py-4 text-center bg-white">Tipe Obat</th>
+                                    <th className="px-6 py-4 text-center bg-white">Jam Resep</th>
+                                    <th className="px-6 py-4 text-right bg-white">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
