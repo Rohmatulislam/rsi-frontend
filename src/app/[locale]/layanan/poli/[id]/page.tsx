@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { PoliDetailPage } from "~/features/outpatient/components/PoliDetailPage";
 import { Metadata } from "next";
 

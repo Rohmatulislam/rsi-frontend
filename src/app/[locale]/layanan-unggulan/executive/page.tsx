@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { PoliExecutivePage } from "~/features/executive/pages/PoliExecutivePage";
 

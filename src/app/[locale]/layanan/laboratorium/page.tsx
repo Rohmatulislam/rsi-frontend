@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { LaboratoriumPage } from "~/features/lab/pages/LaboratoriumPage";
 

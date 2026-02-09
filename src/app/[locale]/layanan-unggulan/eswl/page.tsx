@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { ESWLPage } from "~/features/featured-services/pages/ESWLPage";
 

@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { DoctorListPage } from "~/features/doctor/pages/DoctorListPage";
 import { Suspense } from "react";
 

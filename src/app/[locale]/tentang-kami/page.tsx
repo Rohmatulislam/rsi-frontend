@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { AboutPage } from "~/features/about/pages/AboutPage";
 import { Metadata } from "next";
 

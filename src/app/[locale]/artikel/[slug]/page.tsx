@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { getArticleBySlug } from "~/features/article/api/getArticleBySlug";
 import { ArticleDetailPage } from "./ArticleDetailPage";

@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { RehabilitasiMedikPage } from "~/features/rehabilitation/pages/RehabilitasiMedikPage";
 

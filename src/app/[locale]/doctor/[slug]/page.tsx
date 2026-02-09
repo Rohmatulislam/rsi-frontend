@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Metadata } from "next";
 import { getDoctorBySlug } from "~/features/doctor/api/getDoctorBySlug";
 import DoctorDetailPage from "~/features/doctor/pages/DoctorDetailPage";
