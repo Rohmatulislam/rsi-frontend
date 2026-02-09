@@ -13,10 +13,9 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "~/i18n";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export const metadata: Metadata = {
-  // ... existing metadata
   metadataBase: new URL("https://rsisitihajarmataram.co.id"),
   title: {
     default: "RSI Siti Hajar Mataram - Pelayanan Kesehatan Islami",
@@ -31,17 +30,6 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.png", sizes: "192x192", type: "image/png" },
-      { url: "/logo.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [
-      { url: "/logo.png", sizes: "180x180", type: "image/png" },
-    ],
-    shortcut: ["/favicon.ico"],
   },
   manifest: "/site.webmanifest",
   openGraph: {

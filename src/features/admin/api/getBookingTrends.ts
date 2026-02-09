@@ -22,6 +22,6 @@ export const useGetBookingTrends = (period: TrendPeriod = 'week') => {
     return useQuery({
         queryKey: getBookingTrendsQueryKey(period),
         queryFn: () => getBookingTrends(period),
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchInterval: 10000,
     });
 };

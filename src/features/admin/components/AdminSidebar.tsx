@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield, FileText, Info, Stethoscope, History, Handshake } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, LogOut, Clock, User, Shield, FileText, Info, Stethoscope, History, Handshake, Wallet } from "lucide-react";
 import { useAuth, UserRole } from "~/features/auth/hook/useAuth";
 import { Badge } from "~/components/ui/badge";
 
@@ -38,6 +38,7 @@ export const AdminSidebar = () => {
         { href: "/admin/banners", label: "Banners", icon: LayoutDashboard, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/users", label: "User Management", icon: Users, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/logs", label: "Audit Logs", icon: History, roles: ["ADMIN"] as UserRole[] },
+        { href: "/admin/finance", label: "Laporan Keuangan", icon: Wallet, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/services", label: "Item & Layanan", icon: Stethoscope, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/partners", label: "Kemitraan", icon: Handshake, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/about", label: "About Page", icon: Info, roles: ["ADMIN"] as UserRole[] },

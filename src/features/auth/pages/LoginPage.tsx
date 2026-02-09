@@ -1,32 +1,36 @@
 "use client";
 import { authClient } from "~/lib/auth-client";
 import { LoginForm } from "../components/LoginForm";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
 
 const LoginPage = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    console.log("🏁 LoginPage Mounted - Version: Fix-Token-Race-Condition");
+    setHasMounted(true);
+    console.log("🏁 LoginPage Mounted - Version: Fix-Hydration-Mismatch");
     // Only redirect if session has a valid user object with required fields
-    // This prevents false redirects when the API returns errors or empty data
     if (session?.user?.id && session?.user?.email) {
       router.replace("/");
     }
   }, [session, router]);
 
-  // Logic pembersihan token dihapus untuk mencegah race condition saat login berhasil
+  // Handle hydration mismatch: server render is always "loading"
+  if (!hasMounted || isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center w-full relative">
+        <div className="animate-pulse text-muted-foreground absolute">Memuat...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center w-full relative">
-      {isPending ? (
-        <div className="animate-pulse text-muted-foreground absolute">Memuat...</div>
-      ) : (
-        <LoginForm />
-      )}
+      <LoginForm />
     </div>
   );
 };

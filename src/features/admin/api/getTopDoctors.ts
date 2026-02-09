@@ -20,6 +20,6 @@ export const useGetTopDoctors = (limit: number = 10) => {
     return useQuery({
         queryKey: getTopDoctorsQueryKey(limit),
         queryFn: () => getTopDoctors(limit),
-        staleTime: 1000 * 60 * 10, // 10 minutes
+        refetchInterval: 10000,
     });
 };

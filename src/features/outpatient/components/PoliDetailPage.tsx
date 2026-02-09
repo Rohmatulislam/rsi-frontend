@@ -3,6 +3,7 @@
 import { useGetServiceItemById } from "~/features/services/api/getServiceItemById";
 import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { useGetPoliQueue } from "~/features/outpatient/api/getPoliQueue";
+import { useGetPoliQueuePatients } from "~/features/outpatient/api/getPoliQueuePatients";
 import { ServiceHero, ServiceSection } from "~/features/services";
 import { DoctorCard, DoctorCardSkeleton } from "~/components/shared/DoctorCard";
 import { Button } from "~/components/ui/button";
@@ -248,8 +249,40 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
 
 const QueueInfoCard = ({ poliId, poliName }: { poliId: string, poliName: string }) => {
     const { data: queue, isLoading, error } = useGetPoliQueue(poliId);
+    const { data: patientsData } = useGetPoliQueuePatients(poliId);
     const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+    const [activePatientTab, setActivePatientTab] = useState<'waiting' | 'served'>('waiting');
     const lastCalledQueue = useRef<string | null>(null);
+
+    // Auto-scroll State
+    const [isAutoScroll, setIsAutoScroll] = useState(true);
+    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const tableContainerRef = useRef<HTMLDivElement>(null);
+
+    // 1. Auto-scroll Effect
+    useEffect(() => {
+        if (isAutoScroll && tableContainerRef.current) {
+            const container = tableContainerRef.current;
+
+            scrollIntervalRef.current = setInterval(() => {
+                if (!container) return;
+
+                // Simple scroll down logic
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
+                    // Reached bottom, wait a bit then reset to top
+                    setTimeout(() => {
+                        if (container) container.scrollTop = 0;
+                    }, 2000);
+                } else {
+                    container.scrollTop += 1; // Smooth slow scroll
+                }
+            }, 50); // Adjust speed here
+        }
+
+        return () => {
+            if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
+        };
+    }, [isAutoScroll, patientsData, activePatientTab]);
 
     // TTS Logic
     useEffect(() => {
@@ -342,6 +375,62 @@ const QueueInfoCard = ({ poliId, poliName }: { poliId: string, poliName: string 
                     <span className="text-xl font-bold">{queue.remaining}</span>
                 </div>
             </div>
+
+            {/* Patient List Section */}
+            {patientsData && patientsData.patients.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-dashed">
+                    <div className="flex gap-1 mb-3">
+                        <button
+                            onClick={() => setActivePatientTab('waiting')}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${activePatientTab === 'waiting'
+                                ? 'bg-amber-500 text-white'
+                                : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                }`}
+                        >
+                            Menunggu ({patientsData.patients.filter(p => p.is_waiting).length})
+                        </button>
+                        <button
+                            onClick={() => setActivePatientTab('served')}
+                            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${activePatientTab === 'served'
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                }`}
+                        >
+                            Selesai ({patientsData.patients.filter(p => !p.is_waiting).length})
+                        </button>
+
+                        {/* Auto Scroll Toggle */}
+                        <button
+                            onClick={() => setIsAutoScroll(!isAutoScroll)}
+                            className={`px-2 py-1.5 rounded-lg transition-all ${isAutoScroll ? 'bg-blue-500 text-white' : 'bg-muted text-muted-foreground'}`}
+                            title={isAutoScroll ? "Matikan Auto Scroll" : "Aktifkan Auto Scroll"}
+                        >
+                            {isAutoScroll ? "ON" : "OFF"}
+                        </button>
+                    </div>
+
+                    <div
+                        ref={tableContainerRef}
+                        className="max-h-[150px] overflow-y-auto space-y-1 scroll-smooth"
+                    >
+                        {patientsData.patients
+                            .filter(p => activePatientTab === 'waiting' ? p.is_waiting : !p.is_waiting)
+                            .map((patient, idx) => (
+                                <div key={idx} className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg text-xs">
+                                    <span className="font-mono font-bold text-primary w-8">{patient.no_reg}</span>
+                                    <span className="flex-1 truncate">{patient.nm_pasien}</span>
+                                    <span className="text-muted-foreground">{patient.jam_reg}</span>
+                                </div>
+                            ))
+                        }
+                        {patientsData.patients.filter(p => activePatientTab === 'waiting' ? p.is_waiting : !p.is_waiting).length === 0 && (
+                            <p className="text-center text-muted-foreground text-xs py-4">
+                                {activePatientTab === 'waiting' ? 'Tidak ada pasien menunggu' : 'Belum ada pasien dilayani'}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
 
             <div className="mt-6 pt-4 border-t border-dashed">
                 <p className="text-xs text-center text-muted-foreground">

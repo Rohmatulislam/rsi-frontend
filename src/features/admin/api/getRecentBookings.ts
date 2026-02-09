@@ -22,6 +22,6 @@ export const useGetRecentBookings = (limit: number = 20) => {
     return useQuery({
         queryKey: getRecentBookingsQueryKey(limit),
         queryFn: () => getRecentBookings(limit),
-        staleTime: 1000 * 60, // 1 minute (more frequent for recent bookings)
+        refetchInterval: 10000,
     });
 };

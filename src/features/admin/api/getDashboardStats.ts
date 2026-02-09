@@ -22,6 +22,6 @@ export const useGetDashboardStats = () => {
     return useQuery({
         queryKey: getDashboardStatsQueryKey(),
         queryFn: getDashboardStats,
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchInterval: 10000, // Sync every 10 seconds
     });
 };
