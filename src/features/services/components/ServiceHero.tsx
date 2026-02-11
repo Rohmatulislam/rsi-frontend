@@ -17,11 +17,12 @@ export const ServiceHero = ({
     title,
     subtitle,
     highlightText,
+    backgroundImage,
 }: ServiceHeroProps) => {
     return (
         <section className="relative w-full h-[350px] md:h-[450px] overflow-hidden flex items-center justify-center">
             <Image
-                src={heroImage}
+                src={backgroundImage || heroImage}
                 alt={title}
                 fill
                 sizes="100vw"

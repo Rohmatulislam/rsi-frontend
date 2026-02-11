@@ -155,6 +155,7 @@ const FarmasiPageContent = () => {
                 title="Antrean Farmasi"
                 highlightText="Aman, Cepat, Terintegrasi"
                 subtitle="Komitmen kami adalah menyediakan obat-obatan asli dengan sistem layanan berbasis digital untuk kenyamanan Anda."
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Steps Section */}

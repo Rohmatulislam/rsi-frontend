@@ -32,6 +32,7 @@ export const RawatJalanPage = () => {
                 title={service?.title || service?.name || "Rawat Jalan"}
                 highlightText={service?.subtitle || "Berbagai Poliklinik Spesialis"}
                 subtitle={service?.description || "Layanan pemeriksaan dan konsultasi dengan dokter spesialis dari berbagai bidang keahlian"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Poliklinik Grid */}

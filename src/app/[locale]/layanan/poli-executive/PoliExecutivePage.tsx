@@ -47,6 +47,7 @@ export const PoliExecutivePage = () => {
                 title={service?.title || service?.name || "Poliklinik Executive"}
                 highlightText={service?.subtitle || "Layanan Prioritas Anda"}
                 subtitle={service?.description || "Nikmati layanan medis kelas satu dengan kenyamanan ekstra dan waktu tunggu minimal"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Benefits Section */}
