@@ -58,6 +58,7 @@ export const MCUPage = () => {
                 title={service?.title || service?.name || "Medical Check Up"}
                 highlightText={service?.subtitle || "Paket Lengkap & Terjangkau"}
                 subtitle={service?.description || "Investasi terbaik untuk kesehatan Anda dengan pemeriksaan menyeluruh dan akurat"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Benefits Section */}

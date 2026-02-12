@@ -70,6 +70,7 @@ export const RadiologiPage = () => {
                 title={service?.title || service?.name || "Radiologi"}
                 highlightText={service?.subtitle || "Diagnostik Terpercaya"}
                 subtitle={service?.description || "Layanan radiologi lengkap dengan peralatan canggih untuk hasil diagnostik yang cepat dan tepat"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Benefits Section */}

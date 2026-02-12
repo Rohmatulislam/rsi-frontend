@@ -194,14 +194,11 @@ export const transformInpatientData = (
                 serviceItems
                     .filter(item => item.isActive && normalizeInpatientString(item.category) === normalizedDbName)
                     .forEach(item => {
-                        // Check availability strictly for THIS unit (by unitId/kd_bangsal)
+                        // Try to find availability data for THIS unit+class combo
                         const avail = getAvailabilityFor(availability, unitName, item.name, unitId);
 
-                        // If we have availability data, only show classes that actually have beds in THIS specific unit
-                        if (availability && (!avail || avail.total === 0)) {
-                            return;
-                        }
-
+                        // Always show seeded service items - availability data enhances display but doesn't gate visibility
+                        // SIMRS Khanza may use different class names than seeded data (e.g., "Kelas VIP" vs "VIP A")
                         let priceDisplay = item.price ? `Rp ${item.price.toLocaleString('id-ID')} / malam` : "Hubungi Kami";
                         if (avail && avail.minPrice > 0) {
                             if (avail.minPrice === avail.maxPrice) {
@@ -249,7 +246,6 @@ export const transformInpatientData = (
         if (!groupedItems[cat]) groupedItems[cat] = [];
 
         const avail = getAvailabilityFor(availability, cat, item.name);
-        if (availability && (!avail || avail.total === 0)) return;
 
         let priceDisplay = item.price ? `Rp ${item.price.toLocaleString('id-ID')} / malam` : "Hubungi Kami";
         if (avail && avail.minPrice > 0) {

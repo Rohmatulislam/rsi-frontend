@@ -69,6 +69,7 @@ export const LaboratoriumPage = () => {
                 title={service?.title || service?.name || "Laboratorium"}
                 highlightText={service?.subtitle || "Hasil Cepat & Akurat"}
                 subtitle={service?.description || "Pemeriksaan laboratorium lengkap dengan teknologi modern dan hasil yang akurat"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Benefits Section */}

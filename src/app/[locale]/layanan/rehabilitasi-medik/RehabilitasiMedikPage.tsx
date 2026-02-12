@@ -5,6 +5,7 @@ import { HeartPulse, Brain, Baby, Bone, Dumbbell, MessageSquare } from "lucide-r
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useGetServiceBySlug } from "~/features/services/api/getServiceBySlug";
 
 const therapyServices = [
     {
@@ -45,13 +46,16 @@ const conditions = [
 ];
 
 export const RehabilitasiMedikPage = () => {
+    const { data: service } = useGetServiceBySlug({ slug: 'rehabilitasi-medik' });
+
     return (
         <div className="min-h-screen">
             <ServiceHero
                 badge="REHABILITASI MEDIK"
-                title="Rehabilitasi Medik"
-                highlightText="Terapi Profesional & Komprehensif"
-                subtitle="Layanan rehabilitasi profesional untuk pemulihan fungsi tubuh yang optimal"
+                title={service?.title || service?.name || "Rehabilitasi Medik"}
+                highlightText={service?.subtitle || "Terapi Profesional & Komprehensif"}
+                subtitle={service?.description || "Layanan rehabilitasi profesional untuk pemulihan fungsi tubuh yang optimal"}
+                backgroundImage={service?.image || undefined}
             />
 
             {/* Services */}

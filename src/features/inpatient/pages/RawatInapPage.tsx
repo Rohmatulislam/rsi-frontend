@@ -53,6 +53,7 @@ export const RawatInapPage = () => {
                 title={service?.title || service?.name || "Fasilitas Rawat Inap"}
                 highlightText={service?.subtitle || "Kenyamanan Seperti di Rumah"}
                 subtitle={service?.description || "Berbagai pilihan akomodasi rawat inap mulai dari kelas 3 hingga VVIP suite"}
+                backgroundImage={service?.image || undefined}
             />
 
             <section className="py-8 container mx-auto px-4">
