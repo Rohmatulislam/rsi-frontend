@@ -7,7 +7,7 @@ import {
     DollarSign, TrendingUp, TrendingDown, Calendar, CreditCard,
     BookOpen, FileText, Scale, Landmark, PieChart as PieChartIcon,
     Pill, BarChart3, Download, Loader2, ArrowUpRight, ArrowDownRight,
-    Banknote, Receipt, Wallet, GitCompareArrows, Printer
+    Banknote, Receipt, Wallet, GitCompareArrows, Printer, Target, ShieldCheck
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -46,6 +46,10 @@ import { PaymentMethodReport } from "./PaymentMethodReport";
 import { CashFlowReport } from "./CashFlowReport";
 import { PeriodComparison } from "./PeriodComparison";
 import { PrintLayout } from "./PrintLayout";
+import { BudgetReport } from "./BudgetReport";
+import { AccountsPayableReport } from "./AccountsPayableReport";
+import { AccountsReceivableReport } from "./AccountsReceivableReport";
+import { BPJSPerformanceReport } from "./BPJSPerformanceReport";
 import { formatRupiah, exportToCSV } from "../utils/exportCSV";
 
 const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e', '#06b6d4'];
@@ -58,6 +62,13 @@ export const FinanceManagement = () => {
     const [activeTab, setActiveTab] = useState("overview");
 
     const isCustomRange = startDate && endDate;
+
+    const analyticsProps = {
+        period,
+        date: !isCustomRange ? date : undefined,
+        startDate: isCustomRange ? startDate : undefined,
+        endDate: isCustomRange ? endDate : undefined
+    };
 
     // Real data hooks
     const { data: summary, isLoading: summaryLoading } = useFinanceSummary(
@@ -174,7 +185,7 @@ export const FinanceManagement = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-11 h-auto">
+                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-14 h-auto">
                     <TabsTrigger value="overview" className="gap-1.5 text-xs"><BarChart3 className="h-3.5 w-3.5" />Ringkasan</TabsTrigger>
                     <TabsTrigger value="journal" className="gap-1.5 text-xs"><BookOpen className="h-3.5 w-3.5" />Jurnal</TabsTrigger>
                     <TabsTrigger value="ledger" className="gap-1.5 text-xs"><FileText className="h-3.5 w-3.5" />Buku Besar</TabsTrigger>
@@ -185,6 +196,10 @@ export const FinanceManagement = () => {
                     <TabsTrigger value="drugs" className="gap-1.5 text-xs"><Pill className="h-3.5 w-3.5" />Obat</TabsTrigger>
                     <TabsTrigger value="payment" className="gap-1.5 text-xs"><CreditCard className="h-3.5 w-3.5" />Cara Bayar</TabsTrigger>
                     <TabsTrigger value="comparison" className="gap-1.5 text-xs"><GitCompareArrows className="h-3.5 w-3.5" />Perbandingan</TabsTrigger>
+                    <TabsTrigger value="budget" className="gap-1.5 text-xs text-primary font-bold"><Target className="h-3.5 w-3.5" />Anggaran</TabsTrigger>
+                    <TabsTrigger value="ap" className="gap-1.5 text-xs text-rose-600 font-bold"><Receipt className="h-3.5 w-3.5" />Hutang</TabsTrigger>
+                    <TabsTrigger value="ar" className="gap-1.5 text-xs text-blue-600 font-bold"><DollarSign className="h-3.5 w-3.5" />Piutang</TabsTrigger>
+                    <TabsTrigger value="bpjs" className="gap-1.5 text-xs text-emerald-600 font-bold"><ShieldCheck className="h-3.5 w-3.5" />BPJS</TabsTrigger>
                     <TabsTrigger value="print" className="gap-1.5 text-xs"><Printer className="h-3.5 w-3.5" />Cetak</TabsTrigger>
                 </TabsList>
 
@@ -449,6 +464,25 @@ export const FinanceManagement = () => {
                         startDate={isCustomRange ? startDate : undefined}
                         endDate={isCustomRange ? endDate : undefined}
                     />
+                </TabsContent>
+
+                <TabsContent value="budget" className="mt-6">
+                    <BudgetReport
+                        period={period}
+                        date={date}
+                    />
+                </TabsContent>
+
+                <TabsContent value="ap" className="mt-6">
+                    <AccountsPayableReport {...analyticsProps} />
+                </TabsContent>
+
+                <TabsContent value="ar" className="mt-6">
+                    <AccountsReceivableReport {...analyticsProps} />
+                </TabsContent>
+
+                <TabsContent value="bpjs" className="mt-6">
+                    <BPJSPerformanceReport {...analyticsProps} />
                 </TabsContent>
 
                 <TabsContent value="print" className="mt-6">
