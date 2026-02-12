@@ -2,8 +2,10 @@
 
 import { useProfitLoss } from "../api/getAccountingReports";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, Download } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Button } from "~/components/ui/button";
+import { exportToCSV, formatRupiah } from "../utils/exportCSV";
 
 interface ProfitLossReportProps {
     startDate: string;
@@ -12,6 +14,20 @@ interface ProfitLossReportProps {
 
 export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) => {
     const { data: reports, isLoading, error } = useProfitLoss(startDate, endDate);
+
+    const handleExport = () => {
+        if (!reports) return;
+        exportToCSV(
+            reports.map(r => ({ kd_rek: r.kd_rek, nama_rekening: r.nm_rek, kategori: r.category, jumlah: r.amount })),
+            'laporan_laba_rugi',
+            [
+                { key: 'kd_rek', label: 'Kode Rekening' },
+                { key: 'nama_rekening', label: 'Nama Rekening' },
+                { key: 'kategori', label: 'Kategori' },
+                { key: 'jumlah', label: 'Jumlah (Rp)' },
+            ]
+        );
+    };
 
     if (isLoading) {
         return (
@@ -49,6 +65,10 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                     <h3 className="text-xl font-bold">Laba Rugi</h3>
                     <p className="text-sm text-muted-foreground">Ringkasan pendapatan dan beban operasional rumah sakit.</p>
                 </div>
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -56,7 +76,7 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                     <Card className="bg-emerald-50 border-none shadow-sm">
                         <CardHeader className="pb-2">
                             <CardDescription className="text-emerald-600 font-medium">Total Pendapatan</CardDescription>
-                            <CardTitle className="text-3xl font-bold text-emerald-700">Rp {totalIncome.toLocaleString()}</CardTitle>
+                            <CardTitle className="text-3xl font-bold text-emerald-700">{formatRupiah(totalIncome)}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-2 text-emerald-600">
@@ -69,7 +89,7 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                     <Card className="bg-rose-50 border-none shadow-sm">
                         <CardHeader className="pb-2">
                             <CardDescription className="text-rose-600 font-medium">Total Beban</CardDescription>
-                            <CardTitle className="text-3xl font-bold text-rose-700">Rp {totalExpenses.toLocaleString()}</CardTitle>
+                            <CardTitle className="text-3xl font-bold text-rose-700">{formatRupiah(totalExpenses)}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-2 text-rose-600">
@@ -84,7 +104,7 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                             <CardDescription className={netProfit >= 0 ? "text-primary-foreground/80 font-medium" : "text-white/80 font-medium"}>
                                 {netProfit >= 0 ? 'Laba Bersih' : 'Rugi Bersih'}
                             </CardDescription>
-                            <CardTitle className="text-4xl font-black">Rp {Math.abs(netProfit).toLocaleString()}</CardTitle>
+                            <CardTitle className="text-4xl font-black">{formatRupiah(Math.abs(netProfit))}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-2 opacity-80">
@@ -104,7 +124,7 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                     </CardHeader>
                     <CardContent>
                         <div className="h-[350px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <PieChart>
                                     <Pie
                                         data={chartData}
@@ -120,7 +140,7 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        formatter={(value: number | undefined) => `Rp ${(value ?? 0).toLocaleString()}`}
+                                        formatter={(value: number | undefined) => formatRupiah(value ?? 0)}
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                     />
                                     <Legend />
@@ -146,12 +166,16 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                                             <div className="font-medium">{item.nm_rek}</div>
                                             <div className="text-[10px] text-muted-foreground font-mono">{item.kd_rek}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-bold text-emerald-600">Rp {item.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-right font-bold text-emerald-600">{formatRupiah(item.amount)}</td>
                                     </tr>
                                 ))}
                                 {incomeItems.length === 0 && (
                                     <tr><td colSpan={2} className="px-6 py-10 text-center text-muted-foreground">Tidak ada data pendapatan</td></tr>
                                 )}
+                                <tr className="bg-emerald-50/30 font-bold border-t">
+                                    <td className="px-6 py-3">TOTAL PENDAPATAN</td>
+                                    <td className="px-6 py-3 text-right text-emerald-700">{formatRupiah(totalIncome)}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </CardContent>
@@ -171,12 +195,16 @@ export const ProfitLossReport = ({ startDate, endDate }: ProfitLossReportProps) 
                                             <div className="font-medium">{item.nm_rek}</div>
                                             <div className="text-[10px] text-muted-foreground font-mono">{item.kd_rek}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-bold text-rose-600">Rp {item.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-right font-bold text-rose-600">{formatRupiah(item.amount)}</td>
                                     </tr>
                                 ))}
                                 {expenseItems.length === 0 && (
                                     <tr><td colSpan={2} className="px-6 py-10 text-center text-muted-foreground">Tidak ada data beban</td></tr>
                                 )}
+                                <tr className="bg-rose-50/30 font-bold border-t">
+                                    <td className="px-6 py-3">TOTAL BEBAN</td>
+                                    <td className="px-6 py-3 text-right text-rose-700">{formatRupiah(totalExpenses)}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </CardContent>

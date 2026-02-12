@@ -1,8 +1,10 @@
 "use client";
 
-import { useBalanceSheet, useProfitLoss } from "../api/getAccountingReports";
+import { useBalanceSheet, useProfitLoss, useOpeningEquity } from "../api/getAccountingReports";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
-import { Loader2, Landmark, Plus, Minus, ArrowRight } from "lucide-react";
+import { Loader2, Landmark, Plus, Minus, ArrowRight, Download } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { exportToCSV, formatRupiah } from "../utils/exportCSV";
 
 interface EquityReportProps {
     startDate: string;
@@ -10,11 +12,11 @@ interface EquityReportProps {
 }
 
 export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
-    // Equity changes are basically: Opening Equity + Net Profit - Dividends/Withdrawals = Closing Equity
     const { data: balanceSheet, isLoading: loadingBS } = useBalanceSheet(endDate);
     const { data: profitLoss, isLoading: loadingPL } = useProfitLoss(startDate, endDate);
+    const { data: openingEquityData, isLoading: loadingOE } = useOpeningEquity(startDate);
 
-    if (loadingBS || loadingPL) {
+    if (loadingBS || loadingPL || loadingOE) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
                 <Loader2 className="h-8 w-8 text-primary animate-spin" />
@@ -30,8 +32,21 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
     const expenseTotal = profitLoss?.filter(r => r.category === 'BEBAN').reduce((sum, item) => sum + item.amount, 0) || 0;
     const netProfit = incomeTotal - expenseTotal;
 
-    // Simplified simulation of changes
-    const openingEquity = totalEquity - netProfit;
+    // Use real opening equity from API 
+    const openingEquity = openingEquityData?.openingEquity ?? (totalEquity - netProfit);
+
+    const handleExport = () => {
+        exportToCSV([
+            { item: 'Modal Awal', jumlah: openingEquity },
+            { item: 'Laba Bersih Periode Ini', jumlah: netProfit },
+            { item: 'Pengambilan / Lainnya', jumlah: 0 },
+            { item: 'Modal Akhir', jumlah: totalEquity },
+            ...equityItems.map(e => ({ item: `  ${e.nm_rek} (${e.kd_rek})`, jumlah: e.amount })),
+        ], 'laporan_perubahan_modal', [
+            { key: 'item', label: 'Item' },
+            { key: 'jumlah', label: 'Jumlah (Rp)' },
+        ]);
+    };
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
@@ -40,6 +55,10 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
                     <h3 className="text-xl font-bold">Laporan Perubahan Modal</h3>
                     <p className="text-sm text-muted-foreground">Analisis pertumbuhan ekuitas selama periode berjalan.</p>
                 </div>
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                </Button>
             </div>
 
             <Card className="shadow-sm border-none overflow-hidden">
@@ -57,7 +76,7 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
                                 </div>
                                 <span className="font-medium text-slate-600 uppercase tracking-wider text-sm">Modal Awal</span>
                             </div>
-                            <span className="font-mono text-lg font-bold">Rp {openingEquity.toLocaleString()}</span>
+                            <span className="font-mono text-lg font-bold">{formatRupiah(openingEquity)}</span>
                         </div>
 
                         {/* Net Profit */}
@@ -68,10 +87,10 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
                                 </div>
                                 <span className="font-bold text-emerald-700 uppercase tracking-wider text-sm">Laba Bersih Periode Ini</span>
                             </div>
-                            <span className="font-mono text-lg font-black text-emerald-600">+ Rp {netProfit.toLocaleString()}</span>
+                            <span className="font-mono text-lg font-black text-emerald-600">+ {formatRupiah(Math.abs(netProfit))}</span>
                         </div>
 
-                        {/* Withdrawals / Prive (Simulated or from specific accounts if identified) */}
+                        {/* Withdrawals */}
                         <div className="p-6 flex items-center justify-between hover:bg-muted/10 transition-colors opacity-60">
                             <div className="flex items-center gap-4">
                                 <div className="p-2 bg-rose-100 rounded-lg">
@@ -90,10 +109,10 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
                                 </div>
                                 <div>
                                     <p className="text-xs text-primary-foreground/70 uppercase font-black tracking-widest">Modal Akhir</p>
-                                    <p className="text-sm font-medium opacity-80">Per tanggal {new Date(endDate).toLocaleDateString()}</p>
+                                    <p className="text-sm font-medium opacity-80">Per tanggal {new Date(endDate).toLocaleDateString('id-ID')}</p>
                                 </div>
                             </div>
-                            <span className="text-3xl font-black">Rp {totalEquity.toLocaleString()}</span>
+                            <span className="text-3xl font-black">{formatRupiah(totalEquity)}</span>
                         </div>
                     </div>
                 </CardContent>
@@ -113,7 +132,7 @@ export const EquityReport = ({ startDate, endDate }: EquityReportProps) => {
                                             <div className="font-medium">{item.nm_rek}</div>
                                             <div className="text-[10px] font-mono text-muted-foreground">{item.kd_rek}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-bold">Rp {item.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-right font-bold">{formatRupiah(item.amount)}</td>
                                     </tr>
                                 ))}
                             </tbody>

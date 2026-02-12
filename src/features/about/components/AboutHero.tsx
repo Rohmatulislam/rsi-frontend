@@ -11,6 +11,7 @@ export const AboutHero = () => {
                 src={heroImage}
                 alt="RSI Siti Hajar Mataram"
                 fill
+                sizes="100vw"
                 className="object-cover"
                 priority
                 unoptimized

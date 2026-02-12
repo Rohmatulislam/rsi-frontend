@@ -1,10 +1,12 @@
 "use client";
 
 import { useLedger, useAccounts } from "../api/getAccountingReports";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
-import { Loader2, Search, Book, ArrowRight, History } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Loader2, Search, Book, History, Download } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Button } from "~/components/ui/button";
+import { exportToCSV, formatRupiah } from "../utils/exportCSV";
 
 interface GeneralLedgerProps {
     startDate: string;
@@ -15,6 +17,29 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
     const [selectedAccount, setSelectedAccount] = useState<string>("");
     const { data: accounts, isLoading: loadingAccounts } = useAccounts();
     const { data: ledgerData, isLoading: loadingLedger, error } = useLedger(selectedAccount, startDate, endDate);
+
+    const handleExport = () => {
+        if (!ledgerData?.entries) return;
+        const rows = [
+            { tanggal: 'SALDO AWAL', no_jurnal: '', keterangan: '', debet: 0, kredit: 0, saldo: ledgerData.initial_balance },
+            ...ledgerData.entries.map(e => ({
+                tanggal: e.tgl_jurnal,
+                no_jurnal: e.no_jurnal,
+                keterangan: e.keterangan,
+                debet: e.debet,
+                kredit: e.kredit,
+                saldo: e.saldo,
+            })),
+        ];
+        exportToCSV(rows, `buku_besar_${selectedAccount}`, [
+            { key: 'tanggal', label: 'Tanggal' },
+            { key: 'no_jurnal', label: 'No Jurnal' },
+            { key: 'keterangan', label: 'Keterangan' },
+            { key: 'debet', label: 'Debet' },
+            { key: 'kredit', label: 'Kredit' },
+            { key: 'saldo', label: 'Saldo' },
+        ]);
+    };
 
     if (loadingAccounts) {
         return (
@@ -33,23 +58,31 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
                     <p className="text-sm text-muted-foreground">Mutasi harian terperinci untuk rekening tertentu.</p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white p-1 rounded-xl shadow-sm ring-1 ring-border/50 transition-all focus-within:ring-primary/50 flex-1 max-w-md">
-                    <div className="pl-3 py-2">
-                        <Search className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-white p-1 rounded-xl shadow-sm ring-1 ring-border/50 transition-all focus-within:ring-primary/50 flex-1 max-w-md">
+                        <div className="pl-3 py-2">
+                            <Search className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+                            <SelectTrigger className="border-none shadow-none focus:ring-0">
+                                <SelectValue placeholder="Pilih rekening untuk melihat mutasi..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {accounts?.map(acc => (
+                                    <SelectItem key={acc.kd_rek} value={acc.kd_rek}>
+                                        <span className="font-mono text-[10px] mr-2 text-muted-foreground">[{acc.kd_rek}]</span>
+                                        {acc.nm_rek}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-                        <SelectTrigger className="border-none shadow-none focus:ring-0">
-                            <SelectValue placeholder="Pilih rekening untuk melihat mutasi..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {accounts?.map(acc => (
-                                <SelectItem key={acc.kd_rek} value={acc.kd_rek}>
-                                    <span className="font-mono text-[10px] mr-2 text-muted-foreground">[{acc.kd_rek}]</span>
-                                    {acc.nm_rek}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    {selectedAccount && ledgerData && (
+                        <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                            <Download className="h-4 w-4" />
+                            Export
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -72,6 +105,15 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
                 <div className="py-20 text-center text-rose-500">Gagal memuat data buku besar.</div>
             ) : (
                 <div className="space-y-6">
+                    {/* Account Info */}
+                    {ledgerData?.account && (
+                        <div className="bg-muted/30 rounded-lg p-3 text-sm">
+                            <span className="font-mono text-xs text-muted-foreground mr-2">[{ledgerData.account.kd_rek}]</span>
+                            <span className="font-bold">{ledgerData.account.nm_rek}</span>
+                            <span className="text-xs text-muted-foreground ml-3">Tipe: {ledgerData.account.tipe} • Saldo Normal: {ledgerData.account.balance === 'D' ? 'Debet' : 'Kredit'}</span>
+                        </div>
+                    )}
+
                     {/* Header Summary */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Card className="shadow-sm border-none bg-slate-50">
@@ -79,32 +121,20 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
                                 <CardTitle className="text-xs uppercase text-muted-foreground tracking-wider">Saldo Awal</CardTitle>
                             </CardHeader>
                             <CardContent className="px-4 pb-4">
-                                <p className="text-2xl font-bold text-slate-700">Rp {ledgerData?.initial_balance.toLocaleString()}</p>
-                                <p className="text-[10px] text-muted-foreground mt-1 italic">Per tanggal {new Date(startDate).toLocaleDateString()}</p>
+                                <p className="text-2xl font-bold text-slate-700">{formatRupiah(ledgerData?.initial_balance ?? 0)}</p>
+                                <p className="text-[10px] text-muted-foreground mt-1 italic">Per tanggal {new Date(startDate).toLocaleDateString('id-ID')}</p>
                             </CardContent>
                         </Card>
 
-                        {/* Calculate Final Balance */}
-                        {(() => {
-                            const totalDebet = ledgerData?.entries.reduce((sum, e) => sum + e.debet, 0) || 0;
-                            const totalKredit = ledgerData?.entries.reduce((sum, e) => sum + e.kredit, 0) || 0;
-                            const account = accounts?.find(a => a.kd_rek === selectedAccount);
-                            let finalBalance = ledgerData?.initial_balance || 0;
-                            if (account?.balance === 'D') finalBalance += (totalDebet - totalKredit);
-                            else finalBalance += (totalKredit - totalDebet);
-
-                            return (
-                                <Card className="shadow-sm border-none bg-primary text-primary-foreground">
-                                    <CardHeader className="py-3 px-4">
-                                        <CardTitle className="text-xs uppercase text-primary-foreground/70 tracking-wider">Saldo Akhir</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="px-4 pb-4">
-                                        <p className="text-3xl font-black">Rp {finalBalance.toLocaleString()}</p>
-                                        <p className="text-[10px] text-primary-foreground/70 mt-1 italic">Per tanggal {new Date(endDate).toLocaleDateString()}</p>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })()}
+                        <Card className="shadow-sm border-none bg-primary text-primary-foreground">
+                            <CardHeader className="py-3 px-4">
+                                <CardTitle className="text-xs uppercase text-primary-foreground/70 tracking-wider">Saldo Akhir</CardTitle>
+                            </CardHeader>
+                            <CardContent className="px-4 pb-4">
+                                <p className="text-3xl font-black">{formatRupiah(ledgerData?.closing_balance ?? 0)}</p>
+                                <p className="text-[10px] text-primary-foreground/70 mt-1 italic">Per tanggal {new Date(endDate).toLocaleDateString('id-ID')}</p>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     <Card className="shadow-sm border-none overflow-hidden">
@@ -124,6 +154,7 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
                                             <th className="px-6 py-3 text-left font-medium">Keterangan</th>
                                             <th className="px-6 py-3 text-right font-medium">Debet</th>
                                             <th className="px-6 py-3 text-right font-medium">Kredit</th>
+                                            <th className="px-6 py-3 text-right font-medium">Saldo</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/30">
@@ -137,16 +168,19 @@ export const GeneralLedger = ({ startDate, endDate }: GeneralLedgerProps) => {
                                                     {entry.keterangan}
                                                 </td>
                                                 <td className="px-6 py-4 text-right font-bold text-emerald-600">
-                                                    {entry.debet > 0 ? `Rp ${entry.debet.toLocaleString()}` : '-'}
+                                                    {entry.debet > 0 ? formatRupiah(entry.debet) : '-'}
                                                 </td>
                                                 <td className="px-6 py-4 text-right font-bold text-rose-600">
-                                                    {entry.kredit > 0 ? `Rp ${entry.kredit.toLocaleString()}` : '-'}
+                                                    {entry.kredit > 0 ? formatRupiah(entry.kredit) : '-'}
+                                                </td>
+                                                <td className="px-6 py-4 text-right font-black text-primary">
+                                                    {formatRupiah(entry.saldo)}
                                                 </td>
                                             </tr>
                                         ))}
                                         {ledgerData?.entries.length === 0 && (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-20 text-center text-muted-foreground">
+                                                <td colSpan={6} className="px-6 py-20 text-center text-muted-foreground">
                                                     Tidak ada mutasi ditemukan dalam rentang waktu terpilih.
                                                 </td>
                                             </tr>

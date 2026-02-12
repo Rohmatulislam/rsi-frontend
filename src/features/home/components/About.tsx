@@ -57,6 +57,7 @@ export const About = () => {
                 src={heroImage}
                 alt="RSI Siti Hajar Mataram"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';

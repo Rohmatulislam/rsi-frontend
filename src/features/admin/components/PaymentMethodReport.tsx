@@ -18,6 +18,7 @@ import {
     CartesianGrid
 } from "recharts";
 import { usePaymentMethodReport, useFinanceTrends } from "../api/getFinanceReports";
+import { exportToCSV, formatRupiah } from "../utils/exportCSV";
 
 interface PaymentMethodReportProps {
     period: string;
@@ -29,6 +30,25 @@ interface PaymentMethodReportProps {
 export const PaymentMethodReport = ({ period, date, startDate, endDate }: PaymentMethodReportProps) => {
     const { data: paymentData, isLoading, error } = usePaymentMethodReport(period, date, startDate, endDate);
     const { data: monthlyTrends } = useFinanceTrends();
+
+    const handleExport = () => {
+        if (!paymentData) return;
+        exportToCSV(
+            paymentData.map(d => ({
+                cara_bayar: d.name,
+                total_penerimaan: d.value,
+                transaksi: d.transactions,
+                persentase: Math.round(d.percentage * 10) / 10,
+            })),
+            'cara_bayar',
+            [
+                { key: 'cara_bayar', label: 'Cara Bayar' },
+                { key: 'total_penerimaan', label: 'Total Penerimaan (Rp)' },
+                { key: 'transaksi', label: 'Jumlah Transaksi' },
+                { key: 'persentase', label: 'Persentase (%)' },
+            ]
+        );
+    };
 
     if (isLoading) {
         return (
@@ -73,16 +93,19 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
         return { ...item, icon, color, chartColor };
     }) || [];
 
+    const totalValue = displayData.reduce((s, d) => s + d.value, 0);
+    const totalTx = displayData.reduce((s, d) => s + d.transactions, 0);
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-xl font-bold">Keuntungan Per Cara Bayar</h3>
-                    <p className="text-sm text-muted-foreground">Analisis pendapatan dan profitabilitas berdasarkan metode pembayaran pasien (Real-time)</p>
+                    <h3 className="text-xl font-bold">Pendapatan Per Cara Bayar</h3>
+                    <p className="text-sm text-muted-foreground">Analisis pendapatan berdasarkan metode pembayaran pasien (Real-time)</p>
                 </div>
-                <Button variant="outline" size="sm">
-                    <Download className="mr-2 h-4 w-4" />
-                    Unduh Laporan
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export CSV
                 </Button>
             </div>
 
@@ -98,7 +121,7 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                     <CardContent>
                         <div className="h-[300px] w-full">
                             {hasData ? (
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                     <RePieChart>
                                         <Pie
                                             data={displayData}
@@ -114,7 +137,7 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                                             ))}
                                         </Pie>
                                         <Tooltip
-                                            formatter={(value: number | undefined) => `Rp ${(value ?? 0).toLocaleString()}`}
+                                            formatter={(value: number | undefined) => formatRupiah(value ?? 0)}
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                         />
                                         <Legend />
@@ -132,19 +155,19 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-emerald-500" />
-                            Trend Pertumbuhan (Real-time)
+                            Tren Pertumbuhan (Real-time)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <BarChart data={monthlyTrends || []}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                                     <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `Rp ${val / 1000000}jt`} />
+                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `${(val / 1000000).toFixed(0)}Jt`} />
                                     <Tooltip
                                         cursor={{ fill: '#f8fafc' }}
-                                        formatter={(value: number | undefined) => `Rp ${(value ?? 0).toLocaleString()}`}
+                                        formatter={(value: number | undefined) => formatRupiah(value ?? 0)}
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                     />
                                     <Legend />
@@ -162,7 +185,6 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {displayData.map((item, i) => {
                     const Icon = item.icon;
-                    const margin = item.value > 0 ? Math.round((item.profit / item.value) * 100) : 0;
                     return (
                         <Card key={i} className="shadow-sm border-none overflow-hidden group">
                             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -172,17 +194,17 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-lg font-bold">Rp {(item.value / 1000000).toLocaleString()} Jt</div>
+                                <div className="text-lg font-bold">{formatRupiah(item.value)}</div>
                                 <div className="flex items-center justify-between mt-2">
-                                    <span className="text-[10px] text-muted-foreground mr-2 whitespace-nowrap">Est. Margin Laba</span>
-                                    <span className="text-xs font-medium text-emerald-600">
-                                        {margin}%
-                                    </span>
+                                    <span className="text-[10px] text-muted-foreground mr-2 whitespace-nowrap">{item.transactions} transaksi</span>
+                                    <Badge variant="outline" className="text-[10px] py-0 border-primary/20 bg-primary/5 text-primary font-bold">
+                                        {Math.round(item.percentage * 10) / 10}%
+                                    </Badge>
                                 </div>
                                 <div className="w-full bg-slate-100 h-1.5 rounded-full mt-1.5">
                                     <div
                                         className={`${item.color} h-1.5 rounded-full transition-all duration-500`}
-                                        style={{ width: `${margin}%` }}
+                                        style={{ width: `${Math.min(item.percentage, 100)}%` }}
                                     ></div>
                                 </div>
                             </CardContent>
@@ -191,7 +213,7 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                 })}
             </div>
 
-            {/* Comparison Table */}
+            {/* Full Table */}
             <Card className="shadow-sm border-none">
                 <CardHeader>
                     <CardTitle className="text-lg">Tabel Realisasi Cara Bayar</CardTitle>
@@ -204,8 +226,8 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                                 <tr>
                                     <th className="px-6 py-3 font-medium rounded-l-lg">Cara Bayar</th>
                                     <th className="px-6 py-3 font-medium">Total Penerimaan</th>
-                                    <th className="px-6 py-3 font-medium">Estimasi Laba</th>
-                                    <th className="px-6 py-3 font-medium rounded-r-lg">Efektivitas</th>
+                                    <th className="px-6 py-3 font-medium">Jumlah Transaksi</th>
+                                    <th className="px-6 py-3 font-medium rounded-r-lg">Persentase</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y border-t border-border/50">
@@ -215,17 +237,27 @@ export const PaymentMethodReport = ({ period, date, startDate, endDate }: Paymen
                                             <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
                                             <span className="font-medium">{item.name}</span>
                                         </td>
-                                        <td className="px-6 py-4 font-bold">Rp {item.value.toLocaleString()}</td>
-                                        <td className="px-6 py-4 text-emerald-600">Rp {item.profit.toLocaleString()}</td>
+                                        <td className="px-6 py-4 font-bold">{formatRupiah(item.value)}</td>
+                                        <td className="px-6 py-4">{item.transactions.toLocaleString()}</td>
                                         <td className="px-6 py-4">
-                                            <Badge variant={item.value > 100000000 ? "default" : "secondary"} className="font-mono">
-                                                {item.value > 100000000 ? "High" : "Normal"}
+                                            <Badge variant={item.percentage > 30 ? "default" : "secondary"} className="font-mono">
+                                                {Math.round(item.percentage * 10) / 10}%
                                             </Badge>
                                         </td>
                                     </tr>
                                 )) : (
                                     <tr>
                                         <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Data tidak tersedia</td>
+                                    </tr>
+                                )}
+                                {hasData && (
+                                    <tr className="bg-muted/30 font-bold border-t-2">
+                                        <td className="px-6 py-3 uppercase tracking-wider text-xs">TOTAL</td>
+                                        <td className="px-6 py-3">{formatRupiah(totalValue)}</td>
+                                        <td className="px-6 py-3">{totalTx.toLocaleString()}</td>
+                                        <td className="px-6 py-3">
+                                            <Badge className="font-mono">100%</Badge>
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>

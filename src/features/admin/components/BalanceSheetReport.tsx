@@ -2,8 +2,10 @@
 
 import { useBalanceSheet } from "../api/getAccountingReports";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
-import { Loader2, Landmark, Scale, Wallet2, PieChart as PieChartIcon, ArrowRightLeft } from "lucide-react";
+import { Loader2, Landmark, Scale, Wallet2, PieChart as PieChartIcon, ArrowRightLeft, Download } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Button } from "~/components/ui/button";
+import { exportToCSV, formatRupiah } from "../utils/exportCSV";
 
 interface BalanceSheetReportProps {
     endDate: string;
@@ -11,6 +13,20 @@ interface BalanceSheetReportProps {
 
 export const BalanceSheetReport = ({ endDate }: BalanceSheetReportProps) => {
     const { data: reports, isLoading, error } = useBalanceSheet(endDate);
+
+    const handleExport = () => {
+        if (!reports) return;
+        exportToCSV(
+            reports.map(r => ({ kd_rek: r.kd_rek, nama_rekening: r.nm_rek, kategori: r.category, jumlah: r.amount })),
+            'neraca_saldo',
+            [
+                { key: 'kd_rek', label: 'Kode Rekening' },
+                { key: 'nama_rekening', label: 'Nama Rekening' },
+                { key: 'kategori', label: 'Kategori' },
+                { key: 'jumlah', label: 'Jumlah (Rp)' },
+            ]
+        );
+    };
 
     if (isLoading) {
         return (
@@ -50,6 +66,10 @@ export const BalanceSheetReport = ({ endDate }: BalanceSheetReportProps) => {
                     <h3 className="text-xl font-bold">Neraca (Balance Sheet)</h3>
                     <p className="text-sm text-muted-foreground">Posisi keuangan rumah sakit: Aset, Kewajiban, dan Modal.</p>
                 </div>
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -76,7 +96,7 @@ export const BalanceSheetReport = ({ endDate }: BalanceSheetReportProps) => {
                         <div className="p-3 rounded-lg bg-white/5 border border-white/10 flex items-center gap-3">
                             <ArrowRightLeft className={`h-5 w-5 ${Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 1 ? 'text-emerald-400' : 'text-rose-400'}`} />
                             <span className="text-xs font-medium">
-                                Status: {Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 1 ? 'SEIMBANG (BALANCED)' : 'IDAK SEIMBANG'}
+                                Status: {Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 1 ? 'SEIMBANG (BALANCED)' : 'TIDAK SEIMBANG'}
                             </span>
                         </div>
                     </CardContent>
@@ -91,7 +111,7 @@ export const BalanceSheetReport = ({ endDate }: BalanceSheetReportProps) => {
                     </CardHeader>
                     <CardContent>
                         <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <PieChart>
                                     <Pie
                                         data={chartData}

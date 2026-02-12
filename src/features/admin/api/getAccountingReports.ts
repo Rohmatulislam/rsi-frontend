@@ -15,6 +15,16 @@ export interface JournalEntry {
     }[];
 }
 
+export interface JournalResponse {
+    data: JournalEntry[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
 export interface Account {
     kd_rek: string;
     nm_rek: string;
@@ -29,10 +39,13 @@ export interface LedgerEntry {
     keterangan: string;
     debet: number;
     kredit: number;
+    saldo: number;
 }
 
 export interface LedgerResponse {
+    account: Account;
     initial_balance: number;
+    closing_balance: number;
     entries: LedgerEntry[];
 }
 
@@ -43,16 +56,37 @@ export interface FinancialReportItem {
     category: string;
 }
 
+export interface CashFlowData {
+    operating: {
+        inflows: number;
+        outflows: number;
+        net: number;
+    };
+    investing: {
+        net: number;
+    };
+    financing: {
+        net: number;
+    };
+    openingCash: number;
+    netChange: number;
+    closingCash: number;
+}
+
+export interface OpeningEquityData {
+    openingEquity: number;
+}
+
 // Hooks
-export const useJournal = (startDate: string, endDate: string) => {
+export const useJournal = (startDate: string, endDate: string, page: number = 1, limit: number = 50) => {
     return useQuery({
-        queryKey: ['accounting-journal', startDate, endDate],
+        queryKey: ['accounting-journal', startDate, endDate, page, limit],
         queryFn: async () => {
-            const response = await axiosInstance.get<JournalEntry[]>(`/accounting/journal?startDate=${startDate}&endDate=${endDate}`);
+            const response = await axiosInstance.get<JournalResponse>(`/accounting/journal?startDate=${startDate}&endDate=${endDate}&page=${page}&limit=${limit}`);
             return response.data;
         },
         enabled: !!startDate && !!endDate,
-        refetchInterval: 10000,
+        refetchInterval: 60000,
     });
 };
 
@@ -74,7 +108,7 @@ export const useLedger = (kd_rek: string, startDate: string, endDate: string) =>
             return response.data;
         },
         enabled: !!kd_rek && !!startDate && !!endDate,
-        refetchInterval: 10000,
+        refetchInterval: 60000,
     });
 };
 
@@ -86,7 +120,7 @@ export const useProfitLoss = (startDate: string, endDate: string) => {
             return response.data;
         },
         enabled: !!startDate && !!endDate,
-        refetchInterval: 10000,
+        refetchInterval: 60000,
     });
 };
 
@@ -98,6 +132,29 @@ export const useBalanceSheet = (endDate: string) => {
             return response.data;
         },
         enabled: !!endDate,
-        refetchInterval: 10000,
+        refetchInterval: 60000,
+    });
+};
+
+export const useCashFlow = (startDate: string, endDate: string) => {
+    return useQuery({
+        queryKey: ['accounting-cash-flow', startDate, endDate],
+        queryFn: async () => {
+            const response = await axiosInstance.get<CashFlowData>(`/accounting/cash-flow?startDate=${startDate}&endDate=${endDate}`);
+            return response.data;
+        },
+        enabled: !!startDate && !!endDate,
+        refetchInterval: 60000,
+    });
+};
+
+export const useOpeningEquity = (startDate: string) => {
+    return useQuery({
+        queryKey: ['accounting-opening-equity', startDate],
+        queryFn: async () => {
+            const response = await axiosInstance.get<OpeningEquityData>(`/accounting/opening-equity?startDate=${startDate}`);
+            return response.data;
+        },
+        enabled: !!startDate,
     });
 };
