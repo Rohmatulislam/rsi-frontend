@@ -29,7 +29,7 @@ export const authClient = createAuthClient({
 const errorCodes = {
   USER_ALREADY_EXISTS: {
     en: "User already registered",
-    id: "Email sudah terdaftar",
+    id: "Email sudah terdaftar. Silakan gunakan email lain atau login.",
   },
   USER_EMAIL_NOT_FOUND: {
     en: "Email not found",
@@ -46,6 +46,14 @@ const errorCodes = {
   EMAIL_NOT_VERIFIED: {
     en: "Email not verified",
     id: "Email belum diverifikasi. Silakan cek kotak masuk email Anda.",
+  },
+  PASSWORD_TOO_SHORT: {
+    en: "Password must be at least 8 characters",
+    id: "Password minimal 8 karakter",
+  },
+  FAILED_TO_CREATE_USER: {
+    en: "Failed to create account",
+    id: "Gagal membuat akun. Silakan coba lagi.",
   },
 } satisfies Record<string, { en: string; id: string }>;
 

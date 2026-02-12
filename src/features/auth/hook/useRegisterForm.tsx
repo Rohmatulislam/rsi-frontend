@@ -31,9 +31,28 @@ export const useRegisterForm = () => {
       console.log('[REGISTER] Response:', { error, authResponseData });
 
       // Handle auth errors
-      if (error?.code) {
+      if (error) {
         console.error('[REGISTER] Auth error:', error);
-        toast.error(getErrorMessage(error.code));
+
+        // Check for structured error code first
+        if (error.code) {
+          toast.error(getErrorMessage(error.code));
+          return;
+        }
+
+        // Fallback: extract message from error response
+        const errorMessage = error.message
+          || (error as any)?.statusText
+          || "Terjadi kesalahan saat mendaftar";
+
+        // Map common backend messages to user-friendly notifications
+        if (errorMessage.includes("sudah terdaftar") || errorMessage.includes("already exists")) {
+          toast.error("Email sudah terdaftar. Silakan gunakan email lain atau login.");
+        } else if (errorMessage.includes("Password minimal") || errorMessage.includes("password")) {
+          toast.error("Password minimal 8 karakter.");
+        } else {
+          toast.error(errorMessage);
+        }
         return;
       }
 
@@ -48,18 +67,30 @@ export const useRegisterForm = () => {
           router.push("/");
         } else {
           // No token = email verification required
-          // Redirect to check-email page
+          toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
           router.push(`/check-email?email=${encodeURIComponent(data.email)}`);
         }
         return;
       }
 
       // Fallback: if we got here without error, assume success with email verification
+      toast.success("Registrasi berhasil! Silakan cek email Anda untuk verifikasi.");
       router.push(`/check-email?email=${encodeURIComponent(data.email)}`);
-    } catch (error) {
-      // Handle non-auth errors
+    } catch (error: any) {
+      // Handle non-auth errors (network, etc.)
       console.error('[REGISTER] Exception:', error);
-      toast.error((error as Error).message);
+
+      // Try to extract message from axios/fetch error response
+      const responseMessage = error?.response?.data?.message;
+      if (responseMessage) {
+        if (responseMessage.includes("sudah terdaftar") || responseMessage.includes("already exists")) {
+          toast.error("Email sudah terdaftar. Silakan gunakan email lain atau login.");
+        } else {
+          toast.error(responseMessage);
+        }
+      } else {
+        toast.error("Gagal mendaftar. Silakan periksa koneksi internet Anda dan coba lagi.");
+      }
     }
   };
 
