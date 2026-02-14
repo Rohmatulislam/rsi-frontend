@@ -52,11 +52,11 @@ export const PeriodComparison = ({ period, date, startDate, endDate }: PeriodCom
     const handleExport = () => {
         if (!data) return;
         const rows = [
-            { metrik: 'Pendapatan', periode_ini: data.current.revenue, periode_lalu: data.previous.revenue, perubahan: `${data.changes.revenue}%` },
-            { metrik: 'Pengeluaran', periode_ini: data.current.expenses, periode_lalu: data.previous.expenses, perubahan: `${data.changes.expenses}%` },
-            { metrik: 'Laba Obat', periode_ini: data.current.drugProfit, periode_lalu: data.previous.drugProfit, perubahan: `${data.changes.drugProfit}%` },
-            { metrik: 'Transaksi', periode_ini: data.current.transactions, periode_lalu: data.previous.transactions, perubahan: `${data.changes.transactions}%` },
-            { metrik: 'Laba Bersih', periode_ini: data.current.netIncome, periode_lalu: data.previous.netIncome, perubahan: `${data.changes.netIncome}%` },
+            { metrik: 'Pendapatan', periode_ini: data.current?.revenue || 0, periode_lalu: data.previous?.revenue || 0, perubahan: `${data.changes?.revenue || 0}%` },
+            { metrik: 'Pengeluaran', periode_ini: data.current?.expenses || 0, periode_lalu: data.previous?.expenses || 0, perubahan: `${data.changes?.expenses || 0}%` },
+            { metrik: 'Laba Obat', periode_ini: data.current?.drugProfit || 0, periode_lalu: data.previous?.drugProfit || 0, perubahan: `${data.changes?.drugProfit || 0}%` },
+            { metrik: 'Transaksi', periode_ini: data.current?.transactions || 0, periode_lalu: data.previous?.transactions || 0, perubahan: `${data.changes?.transactions || 0}%` },
+            { metrik: 'Laba Bersih', periode_ini: data.current?.netIncome || 0, periode_lalu: data.previous?.netIncome || 0, perubahan: `${data.changes?.netIncome || 0}%` },
         ];
         exportToCSV(rows, 'perbandingan_periode', [
             { key: 'metrik', label: 'Metrik' },
@@ -84,17 +84,18 @@ export const PeriodComparison = ({ period, date, startDate, endDate }: PeriodCom
         );
     }
 
-    const formatDate = (d: string) => {
+    const formatDate = (d?: string) => {
+        if (!d) return '-';
         const dt = new Date(d);
         return dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
     };
 
     const metrics = [
-        { key: 'revenue', label: 'Pendapatan', current: data.current.revenue, previous: data.previous.revenue, change: data.changes.revenue, icon: TrendingUp, color: 'bg-emerald-500' },
-        { key: 'expenses', label: 'Pengeluaran', current: data.current.expenses, previous: data.previous.expenses, change: data.changes.expenses, icon: TrendingDown, color: 'bg-rose-500' },
-        { key: 'drugProfit', label: 'Laba Obat', current: data.current.drugProfit, previous: data.previous.drugProfit, change: data.changes.drugProfit, icon: TrendingUp, color: 'bg-blue-500' },
-        { key: 'transactions', label: 'Transaksi', current: data.current.transactions, previous: data.previous.transactions, change: data.changes.transactions, icon: BarChart3, color: 'bg-purple-500' },
-        { key: 'netIncome', label: 'Laba Bersih', current: data.current.netIncome, previous: data.previous.netIncome, change: data.changes.netIncome, icon: TrendingUp, color: 'bg-amber-500' },
+        { key: 'revenue', label: 'Pendapatan', current: data.current?.revenue || 0, previous: data.previous?.revenue || 0, change: data.changes?.revenue || 0, icon: TrendingUp, color: 'bg-emerald-500' },
+        { key: 'expenses', label: 'Pengeluaran', current: data.current?.expenses || 0, previous: data.previous?.expenses || 0, change: data.changes?.expenses || 0, icon: TrendingDown, color: 'bg-rose-500' },
+        { key: 'drugProfit', label: 'Laba Obat', current: data.current?.drugProfit || 0, previous: data.previous?.drugProfit || 0, change: data.changes?.drugProfit || 0, icon: TrendingUp, color: 'bg-blue-500' },
+        { key: 'transactions', label: 'Transaksi', current: data.current?.transactions || 0, previous: data.previous?.transactions || 0, change: data.changes?.transactions || 0, icon: BarChart3, color: 'bg-purple-500' },
+        { key: 'netIncome', label: 'Laba Bersih', current: data.current?.netIncome || 0, previous: data.previous?.netIncome || 0, change: data.changes?.netIncome || 0, icon: TrendingUp, color: 'bg-amber-500' },
     ];
 
     const chartData = metrics.filter(m => m.key !== 'transactions').map(m => ({
@@ -109,9 +110,9 @@ export const PeriodComparison = ({ period, date, startDate, endDate }: PeriodCom
                 <div>
                     <h3 className="text-xl font-bold">Perbandingan Periode</h3>
                     <p className="text-sm text-muted-foreground">
-                        {formatDate(data.current.startDate)} – {formatDate(data.current.endDate)}
+                        {formatDate(data.current?.startDate)} – {formatDate(data.current?.endDate)}
                         {' vs '}
-                        {formatDate(data.previous.startDate)} – {formatDate(data.previous.endDate)}
+                        {formatDate(data.previous?.startDate)} – {formatDate(data.previous?.endDate)}
                     </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">

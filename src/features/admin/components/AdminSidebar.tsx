@@ -39,6 +39,7 @@ export const AdminSidebar = () => {
         { href: "/admin/users", label: "User Management", icon: Users, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/logs", label: "Audit Logs", icon: History, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/finance", label: "Laporan Keuangan", icon: Wallet, roles: ["ADMIN"] as UserRole[] },
+        { href: "/admin/finance/treatment-details", label: "Detail Tindakan", icon: FileText, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/services", label: "Item & Layanan", icon: Stethoscope, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/partners", label: "Kemitraan", icon: Handshake, roles: ["ADMIN"] as UserRole[] },
         { href: "/admin/about", label: "About Page", icon: Info, roles: ["ADMIN"] as UserRole[] },

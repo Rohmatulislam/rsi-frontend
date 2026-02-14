@@ -12,6 +12,12 @@ export type AdminAppointmentDto = {
     appointmentDate: string;
     status: 'scheduled' | 'completed' | 'cancelled';
     notes: string;
+    noRawat?: string;
+    noReg?: string;
+    poliCode?: string;
+    poliName?: string;
+    payerName?: string;
+    payerCode?: string;
 };
 
 export type AdminAppointmentsReport = {
@@ -20,10 +26,11 @@ export type AdminAppointmentsReport = {
     byStatus: Record<string, number>;
 };
 
-export const getAdminAppointments = async (startDate?: string, endDate?: string) => {
+export const getAdminAppointments = async (startDate?: string, endDate?: string, search?: string) => {
     const params = new URLSearchParams();
     if (startDate) params.append("startDate", startDate);
     if (endDate) params.append("endDate", endDate);
+    if (search) params.append("search", search);
 
     const response = await axiosInstance.get<AdminAppointmentsReport>("/admin/appointments/reports", {
         params
@@ -31,9 +38,9 @@ export const getAdminAppointments = async (startDate?: string, endDate?: string)
     return response.data;
 };
 
-export const useAdminAppointments = (startDate?: string, endDate?: string) => {
+export const useAdminAppointments = (startDate?: string, endDate?: string, search?: string) => {
     return useQuery({
-        queryKey: ["admin", "appointments", startDate, endDate],
-        queryFn: () => getAdminAppointments(startDate, endDate),
+        queryKey: ["admin", "appointments", startDate, endDate, search],
+        queryFn: () => getAdminAppointments(startDate, endDate, search),
     });
 };

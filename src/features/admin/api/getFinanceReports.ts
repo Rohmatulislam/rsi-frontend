@@ -238,3 +238,66 @@ export const useBPJSPerformance = (period?: string, date?: string, startDate?: s
         refetchInterval: 300000, // 5 minutes
     });
 };
+export interface TreatmentDetailData {
+    no_rawat: string;
+    no_rkm_medis: string;
+    nm_pasien: string;
+    kd_jenis_prw: string;
+    nm_perawatan: string;
+    tgl_perawatan: string;
+    jam_rawat: string;
+    caraBayar: string;
+    performerName: string;
+    secondaryPerformerName?: string;
+    unitName: string;
+    jasaSarana: number;
+    paketBHP: number;
+    jmDokter: number;
+    jmPetugas: number;
+    kso: number;
+    menejemen: number;
+    total: number;
+    source: string;
+    biaya_obat?: number;
+    jml?: number;
+    embalase?: number;
+    tuslah?: number;
+}
+
+export interface PaginatedTreatmentDetails {
+    data: TreatmentDetailData[];
+    total: number;
+    summary?: {
+        jasaSarana: number;
+        paketBHP: number;
+        jmDokter: number;
+        jmPetugas: number;
+        kso: number;
+        menejemen: number;
+        total: number;
+    };
+    limit: number;
+    offset: number;
+}
+
+export const useTreatmentDetails = (params: {
+    period: string;
+    date?: string;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+    category?: string;
+    limit?: number;
+    offset?: number;
+}) => {
+    return useQuery<PaginatedTreatmentDetails>({
+        queryKey: ["finance", "treatment-details", params],
+        queryFn: async () => {
+            const response = await axiosInstance.get("/finance-stats/treatment-details", {
+                params
+            });
+            return response.data;
+        },
+        refetchInterval: 60000,
+    });
+};

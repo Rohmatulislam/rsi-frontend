@@ -7,6 +7,21 @@ import logo from "~/assets/logo.png";
 import { useTranslations } from "next-intl";
 import { VisitorCounter } from "~/features/home/components/VisitorCounter";
 
+const TiktokIcon = ({ className }: { className?: string }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+    >
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+);
+
 const contactInfo = {
     phone: "087865733233",
     emergency: "087865733233",
@@ -14,9 +29,10 @@ const contactInfo = {
 };
 
 const socialLinks = [
-    { icon: Facebook, href: "https://facebook.com/rsisitihajar", label: "Facebook" },
-    { icon: Instagram, href: "https://instagram.com/rsisitihajar", label: "Instagram" },
-    { icon: Youtube, href: "https://youtube.com/@rsisitihajar", label: "YouTube" },
+    { icon: Facebook, href: "https://www.facebook.com/share/1bZeVm9LGQ/", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/rsisitihajar.mataram?igsh=MTdseThlbDFkMWwyag==", label: "Instagram" },
+    { icon: Youtube, href: "https://www.youtube.com/@rsisitihajarmataram", label: "YouTube" },
+    { icon: TiktokIcon, href: "https://www.tiktok.com/@rsisitihajar.mataram?_r=", label: "Tiktok" },
 ];
 
 export const Footer = () => {
