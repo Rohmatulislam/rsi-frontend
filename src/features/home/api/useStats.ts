@@ -10,7 +10,7 @@ export const useGetStats = () => {
     return useQuery<SiteStats>({
         queryKey: ["site-stats"],
         queryFn: async () => {
-            const { data } = await axiosInstance.get("/stats");
+            const { data } = await axiosInstance.get("stats");
             return data;
         },
         // Don't refetch too often

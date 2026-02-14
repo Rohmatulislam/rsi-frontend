@@ -9,7 +9,7 @@ export const partnerKeys = {
 };
 
 export const getPartners = async (): Promise<Partner[]> => {
-    const { data } = await axiosInstance.get("/partners");
+    const { data } = await axiosInstance.get("partners");
     return data;
 };
 

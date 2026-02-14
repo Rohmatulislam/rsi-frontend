@@ -4,7 +4,7 @@ import { QueryConfig } from "~/lib/react-query";
 import { ArticleDto } from "../services/articleService";
 
 export const getArticleBySlug = async (slug: string) => {
-    const response = await axiosInstance.get<ArticleDto>(`/articles/${slug}`);
+    const response = await axiosInstance.get<ArticleDto>(`articles/${slug}`);
     return response.data;
 };
 

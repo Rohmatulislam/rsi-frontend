@@ -19,7 +19,7 @@ export interface UserProfile {
 }
 
 export const getProfile = async (): Promise<UserProfile> => {
-    const res = await axiosInstance.get("/users/me");
+    const res = await axiosInstance.get("users/me");
     return res.data;
 };
 
@@ -28,6 +28,6 @@ export const updateProfile = async (data: {
     phone?: string;
     image?: string;
 }): Promise<UserProfile> => {
-    const res = await axiosInstance.patch("/users/me", data);
+    const res = await axiosInstance.patch("users/me", data);
     return res.data;
 };

@@ -12,7 +12,12 @@ export interface UpdateArticleDto {
 }
 
 export const updateArticle = async ({ slug, data }: { slug: string; data: UpdateArticleDto }) => {
-    const response = await axiosInstance.patch(`/articles/${slug}`, data);
+    if (!slug || slug === 'undefined' || slug === 'null') {
+        throw new Error(`Invalid article slug for update: ${slug}`);
+    }
+    const url = `articles/${slug}`;
+    console.log(`>>> [updateArticle] PATCH URL: ${url} (slug: '${slug}')`);
+    const response = await axiosInstance.patch(url, data);
     return response.data;
 };
 

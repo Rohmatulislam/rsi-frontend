@@ -5,22 +5,25 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "../constants/localStorage";
 
-const LoginPage = () => {
+export default function LoginPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  const [hasMounted, setHasMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setHasMounted(true);
+    setMounted(true);
     console.log("🏁 LoginPage Mounted - Version: Fix-Hydration-Mismatch");
+  }, []);
+
+  useEffect(() => {
     // Only redirect if session has a valid user object with required fields
-    if (session?.user?.id && session?.user?.email) {
+    if (mounted && session?.user?.id && session?.user?.email) {
       router.replace("/");
     }
-  }, [session, router]);
+  }, [session, router, mounted]);
 
   // Handle hydration mismatch: server render is always "loading"
-  if (!hasMounted || isPending) {
+  if (!mounted || isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center w-full relative">
         <div className="animate-pulse text-muted-foreground absolute">Memuat...</div>
@@ -33,6 +36,4 @@ const LoginPage = () => {
       <LoginForm />
     </div>
   );
-};
-
-export default LoginPage;
+}

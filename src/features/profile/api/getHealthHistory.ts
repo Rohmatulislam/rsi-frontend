@@ -9,6 +9,6 @@ export interface HealthRecord {
 }
 
 export const getHealthHistory = async (): Promise<HealthRecord[]> => {
-    const res = await axiosInstance.get("/users/me/health-history");
+    const res = await axiosInstance.get("users/me/health-history");
     return res.data;
 };

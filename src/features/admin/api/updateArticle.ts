@@ -4,7 +4,12 @@ import { ArticleDto } from "~/features/article/services/articleService";
 import { UpdateArticleDto } from "~/features/admin/types/article";
 
 export const updateArticle = async ({ slug, data }: { slug: string; data: UpdateArticleDto }) => {
-    return axiosInstance.patch<ArticleDto>(`/articles/${slug}`, data).then((res) => res.data);
+    if (!slug || slug === 'undefined' || slug === 'null') {
+        throw new Error(`Invalid article slug for update: ${slug}`);
+    }
+    const url = `articles/${slug}`;
+    console.log(`>>> [admin/updateArticle] PATCH URL: ${url} (slug: '${slug}')`);
+    return axiosInstance.patch<ArticleDto>(url, data).then((res) => res.data);
 };
 
 export const useUpdateArticle = () => {

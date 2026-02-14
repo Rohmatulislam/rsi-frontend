@@ -18,6 +18,17 @@ export default function EditArticlePage({ params }: { params: Promise<{ slug: st
     const { data: article, isLoading } = useGetArticleBySlug({ slug: originalSlug });
     const updateArticle = useUpdateArticle();
 
+    console.log('>>> [EditArticlePage] Rendered with originalSlug:', originalSlug);
+
+    useEffect(() => {
+        if (originalSlug) {
+            // alert(`DEBUG: Edit Page Mounted. Slug: ${originalSlug}`);
+            console.log(`DEBUG: Edit Page Mounted. Slug: ${originalSlug}`);
+        } else {
+            alert("DEBUG: Slug is MISSING from params!");
+        }
+    }, [originalSlug]);
+
     const [formData, setFormData] = useState({
         title: "",
         slug: "",
@@ -45,6 +56,14 @@ export default function EditArticlePage({ params }: { params: Promise<{ slug: st
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log('>>> [EditArticlePage] Submitting with originalSlug:', originalSlug);
+
+        if (!originalSlug || originalSlug === 'undefined' || originalSlug === 'null') {
+            alert("Error: Article slug is missing. Cannot update.");
+            return;
+        }
+
         try {
             await updateArticle.mutateAsync({
                 slug: originalSlug,

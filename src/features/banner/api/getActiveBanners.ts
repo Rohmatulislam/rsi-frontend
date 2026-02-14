@@ -4,7 +4,7 @@ import { Banner } from "../services/bannerService";
 import { bannerKeys } from "./getBanners";
 
 export const getActiveBanners = async (): Promise<Banner[]> => {
-    const { data } = await axiosInstance.get("/banners/active");
+    const { data } = await axiosInstance.get("banners/active");
     return data;
 };
 

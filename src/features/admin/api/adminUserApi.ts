@@ -24,7 +24,7 @@ export const adminUserKeys = {
 
 // GET all users
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
-    const { data } = await axiosInstance.get("/admin/users");
+    const { data } = await axiosInstance.get("admin/users");
     return data;
 };
 

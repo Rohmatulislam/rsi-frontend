@@ -4,7 +4,8 @@ import { QueryConfig } from "~/lib/react-query";
 import { ArticleDto } from "../services/articleService";
 
 export const getArticles = async () => {
-    const response = await axiosInstance.get<ArticleDto[]>("/articles");
+    const response = await axiosInstance.get<ArticleDto[]>("articles");
+    console.log(`>>> [useGetArticles] Fetched ${response.data.length} articles. Sample[0]:`, response.data[0]);
     return response.data;
 };
 

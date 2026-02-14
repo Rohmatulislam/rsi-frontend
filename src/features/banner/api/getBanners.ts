@@ -12,7 +12,7 @@ export const bannerKeys = {
 };
 
 export const getBanners = async (): Promise<Banner[]> => {
-    const { data } = await axiosInstance.get("/banners");
+    const { data } = await axiosInstance.get("banners");
     return data;
 };
 

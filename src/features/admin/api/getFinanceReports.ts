@@ -43,7 +43,7 @@ export const useDrugProfitReport = (period: string, date?: string, startDate?: s
     return useQuery<DrugProfitData[]>({
         queryKey: ["finance", "drug-profit", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/drug-profit", {
+            const response = await axiosInstance.get("finance-stats/drug-profit", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -56,7 +56,7 @@ export const usePaymentMethodReport = (period: string, date?: string, startDate?
     return useQuery<PaymentMethodData[]>({
         queryKey: ["finance", "payment-method", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/payment-method", {
+            const response = await axiosInstance.get("finance-stats/payment-method", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -69,7 +69,7 @@ export const useFinanceSummary = (period: string, date?: string, startDate?: str
     return useQuery<FinanceSummary>({
         queryKey: ["finance", "summary", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/summary", {
+            const response = await axiosInstance.get("finance-stats/summary", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -82,7 +82,7 @@ export const useFinanceTrends = () => {
     return useQuery<FinanceTrend[]>({
         queryKey: ["finance", "trends"],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/trends");
+            const response = await axiosInstance.get("finance-stats/trends");
             return response.data;
         },
         refetchInterval: 60000,
@@ -93,7 +93,7 @@ export const useExpenseSummary = (period: string, date?: string, startDate?: str
     return useQuery<ExpenseSummary>({
         queryKey: ["finance", "expenses", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/expenses", {
+            const response = await axiosInstance.get("finance-stats/expenses", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -128,7 +128,7 @@ export const usePeriodComparison = (period: string, date?: string, startDate?: s
     return useQuery<PeriodComparisonData | null>({
         queryKey: ["finance", "period-comparison", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/period-comparison", {
+            const response = await axiosInstance.get("finance-stats/period-comparison", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -161,7 +161,7 @@ export const useBudgets = (period: string, year: number, month?: number) => {
     return useQuery<BudgetData[]>({
         queryKey: ["finance", "budgets", period, year, month],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/budget", {
+            const response = await axiosInstance.get("finance-stats/budget", {
                 params: { period, year, month }
             });
             return response.data;
@@ -173,7 +173,7 @@ export const useBudgetVariance = (period: string, year: number, month?: number) 
     return useQuery<BudgetVariance[]>({
         queryKey: ["finance", "budget-variance", period, year, month],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/budget/variance", {
+            const response = await axiosInstance.get("finance-stats/budget/variance", {
                 params: { period, year, month }
             });
             return response.data;
@@ -204,7 +204,7 @@ export const useAccountsPayable = (period?: string, date?: string, startDate?: s
     return useQuery<any>({
         queryKey: ["finance", "accounts-payable", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/accounts-payable", {
+            const response = await axiosInstance.get("finance-stats/accounts-payable", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -217,7 +217,7 @@ export const useAccountsReceivable = (period?: string, date?: string, startDate?
     return useQuery<any>({
         queryKey: ["finance", "accounts-receivable", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/accounts-receivable", {
+            const response = await axiosInstance.get("finance-stats/accounts-receivable", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -230,7 +230,7 @@ export const useBPJSPerformance = (period?: string, date?: string, startDate?: s
     return useQuery<any>({
         queryKey: ["finance", "bpjs-performance", period, date, startDate, endDate],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/bpjs-performance", {
+            const response = await axiosInstance.get("finance-stats/bpjs-performance", {
                 params: { period, date, startDate, endDate }
             });
             return response.data;
@@ -293,7 +293,7 @@ export const useTreatmentDetails = (params: {
     return useQuery<PaginatedTreatmentDetails>({
         queryKey: ["finance", "treatment-details", params],
         queryFn: async () => {
-            const response = await axiosInstance.get("/finance-stats/treatment-details", {
+            const response = await axiosInstance.get("finance-stats/treatment-details", {
                 params
             });
             return response.data;

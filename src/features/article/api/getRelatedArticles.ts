@@ -3,7 +3,7 @@ import { axiosInstance } from "~/lib/axios";
 import { ArticleDto } from "../services/articleService";
 
 export const getRelatedArticles = async (slug: string) => {
-    const response = await axiosInstance.get<ArticleDto[]>(`/articles/${slug}/related`);
+    const response = await axiosInstance.get<ArticleDto[]>(`articles/${slug}/related`);
     return response.data;
 };
 

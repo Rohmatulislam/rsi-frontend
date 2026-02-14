@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "~/lib/axios";
 
 export const deleteArticle = async (slug: string) => {
-    return axiosInstance.delete(`/articles/${slug}`);
+    return axiosInstance.delete(`articles/${slug}`);
 };
 
 export const useDeleteArticle = () => {

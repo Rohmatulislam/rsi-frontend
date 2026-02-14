@@ -4,7 +4,7 @@ import { QueryConfig } from "~/lib/react-query";
 import { LabTest } from "../services/labService";
 
 export const getLabTests = async (kd_pj?: string): Promise<LabTest[]> => {
-    const response = await axiosInstance.get("/lab/tests", {
+    const response = await axiosInstance.get("lab/tests", {
         params: { kd_pj }
     });
     return response.data;

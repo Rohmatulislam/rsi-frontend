@@ -11,7 +11,7 @@ export interface FamilyMember {
 }
 
 export const getFamilyMembers = async (): Promise<FamilyMember[]> => {
-    const res = await axiosInstance.get("/users/me/family");
+    const res = await axiosInstance.get("users/me/family");
     return res.data;
 };
 

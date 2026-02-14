@@ -7,7 +7,7 @@ import { Category } from "../types/category";
 export type { Category };
 
 export const getCategories = async () => {
-    const response = await axiosInstance.get<Category[]>("/categories");
+    const response = await axiosInstance.get<Category[]>("categories");
     return response.data;
 };
 

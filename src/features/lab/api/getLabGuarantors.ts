@@ -4,7 +4,7 @@ import { QueryConfig } from "~/lib/react-query";
 import { LabGuarantor } from "../services/labService";
 
 export const getLabGuarantors = async (): Promise<LabGuarantor[]> => {
-    const response = await axiosInstance.get("/lab/guarantors");
+    const response = await axiosInstance.get("lab/guarantors");
     return response.data;
 };
 

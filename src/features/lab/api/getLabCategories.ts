@@ -3,7 +3,7 @@ import { axiosInstance } from "~/lib/axios";
 import { QueryConfig } from "~/lib/react-query";
 
 export const getLabCategories = async (kd_pj?: string): Promise<string[]> => {
-    const response = await axiosInstance.get("/lab/categories", {
+    const response = await axiosInstance.get("lab/categories", {
         params: { kd_pj }
     });
     return response.data;

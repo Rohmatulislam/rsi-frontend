@@ -37,12 +37,21 @@ export default function AdminArticlesPage() {
     };
 
     const handleEdit = (article: ArticleDto) => {
+        if (!article.slug) {
+            alert("DATA KORUP: Artikel ini tidak memiliki slug. Mohon hapus artikel ini dan buat baru.");
+            return;
+        }
         setCurrentArticle(article);
         setIsModalOpen(true);
     };
 
     const handleSave = (data: CreateArticleDto | UpdateArticleDto, isEdit: boolean) => {
         if (isEdit && currentArticle) {
+            console.log(`>>> [AdminArticlesPage] Saving Edit. Slug: '${currentArticle.slug}'`);
+            if (!currentArticle.slug) {
+                alert("Critical Error: Original slug is missing!");
+                return;
+            }
             updateArticle.mutate({
                 slug: currentArticle.slug,
                 data: data as UpdateArticleDto

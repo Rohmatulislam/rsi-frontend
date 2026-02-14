@@ -10,10 +10,10 @@ const getBaseURL = () => {
     // If accessing via an IP address (not localhost), use the same IP for the API
     const isIP = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname);
     if (isIP && hostname !== "127.0.0.1") {
-      return `http://${hostname}:2001/api`;
+      return `http://${hostname}:2001/api/`;
     }
   }
-  return envURL;
+  return envURL.endsWith('/') ? envURL : `${envURL}/`;
 };
 
 export const axiosInstance = axios.create({

@@ -144,7 +144,31 @@ export const ArticleDetailPage = ({ slug }: ArticleDetailPageProps) => {
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className="text-sm font-medium text-slate-500">Bagikan:</span>
-                                <Button variant="ghost" size="icon" className="rounded-full hover:bg-blue-50 hover:text-blue-600">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="rounded-full hover:bg-blue-50 hover:text-blue-600"
+                                    onClick={() => {
+                                        const url = window.location.href;
+                                        const title = article.title;
+                                        const text = `Baca artikel menarik ini: ${article.title}`;
+
+                                        if (navigator.share) {
+                                            navigator.share({
+                                                title,
+                                                text,
+                                                url
+                                            }).catch(err => console.error("Error sharing:", err));
+                                        } else {
+                                            navigator.clipboard.writeText(url).then(() => {
+                                                alert("Link artikel berhasil disalin!");
+                                            }).catch(err => {
+                                                console.error("Failed to copy:", err);
+                                                alert("Gagal menyalin link.");
+                                            });
+                                        }
+                                    }}
+                                >
                                     <Share2 className="h-5 w-5" />
                                 </Button>
                             </div>
