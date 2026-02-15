@@ -13,6 +13,7 @@ import { ServiceCTA } from "~/features/services/components/ServiceCTA";
 import { ServicePageSkeleton } from "~/components/shared/ServicePageSkeleton";
 import { BreadcrumbContainer } from "~/components/shared/Breadcrumb";
 import { useState, useEffect, useRef } from "react";
+import { formatDisplayPoliName, normalizePoliName, isExecutiveName } from "~/lib/utils/naming";
 
 interface PoliDetailPageProps {
     id: string;
@@ -60,15 +61,10 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
     }
 
     // Check if this is executive based on service slug or item name
-    const isExecutive = item.service?.slug === 'poli-executive' ||
-        item.name.toLowerCase().includes('eksekutif') ||
-        item.name.toLowerCase().includes('executive');
+    const isExecutive = item.service?.slug === 'poli-executive' || isExecutiveName(item.name);
 
-    // Extract base specialty from item name (remove "Poliklinik", "Poli", "Eksekutif", "Spesialis", etc.)
-    const baseSpecialty = item.name
-        .replace(/poliklinik|poli|eksekutif|ekskutif|executive|spesialis/gi, '')
-        .replace(/umum\/pks/gi, '')
-        .trim();
+    // Extract base specialty from item name (standardized)
+    const baseSpecialty = normalizePoliName(item.name);
 
     // Filter doctors by matching specialization
     const filteredDoctors = allDoctors?.filter(doc => {
@@ -115,9 +111,9 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
 
             <ServiceHero
                 badge={isExecutive ? "POLI EKSEKUTIF" : "POLIKLINIK SPESIALIS"}
-                title={item.name}
+                title={formatDisplayPoliName(item.name)}
                 highlightText={isExecutive ? "Layanan Premium" : "Layanan Dokter Spesialis"}
-                subtitle={item.description || `Layanan konsultasi dan pemeriksaan ${item.name} dengan dokter spesialis berpengalaman.`}
+                subtitle={item.description || `Layanan konsultasi dan pemeriksaan ${formatDisplayPoliName(item.name)} dengan dokter spesialis berpengalaman.`}
             />
 
             {/* Live Service Section (Video + Queue) */}

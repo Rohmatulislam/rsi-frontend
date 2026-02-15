@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {
     Building2, Stethoscope, Pill, FlaskConical, Radiation,
-    Heart, ClipboardCheck, ArrowRight, Sparkles
+    Heart, ClipboardCheck, ArrowRight, Sparkles, ShoppingCart
 } from "lucide-react";
 import { ServiceHero, ServiceSection } from "~/features/services";
 import { cn } from "~/lib/utils";
@@ -33,14 +33,14 @@ const services = [
     {
         title: "Laboratorium",
         description: "Pemeriksaan laboratorium dengan hasil akurat dan cepat",
-        href: "/layanan/laboratorium",
+        href: "/layanan/diagnostic-hub?tab=lab",
         icon: FlaskConical,
         color: "bg-purple-500",
     },
     {
         title: "Radiologi",
         description: "Pemeriksaan X-Ray, CT Scan, USG dan lainnya",
-        href: "/layanan/radiologi",
+        href: "/layanan/diagnostic-hub?tab=radio",
         icon: Radiation,
         color: "bg-rose-500",
     },
@@ -54,9 +54,16 @@ const services = [
     {
         title: "Medical Check Up",
         description: "Paket pemeriksaan kesehatan menyeluruh",
-        href: "/layanan/mcu",
+        href: "/layanan/diagnostic-hub?tab=mcu",
         icon: ClipboardCheck,
         color: "bg-indigo-500",
+    },
+    {
+        title: "Diagnostic Hub",
+        description: "Portal terpadu untuk pesan Lab, Radiologi, dan MCU sekaligus",
+        href: "/layanan/diagnostic-hub",
+        icon: ShoppingCart,
+        color: "bg-blue-600",
     },
 ];
 

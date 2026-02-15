@@ -17,6 +17,7 @@
         "radiology": "Radiology",
         "rehab": "Medical Rehabilitation",
         "mcu": "MCU (Medical Check Up)",
+        "diagnostic_hub": "Diagnostic Hub",
         "surgery": "Minimal Invasive Surgery",
         "eswl": "ESWL",
         "birth": "Sharia Birth",

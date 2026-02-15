@@ -11,13 +11,23 @@ import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { RadioFiltersSidebar } from "./RadioFiltersSidebar";
 import { RadioTestCard } from "./RadioTestCard";
 import { RadioMobileSummary } from "./RadioMobileSummary";
+import { useDiagnosticBasket, DiagnosticItem } from "~/features/diagnostic/store/useDiagnosticBasket";
 
 interface RadioCatalogProps {
     onSelect?: (testIds: string[]) => void;
     selectedTests?: string[];
+    hideSummary?: boolean;
 }
 
-export const RadioCatalog = ({ onSelect, selectedTests = [] }: RadioCatalogProps) => {
+export const RadioCatalog = ({ onSelect, selectedTests: externalSelected = [], hideSummary }: RadioCatalogProps) => {
+    const { items: basketItems, removeItem: removeFromBasket } = useDiagnosticBasket();
+
+    const selectedTests = useMemo(() => {
+        return basketItems
+            .filter((item: DiagnosticItem) => item.type === 'RADIOLOGY')
+            .map((i: DiagnosticItem) => i.id);
+    }, [basketItems]);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [selectedGuarantor, setSelectedGuarantor] = useState<string>("A09"); // Default to UMUM
@@ -61,10 +71,13 @@ export const RadioCatalog = ({ onSelect, selectedTests = [] }: RadioCatalogProps
     }, [selectedTestsData]);
 
     const toggleTest = (testId: string) => {
-        const newSelected = selectedTests.includes(testId)
-            ? selectedTests.filter(id => id !== testId)
-            : [...selectedTests, testId];
-        onSelect?.(newSelected);
+        if (selectedTests.includes(testId)) {
+            removeFromBasket(testId);
+        } else {
+            // Addition is handled in RadioTestCard onClick for the Hub
+            // but we keep onSelect for direct usage of RadioCatalog elsewhere
+            onSelect?.([...selectedTests, testId]);
+        }
     };
 
     return (
@@ -117,16 +130,18 @@ export const RadioCatalog = ({ onSelect, selectedTests = [] }: RadioCatalogProps
             </div>
 
             {/* Mobile Summary */}
-            <RadioMobileSummary
-                selectedTests={selectedTests}
-                totalPrice={totalPrice}
-                selectedTestsData={selectedTestsData}
-                radioDoctors={radioDoctors}
-                selectedDoctorId={selectedDoctorId}
-                onDoctorChange={setSelectedDoctorId}
-                selectedRadioDoctor={selectedRadioDoctor}
-                onClearSelection={() => onSelect?.([])}
-            />
+            {!hideSummary && (
+                <RadioMobileSummary
+                    selectedTests={selectedTests}
+                    totalPrice={totalPrice}
+                    selectedTestsData={selectedTestsData}
+                    radioDoctors={radioDoctors}
+                    selectedDoctorId={selectedDoctorId}
+                    onDoctorChange={setSelectedDoctorId}
+                    selectedRadioDoctor={selectedRadioDoctor}
+                    onClearSelection={() => onSelect?.([])}
+                />
+            )}
         </div>
     );
 };

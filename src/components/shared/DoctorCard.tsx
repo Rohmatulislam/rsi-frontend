@@ -290,6 +290,8 @@ export const DoctorCard = ({
 };
 
 // Skeleton Loading Component
+import { Skeleton } from "~/components/ui/skeleton";
+
 export const DoctorCardSkeleton = () => {
   return (
     <div className="relative bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full animate-pulse">
@@ -297,13 +299,13 @@ export const DoctorCardSkeleton = () => {
       <div className="p-5 pb-3">
         <div className="flex items-center gap-4">
           <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-700" />
+            <Skeleton className="w-16 h-16 rounded-full" />
           </div>
 
           <div className="min-w-0 flex-1 space-y-2">
-            <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
-            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4" />
+            <Skeleton className="h-5 w-3/4 rounded" />
+            <Skeleton className="h-4 w-1/2 rounded" />
+            <Skeleton className="h-3 w-1/4 rounded" />
           </div>
         </div>
       </div>
@@ -319,14 +321,14 @@ export const DoctorCardSkeleton = () => {
           <div className="space-y-3 pt-1">
             {/* Location skeleton */}
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
-              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+              <Skeleton className="w-4 h-4 rounded" />
+              <Skeleton className="h-4 w-2/3 rounded" />
             </div>
 
             {/* Schedule skeleton */}
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
-              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+              <Skeleton className="w-4 h-4 rounded" />
+              <Skeleton className="h-4 w-3/4 rounded" />
             </div>
           </div>
         </div>

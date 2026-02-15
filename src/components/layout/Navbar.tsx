@@ -150,16 +150,23 @@ export const Navbar = () => {
                 <Link href="/layanan/farmasi">{t("pharmacy")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/laboratorium">{t("lab")}</Link>
+                <Link href="/layanan/laboratorium?tab=lab">{t("lab")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/radiologi">{t("radiology")}</Link>
+                <Link href="/layanan/radiologi?tab=radio">{t("radiology")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/layanan/rehabilitasi-medik">{t("rehab")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/layanan/mcu">{t("mcu")}</Link>
+                <Link href="/layanan/mcu?tab=mcu">{t("mcu")}</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild className="bg-primary/5 focus:bg-primary/10">
+                <Link href="/layanan/diagnostic-hub" className="font-bold text-primary flex items-center justify-between w-full">
+                  {t("diagnostic_hub")}
+                  <ShoppingCart className="h-3 w-3" />
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -246,17 +253,20 @@ export const Navbar = () => {
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/farmasi'; }}>
                 {t("pharmacy")}
               </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/laboratorium'; }}>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=lab'; }}>
                 {t("lab")}
               </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/radiologi'; }}>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=radio'; }}>
                 {t("radiology")}
               </CommandItem>
               <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rehabilitasi-medik'; }}>
                 {t("rehab")}
               </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/mcu'; }}>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=mcu'; }}>
                 {t("mcu")}
+              </CommandItem>
+              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub'; }} className="font-bold text-primary">
+                {t("diagnostic_hub")} (MCU, Lab, Radio)
               </CommandItem>
             </CommandGroup>
 
@@ -457,10 +467,14 @@ export const Navbar = () => {
                 <MobileNavLink href="/layanan/rawat-inap" onClick={() => setIsOpen(false)}>{t("inpatient")}</MobileNavLink>
                 <MobileNavLink href="/layanan/rawat-jalan" onClick={() => setIsOpen(false)}>{t("outpatient")}</MobileNavLink>
                 <MobileNavLink href="/layanan/farmasi" onClick={() => setIsOpen(false)}>{t("pharmacy")}</MobileNavLink>
-                <MobileNavLink href="/layanan/laboratorium" onClick={() => setIsOpen(false)}>{t("lab")}</MobileNavLink>
-                <MobileNavLink href="/layanan/radiologi" onClick={() => setIsOpen(false)}>{t("radiology")}</MobileNavLink>
+                <MobileNavLink href="/layanan/diagnostic-hub?tab=lab" onClick={() => setIsOpen(false)}>{t("lab")}</MobileNavLink>
+                <MobileNavLink href="/layanan/diagnostic-hub?tab=radio" onClick={() => setIsOpen(false)}>{t("radiology")}</MobileNavLink>
                 <MobileNavLink href="/layanan/rehabilitasi-medik" onClick={() => setIsOpen(false)}>{t("rehab")}</MobileNavLink>
-                <MobileNavLink href="/layanan/mcu" onClick={() => setIsOpen(false)}>{t("mcu")}</MobileNavLink>
+                <MobileNavLink href="/layanan/diagnostic-hub?tab=mcu" onClick={() => setIsOpen(false)}>{t("mcu")}</MobileNavLink>
+                <div className="mx-3 my-1 border-t border-dashed" />
+                <MobileNavLink href="/layanan/diagnostic-hub" onClick={() => setIsOpen(false)}>
+                  <span className="font-bold text-primary">{t("diagnostic_hub")}</span>
+                </MobileNavLink>
               </MobileNavSection>
 
               {/* Layanan Unggulan - Collapsible */}

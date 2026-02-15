@@ -19,8 +19,11 @@ import { McuBenefitsSection } from "../components/McuBenefitsSection";
 import { McuInfoSection } from "../components/McuInfoSection";
 import { McuPackage } from "../services/mcuService";
 import { McuBookingModal } from "../components/McuBookingModal";
+import { useDiagnosticBasket } from "~/features/diagnostic/store/useDiagnosticBasket";
+import { ShoppingBasket } from "lucide-react";
 
 export const MCUPage = () => {
+    const { addItem, hasItem, removeItem } = useDiagnosticBasket();
     const { data: service, isLoading: serviceLoading } = useGetServiceBySlug({ slug: 'mcu' });
     const { data: mcuPackages, isLoading: mcuLoading } = useGetMcuPackages();
 
@@ -290,12 +293,35 @@ export const MCUPage = () => {
                                             ))}
                                             <div className="text-[10px] font-bold text-primary italic pl-8">+ {pkg.features?.split(',').length! - 3} pemeriksaan lainnya</div>
                                         </div>
-                                        <Button
-                                            onClick={() => handleSelectPackage(pkg)}
-                                            className="w-full rounded-2xl h-12 shadow-lg shadow-primary/10 group-hover:shadow-primary/20 transition-all font-bold"
-                                        >
-                                            Pilih Paket <ChevronRight className="h-4 w-4 ml-2" />
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant={hasItem(pkg.id) ? "secondary" : "outline"}
+                                                size="icon"
+                                                onClick={() => {
+                                                    if (hasItem(pkg.id)) {
+                                                        removeItem(pkg.id);
+                                                    } else {
+                                                        addItem({
+                                                            id: pkg.id,
+                                                            name: pkg.name,
+                                                            price: pkg.price,
+                                                            type: 'MCU',
+                                                            category: pkg.category,
+                                                            description: pkg.features?.split(',')[0],
+                                                        });
+                                                    }
+                                                }}
+                                                className={`rounded-2xl h-12 w-12 shrink-0 ${hasItem(pkg.id) ? 'bg-primary/20 text-primary border-primary' : ''}`}
+                                            >
+                                                <ShoppingBasket className="h-5 w-5" />
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleSelectPackage(pkg)}
+                                                className="flex-grow rounded-2xl h-12 shadow-lg shadow-primary/10 group-hover:shadow-primary/20 transition-all font-bold"
+                                            >
+                                                Rincian <ChevronRight className="h-4 w-4 ml-2" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -328,18 +354,40 @@ export const MCUPage = () => {
                                                     <p className="text-3xl font-black">Rp {dynamicPricing.final.toLocaleString('id-ID')}</p>
                                                 </div>
                                             </div>
-                                            <McuBookingModal
-                                                package={{ ...selectedPackage, price: dynamicPricing.final }}
-                                                selectedExams={selectedExams}
-                                                trigger={
-                                                    <Button
-                                                        disabled={selectedExams.length === 0}
-                                                        className="bg-white text-primary hover:bg-slate-100 h-14 rounded-2xl px-8 font-black shadow-xl"
-                                                    >
-                                                        Booking
-                                                    </Button>
-                                                }
-                                            />
+                                            <div className="flex items-center gap-3">
+                                                <Button
+                                                    variant={hasItem(selectedPackage.id) ? "secondary" : "outline"}
+                                                    className={`h-14 rounded-2xl px-6 font-black border-2 ${hasItem(selectedPackage.id) ? 'bg-white/20 text-white border-white' : 'bg-white/10 text-white hover:bg-white/20 border-white/30'}`}
+                                                    onClick={() => {
+                                                        if (hasItem(selectedPackage.id)) {
+                                                            removeItem(selectedPackage.id);
+                                                        } else {
+                                                            addItem({
+                                                                id: selectedPackage.id,
+                                                                name: selectedPackage.name,
+                                                                price: dynamicPricing.final,
+                                                                type: 'MCU',
+                                                                category: selectedPackage.category,
+                                                                description: selectedPackage.features?.split(',')[0],
+                                                            });
+                                                        }
+                                                    }}
+                                                >
+                                                    {hasItem(selectedPackage.id) ? 'Di Keranjang' : 'Tambah Hub'}
+                                                </Button>
+                                                <McuBookingModal
+                                                    package={{ ...selectedPackage, price: dynamicPricing.final }}
+                                                    selectedExams={selectedExams}
+                                                    trigger={
+                                                        <Button
+                                                            disabled={selectedExams.length === 0}
+                                                            className="bg-white text-primary hover:bg-slate-100 h-14 rounded-2xl px-8 font-black shadow-xl flex-grow"
+                                                        >
+                                                            Booking
+                                                        </Button>
+                                                    }
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 

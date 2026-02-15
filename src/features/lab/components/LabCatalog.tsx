@@ -13,8 +13,14 @@ import { LabTemplateDetail } from "./LabTemplateDetail";
 import { LabFiltersSidebar } from "./LabFiltersSidebar";
 import { LabTestCard } from "./LabTestCard";
 import { LabMobileSummary } from "./LabMobileSummary";
+import { useDiagnosticBasket, DiagnosticItem } from "~/features/diagnostic/store/useDiagnosticBasket";
 
-export const LabCatalog = () => {
+export interface LabCatalogProps {
+    hideSummary?: boolean;
+}
+
+export const LabCatalog = ({ hideSummary }: LabCatalogProps) => {
+    const { items: basketItems, removeItem: removeFromBasket, addItem: addToBasket, hasItem } = useDiagnosticBasket();
     const [selectedGuarantor, setSelectedGuarantor] = useState<string>("A09"); // Default to UMUM
     const [expandedTests, setExpandedTests] = useState<Record<string, boolean>>({});
     const [viewingTemplateId, setViewingTemplateId] = useState<number | null>(null);
@@ -43,7 +49,6 @@ export const LabCatalog = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
-    const [selectedTests, setSelectedTests] = useState<LabTest[]>([]);
 
     const filteredTests = useMemo(() => {
         if (!tests) return [];
@@ -55,22 +60,32 @@ export const LabCatalog = () => {
         });
     }, [tests, searchQuery, selectedCategory]);
 
-    const toggleTest = (test: LabTest) => {
-        setSelectedTests(prev => {
-            const exists = prev.find(t => t.id === test.id);
-            if (exists) {
-                return prev.filter(t => t.id !== test.id);
-            }
-            return [...prev, { ...test, price: test.price || 0 }];
-        });
-    };
+    const selectedTests = useMemo(() => {
+        return basketItems.filter((item: DiagnosticItem) => item.type === 'LAB') as any as LabTest[];
+    }, [basketItems]);
 
     const totalPrice = useMemo(() => {
-        return selectedTests.reduce((sum, test) => sum + test.price, 0);
+        return selectedTests.reduce((sum, test) => sum + (test.price || 0), 0);
     }, [selectedTests]);
 
+    const toggleTest = (test: LabTest) => {
+        if (hasItem(test.id)) {
+            removeFromBasket(test.id);
+        } else {
+            addToBasket({
+                id: test.id,
+                name: test.name,
+                price: test.price || 0,
+                type: 'LAB',
+                category: test.category,
+                description: (test as any).description,
+                preparation: (test as any).preparation?.join(', ')
+            });
+        }
+    };
+
     const removeTest = (id: string) => {
-        setSelectedTests(prev => prev.filter(t => t.id !== id));
+        removeFromBasket(id);
     };
 
     const toggleExpand = (e: React.MouseEvent, id: string) => {
@@ -89,7 +104,12 @@ export const LabCatalog = () => {
 
     const handleGuarantorChange = (val: string) => {
         setSelectedGuarantor(val);
-        setSelectedTests([]);
+        // Clear lab items from basket if guarantor changes? 
+        // Actually SIMRS prices depend on guarantor, so yes, it's safer.
+        basketItems
+            .filter((item: DiagnosticItem) => item.type === 'LAB')
+            .forEach((item: DiagnosticItem) => removeFromBasket(item.id));
+
         setSelectedCategory("All");
         setExpandedTests({});
     };
@@ -135,6 +155,7 @@ export const LabCatalog = () => {
                 pkDoctors={pkDoctors}
                 selectedDoctorId={selectedDoctorId}
                 onDoctorChange={setSelectedDoctorId}
+                hideSummary={hideSummary}
             />
 
             {/* Tests Grid */}
@@ -153,7 +174,7 @@ export const LabCatalog = () => {
 
                 <div className="grid grid-cols-1 gap-4">
                     {filteredTests.map(test => {
-                        const isSelected = selectedTests.some(t => t.id === test.id);
+                        const isSelected = hasItem(test.id);
                         const isExpanded = expandedTests[test.id] || (searchQuery.length > 2 && test.template.some(t => t.name.toLowerCase().includes(searchQuery.toLowerCase())));
 
                         return (
@@ -181,16 +202,18 @@ export const LabCatalog = () => {
             </div>
 
             {/* Sticky Mobile Summary */}
-            <LabMobileSummary
-                selectedTests={selectedTests}
-                totalPrice={totalPrice}
-                pkDoctors={pkDoctors}
-                selectedDoctorId={selectedDoctorId}
-                onDoctorChange={setSelectedDoctorId}
-                selectedDoctor={selectedPkDoctor}
-                guarantors={guarantors ?? []}
-                selectedGuarantor={selectedGuarantor}
-            />
+            {!hideSummary && (
+                <LabMobileSummary
+                    selectedTests={selectedTests}
+                    totalPrice={totalPrice}
+                    pkDoctors={pkDoctors}
+                    selectedDoctorId={selectedDoctorId}
+                    onDoctorChange={setSelectedDoctorId}
+                    selectedDoctor={selectedPkDoctor}
+                    guarantors={guarantors ?? []}
+                    selectedGuarantor={selectedGuarantor}
+                />
+            )}
         </div>
     );
 };

@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card } from "~/components/ui/card";
 import { LabTest } from "../services/labService";
+import { useDiagnosticBasket } from "~/features/diagnostic/store/useDiagnosticBasket";
 
 interface LabTestCardProps {
     test: LabTest;
@@ -18,7 +19,7 @@ interface LabTestCardProps {
 
 export const LabTestCard = ({
     test,
-    isSelected,
+    isSelected: activeInCatalog, // Local selection in catalog
     isExpanded,
     searchQuery,
     onToggle,
@@ -26,6 +27,25 @@ export const LabTestCard = ({
     onOpenTemplateDetail
 }: LabTestCardProps) => {
     const price = test.price || 0;
+    const { hasItem, addItem, removeItem } = useDiagnosticBasket();
+    const isSelected = hasItem(test.id);
+
+    const handleToggleBasket = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isSelected) {
+            removeItem(test.id);
+        } else {
+            addItem({
+                id: test.id,
+                name: test.name,
+                price: price,
+                type: 'LAB',
+                category: test.category,
+                description: (test as any).description,
+                preparation: (test as any).preparation?.join(', ')
+            });
+        }
+    };
 
     return (
         <Card

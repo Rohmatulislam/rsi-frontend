@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useGetServices } from "~/features/services/api/getServices";
 import { useTranslations } from "next-intl";
+import { ServiceCardSkeleton } from "~/features/services/components/ServiceCardSkeleton";
 
 const iconMap: Record<string, any> = {
     Stethoscope,
@@ -92,7 +93,10 @@ export const ServiceCardsSection = () => {
     ).map(service => ({
         icon: iconMap[service.icon || 'Activity'] || Activity,
         title: service.name,
-        href: `/layanan/${service.slug}`,
+        href: service.slug === 'mcu' ? '/layanan/diagnostic-hub?tab=mcu' :
+            service.slug === 'laboratorium' ? '/layanan/diagnostic-hub?tab=lab' :
+                service.slug === 'radiologi' ? '/layanan/diagnostic-hub?tab=radio' :
+                    `/layanan/${service.slug}`,
         color: service.slug === 'mcu' ? 'rose' :
             service.slug === 'laboratorium' ? 'cyan' :
                 service.slug === 'radiologi' ? 'success' :
@@ -108,7 +112,7 @@ export const ServiceCardsSection = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl w-full">
                         {isLoading ? (
                             Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="animate-pulse bg-card border border-border rounded-xl p-4 h-[140px] w-full shadow-lg" />
+                                <ServiceCardSkeleton key={i} />
                             ))
                         ) : (
                             displayServices.map((service, index) => (

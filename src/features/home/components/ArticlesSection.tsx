@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { getImageSrc } from "~/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetCategories } from "~/features/admin/api/getCategories";
+import { ArticleCardSkeleton } from "~/features/article/components/ArticleCardSkeleton";
 
 export const ArticlesSection = () => {
     const t = useTranslations("Home");
@@ -126,7 +127,7 @@ export const ArticlesSection = () => {
                                 >
                                     {isLoading ? (
                                         Array.from({ length: 3 }).map((_, i) => (
-                                            <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 h-80 animate-pulse" />
+                                            <ArticleCardSkeleton key={i} />
                                         ))
                                     ) : filteredArticles.length > 0 ? (
                                         filteredArticles.slice(0, 3).map((article, index) => (
