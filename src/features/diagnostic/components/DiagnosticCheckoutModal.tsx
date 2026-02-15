@@ -29,6 +29,7 @@ export const DiagnosticCheckoutModal = ({ trigger }: DiagnosticCheckoutModalProp
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState<Step>("date");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [bookingResponse, setBookingResponse] = useState<any>(null);
 
     const [formData, setFormData] = useState({
         date: undefined as Date | undefined,
@@ -116,6 +117,9 @@ export const DiagnosticCheckoutModal = ({ trigger }: DiagnosticCheckoutModalProp
 
             if (!response.ok) throw new Error("Gagal membuat reservasi");
 
+            const result = await response.json();
+            setBookingResponse(result);
+
             toast.success("Checkout Berhasil!", {
                 description: `Reservasi diagnostic Anda telah dijadwalkan.`,
             });
@@ -199,7 +203,7 @@ export const DiagnosticCheckoutModal = ({ trigger }: DiagnosticCheckoutModalProp
                             />
                         )}
                         {step === "confirm" && <DiagnosticConfirmStep formData={formData} />}
-                        {step === "success" && <DiagnosticSuccessStep formData={formData} />}
+                        {step === "success" && <DiagnosticSuccessStep formData={formData} bookingResponse={bookingResponse} />}
                     </div>
                 </div>
 
