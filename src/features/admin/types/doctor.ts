@@ -49,3 +49,25 @@ export interface UpdateDoctorDto {
   isStudying?: boolean;
   isOnLeave?: boolean;
 }
+
+export interface DoctorScheduleException {
+  id: string;
+  doctorId: string;
+  date: string;
+  type: 'LEAVE' | 'RESCHEDULE' | 'EXTRA_QUOTA';
+  startTime?: string;
+  endTime?: string;
+  note?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDoctorScheduleExceptionDto {
+  doctorId: string;
+  date: string;
+  type: 'LEAVE' | 'RESCHEDULE' | 'EXTRA_QUOTA';
+  startTime?: string;
+  endTime?: string;
+  note?: string;
+}

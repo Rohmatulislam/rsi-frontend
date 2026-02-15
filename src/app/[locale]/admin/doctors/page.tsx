@@ -11,6 +11,8 @@ import { DoctorDto } from "~/features/home/api/getDoctors";
 import { DoctorModal } from "~/features/admin/components/DoctorModal";
 import { CreateDoctorDto, UpdateDoctorDto } from "~/features/admin/types/doctor";
 import { Button } from "~/components/ui/button";
+import { DoctorScheduleExceptionModal } from "~/features/admin/components/DoctorScheduleExceptionModal";
+import { Calendar } from "lucide-react";
 
 export default function AdminDoctorsPage() {
     const { data: doctors, isLoading } = useGetDoctorsList({
@@ -29,6 +31,10 @@ export default function AdminDoctorsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentDoctor, setCurrentDoctor] = useState<DoctorDto | null>(null);
 
+    // Exception Modal State
+    const [isExceptionModalOpen, setIsExceptionModalOpen] = useState(false);
+    const [currentExceptionDoctor, setCurrentExceptionDoctor] = useState<DoctorDto | null>(null);
+
     const filteredDoctors = doctors?.filter(d =>
         d.name.toLowerCase().includes(search.toLowerCase()) ||
         (d.kd_dokter && d.kd_dokter.toLowerCase().includes(search.toLowerCase()))
@@ -42,6 +48,11 @@ export default function AdminDoctorsPage() {
     const handleEdit = (doctor: DoctorDto) => {
         setCurrentDoctor(doctor);
         setIsModalOpen(true);
+    };
+
+    const handleManageSchedule = (doctor: DoctorDto) => {
+        setCurrentExceptionDoctor(doctor);
+        setIsExceptionModalOpen(true);
     };
 
     const handleSave = (data: CreateDoctorDto | UpdateDoctorDto, isEdit: boolean) => {
@@ -223,6 +234,13 @@ export default function AdminDoctorsPage() {
                                     </td>
                                     <td className="p-4 text-right">
                                         <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleManageSchedule(doc)}
+                                                className="p-2 hover:bg-blue-100 rounded text-blue-500"
+                                                title="Kelola Jadwal / Cuti"
+                                            >
+                                                <Calendar className="w-4 h-4" />
+                                            </button>
                                             <button onClick={() => handleEdit(doc)} className="p-2 hover:bg-slate-100 rounded text-slate-500">
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
@@ -255,6 +273,15 @@ export default function AdminDoctorsPage() {
                 doctor={currentDoctor}
                 onSave={handleSave}
                 isSaving={isSaving}
+            />
+
+            <DoctorScheduleExceptionModal
+                isOpen={isExceptionModalOpen}
+                onClose={() => {
+                    setIsExceptionModalOpen(false);
+                    setCurrentExceptionDoctor(null);
+                }}
+                doctor={currentExceptionDoctor}
             />
         </div>
     );
