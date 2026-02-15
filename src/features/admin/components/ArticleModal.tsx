@@ -46,6 +46,7 @@ export const ArticleModal = ({ isOpen, onClose, article, onSave, isSaving }: Art
                 content: article.content,
                 excerpt: article.excerpt || "",
                 image: article.image || "",
+                author: article.author || "",
                 isActive: true,
                 categoryIds: article.categories?.map(c => c.id) || [],
             });
@@ -56,6 +57,7 @@ export const ArticleModal = ({ isOpen, onClose, article, onSave, isSaving }: Art
                 content: "",
                 excerpt: "",
                 image: "",
+                author: "",
                 isActive: true,
                 categoryIds: [],
             });
@@ -138,6 +140,11 @@ export const ArticleModal = ({ isOpen, onClose, article, onSave, isSaving }: Art
                                 <Label htmlFor="slug">Slug (URL)</Label>
                                 <Input id="slug" name="slug" value={formData.slug} onChange={handleChange} required />
                                 {article && <p className="text-xs text-yellow-600">Warning: Changing slug will change the URL.</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="author">Author</Label>
+                                <Input id="author" name="author" value={formData.author || ""} onChange={handleChange} placeholder="Nama Penulis" />
                             </div>
 
                             <div className="space-y-3">

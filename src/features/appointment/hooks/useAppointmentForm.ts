@@ -223,19 +223,52 @@ export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: 
       const date = new Date(today);
       date.setDate(today.getDate() + i);
 
-      // Check if doctor has schedule on this day
       const dayOfWeek = date.getDay();
-      const hasSchedule = doctor?.schedules?.some((s: any) => s.dayOfWeek === dayOfWeek);
 
-      if (hasSchedule) {
-        const schedule = doctor?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
+      let schedule: any = null;
+
+      // 1. Try to find in detailed schedules (synced from Khanza)
+      if (doctor?.scheduleDetails && doctor.scheduleDetails.length > 0) {
+        // If poli is selected, filter by it
+        if (formData.poliId) {
+          const dayName = daysMap[dayOfWeek].toUpperCase(); // SENIN, SELASA...
+          const khanzaDayName = dayOfWeek === 0 ? 'AKHAD' : dayName; // Khanza uses AKHAD
+
+          schedule = doctor.scheduleDetails.find((s: any) =>
+            (s.hari_kerja.toUpperCase() === dayName || s.hari_kerja.toUpperCase() === khanzaDayName) &&
+            s.kd_poli === formData.poliId
+          );
+        } else {
+          // Fallback if no poli selected yet (though UI forces it), just take any for this day
+          // ... logic kept same as before but looking at scheduleDetails first
+          const dayName = daysMap[dayOfWeek].toUpperCase();
+          const khanzaDayName = dayOfWeek === 0 ? 'AKHAD' : dayName;
+          schedule = doctor.scheduleDetails.find((s: any) =>
+            s.hari_kerja.toUpperCase() === dayName || s.hari_kerja.toUpperCase() === khanzaDayName
+          );
+        }
+      }
+
+      // 2. Fallback to local schedules if not found above
+      if (!schedule && doctor?.schedules) {
+        // Note: Local schedules might not have kd_poli attached deeply, usually just startTime/endTime/dayOfWeek
+        // But if we improved backend, they might.
+        // For now, simple day matching as fallback
+        schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+      }
+
+      if (schedule) {
         const dateStr = date.toISOString().split('T')[0];
         const dayName = daysMap[dayOfWeek];
         const dateDisplay = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+        // Normalize times
+        const start = schedule.jam_mulai || schedule.startTime || '08:00';
+        const end = schedule.jam_selesai || schedule.endTime || '14:00';
+
         dates.push({
           value: dateStr,
-          label: `${dayName}, ${dateDisplay} (${schedule?.startTime || '08:00'} - ${schedule?.endTime || '14:00'})`,
+          label: `${dayName}, ${dateDisplay} (${start} - ${end})`,
         });
       }
     }
@@ -245,19 +278,46 @@ export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: 
 
   // Generate available times for a selected date based on doctor's schedule
   const getAvailableTimesForDate = (selectedDate: string): string[] => {
-    if (!selectedDate || !doctor?.schedules) return [];
+    if (!selectedDate) return [];
 
-    // Find the doctor's schedule for this day of week
     const date = new Date(selectedDate);
     const dayOfWeek = date.getDay();
 
-    // Get the schedule for this day
-    const schedule = doctor?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
+    // Days mapping for Khanza matching
+    const daysMap: Record<number, string> = {
+      0: 'MINGGU', 1: 'SENIN', 2: 'SELASA', 3: 'RABU', 4: 'KAMIS', 5: 'JUMAT', 6: 'SABTU'
+    };
+    const dayName = daysMap[dayOfWeek];
+    const khanzaDayName = dayOfWeek === 0 ? 'AKHAD' : dayName;
+
+    let schedule: any = null;
+
+    // 1. Prioritize Validated Khanza Schedule Details (Poli-Aware)
+    if (doctor?.scheduleDetails && doctor.scheduleDetails.length > 0) {
+      if (formData.poliId) {
+        schedule = doctor.scheduleDetails.find((s: any) =>
+          (s.hari_kerja.toUpperCase() === dayName || s.hari_kerja.toUpperCase() === khanzaDayName) &&
+          s.kd_poli === formData.poliId
+        );
+      }
+      // If no poli selected (unlikely in step 3) or not found, try loose match
+      if (!schedule) {
+        schedule = doctor.scheduleDetails.find((s: any) =>
+          s.hari_kerja.toUpperCase() === dayName || s.hari_kerja.toUpperCase() === khanzaDayName
+        );
+      }
+    }
+
+    // 2. Fallback to local schedules
+    if (!schedule && doctor?.schedules) {
+      schedule = doctor.schedules.find((s: any) => s.dayOfWeek === dayOfWeek);
+    }
+
     if (!schedule) return [];
 
     // Extract start and end times
-    const startTime = schedule.startTime || '08:00';
-    const endTime = schedule.endTime || '17:00';
+    const startTime = schedule.jam_mulai || schedule.startTime || '08:00';
+    const endTime = schedule.jam_selesai || schedule.endTime || '17:00';
 
     // Generate time slots (30-min intervals)
     const startHour = parseInt(startTime.split(':')[0]);
