@@ -77,6 +77,8 @@
   --shadow-2xl: 0rem 0.2rem 0.5rem 0.1rem hsl(210 10% 20% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+  --ramadan-gold: oklch(0.77 0.12 85); /* #D4AF37 */
+  --ramadan-gold-light: oklch(0.92 0.08 95); /* #F9E79F */
 }
 
 .dark {
@@ -183,6 +185,9 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+
+  --color-ramadan-gold: var(--ramadan-gold);
+  --color-ramadan-gold-light: var(--ramadan-gold-light);
 }
 
 @layer base {
@@ -192,5 +197,13 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  .bg-islamic-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l5.878 18.09h19.022l-15.388 11.18 5.878 18.09L30 36.18l-15.39 11.18 5.878-18.09L5.1 18.09h19.022L30 0z' fill='%23D4AF37' fill-opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .ramadan-glow {
+    box-shadow: 0 0 20px 2px rgba(212, 175, 55, 0.3);
   }
 }

@@ -39,31 +39,34 @@ export const ArticlesSection = () => {
     if (!isLoading && (!articles || articles.length === 0)) return null;
 
     return (
-        <section className="py-24 bg-white dark:bg-slate-950">
+        <section className="py-24">
             <div className="container mx-auto px-4 md:px-8">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+                <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
                     {/* Left Section: Header & Topics */}
-                    <div className="lg:w-[30%]">
+                    <div className="lg:w-[35%] relative">
+                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-ramadan-gold/10 rounded-full blur-3xl pointer-events-none" />
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
+                            className="relative z-10"
                         >
-                            <h2 className="text-4xl font-bold text-slate-800 dark:text-white mb-6">
+                            <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-8 leading-tight">
                                 {t("latest_articles")}
+                                <span className="text-ramadan-gold ml-2">.</span>
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 leading-relaxed">
-                                Temukan informasi kesehatan yang bermanfaat untuk hidup lebih sehat melalui artikel blog kami.
+                            <p className="text-slate-600 dark:text-slate-400 text-lg mb-8 leading-relaxed font-medium">
+                                Temukan informasi kesehatan terpilih untuk menjaga kebugaran selama bulan Ramadan dan seterusnya.
                             </p>
                             <Link
                                 href="/artikel"
-                                className="inline-flex items-center gap-2 text-primary font-bold text-sm group mb-8"
+                                className="inline-flex items-center gap-3 bg-ramadan-gold/10 text-ramadan-gold px-6 py-3 rounded-2xl font-black text-sm group mb-10 hover:bg-ramadan-gold hover:text-white transition-all duration-500 shadow-xl shadow-ramadan-gold/10"
                             >
                                 {t("view_all_articles")}
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                             </Link>
 
-                            <div className="h-px w-20 bg-slate-200 dark:bg-slate-800 mb-8" />
+                            <div className="h-1.5 w-24 bg-ramadan-gold rounded-full mb-10" />
 
                             {popularTopics.length > 0 && (
                                 <>

@@ -91,21 +91,22 @@ export const RecommendedDoctorsSection = () => {
   const displayDoctors: any[] = (doctors && doctors.length > 0) ? doctors : mockDoctors;
 
   return (
-    <section className="w-full py-20 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+    <section className="w-full">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-          <div className="space-y-3">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-4">
+              <div className="h-10 w-2 bg-ramadan-gold rounded-full hidden md:block" />
               {t("title")}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl">
+            <p className="text-lg text-muted-foreground max-w-2xl font-medium">
               {t("subtitle")}
             </p>
           </div>
-          <Button variant="outline" size="lg" asChild className="hidden md:flex rounded-full px-6 hover:bg-primary hover:text-white transition-all duration-300">
+          <Button variant="outline" size="lg" asChild className="hidden md:flex rounded-2xl border-ramadan-gold/50 text-ramadan-gold hover:bg-ramadan-gold hover:text-white transition-all duration-500 shadow-xl shadow-ramadan-gold/5">
             <Link href="/doctors">
               {t("view_all")}
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
         </div>

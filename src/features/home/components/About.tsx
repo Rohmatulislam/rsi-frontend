@@ -64,17 +64,18 @@ export const About = () => {
                 }}
               />
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20" />
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-ramadan-gold/10 to-emerald-900/40" />
+              <div className="absolute inset-0 bg-islamic-pattern opacity-10 pointer-events-none" />
 
               {/* Floating badge */}
-              <div className="absolute bottom-6 left-6 bg-card/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Award className="h-6 w-6 text-primary" />
+              <div className="absolute bottom-6 left-6 bg-card/95 backdrop-blur-md p-5 rounded-2xl shadow-2xl border-2 border-ramadan-gold/30 ramadan-glow">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-ramadan-gold/10 rounded-xl">
+                    <Award className="h-7 w-7 text-ramadan-gold" />
                   </div>
                   <div>
-                    <p className="font-bold text-lg">{t("accredited")}</p>
-                    <p className="text-sm text-muted-foreground">{t("accredited_standard")}</p>
+                    <p className="font-black text-xl tracking-tight text-slate-900">{t("accredited")}</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-ramadan-gold">{t("accredited_standard")}</p>
                   </div>
                 </div>
               </div>
@@ -82,11 +83,14 @@ export const About = () => {
           </div>
 
           {/* Right Side - Content */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             <div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
                 {t("hospital_type")} <br />{" "}
-                <span className="text-primary">{t("hospital_name")}</span>
+                <span className="text-primary relative inline-block">
+                  {t("hospital_name")}
+                  <div className="absolute -bottom-2 left-0 w-1/3 h-1.5 bg-ramadan-gold rounded-full" />
+                </span>
               </h2>
 
               {/* Description */}

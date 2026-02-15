@@ -82,7 +82,9 @@ export const BannerCarousel = () => {
     const currentBanner = banners[currentIndex];
 
     return (
-        <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
+        <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-b-4 border-ramadan-gold/30">
+            {/* Subtle Ramadan pattern overlay */}
+            <div className="absolute inset-0 bg-islamic-pattern opacity-10 pointer-events-none z-10" />
             {/* Banner Image & Content */}
             <div className="relative w-full h-full">
                 {/* Background Image */}

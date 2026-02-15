@@ -42,9 +42,10 @@ const ServiceCard = ({
     href?: string;
     color?: string;
 }) => {
+    const isRamadanAccent = color === "accent";
     const colorClasses = {
         primary: "bg-blue-500/10 group-hover:bg-blue-500/20 text-blue-600 dark:text-blue-400",
-        accent: "bg-amber-500/10 group-hover:bg-amber-500/20 text-amber-600 dark:text-amber-400",
+        accent: "bg-ramadan-gold/10 group-hover:bg-ramadan-gold/20 text-ramadan-gold group-hover:scale-110",
         success: "bg-green-500/10 group-hover:bg-green-500/20 text-green-600 dark:text-green-400",
         purple: "bg-purple-500/10 group-hover:bg-purple-500/20 text-purple-600 dark:text-purple-400",
         rose: "bg-rose-500/10 group-hover:bg-rose-500/20 text-rose-600 dark:text-rose-400",
@@ -53,13 +54,13 @@ const ServiceCard = ({
 
     const CardContent = (
         <div
-            className={`group bg-card hover:bg-card/80 border border-border rounded-xl p-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 cursor-pointer h-full min-h-[140px] flex items-center justify-center`}
+            className={`group bg-card hover:bg-card/80 border ${isRamadanAccent ? 'border-ramadan-gold/50 ramadan-glow' : 'border-border'} rounded-xl p-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 cursor-pointer h-full min-h-[140px] flex items-center justify-center`}
         >
             <div className="flex flex-col items-center gap-3 text-center">
                 <div className={`p-3 rounded-full transition-all duration-300 ${colorClasses[color as keyof typeof colorClasses] || colorClasses.primary}`}>
                     <Icon className="h-7 w-7" />
                 </div>
-                <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors line-clamp-2">
+                <h3 className={`font-semibold text-xs sm:text-sm ${isRamadanAccent ? 'text-slate-800' : 'group-hover:text-primary'} transition-colors line-clamp-2`}>
                     {title}
                 </h3>
             </div>
@@ -106,7 +107,7 @@ export const ServiceCardsSection = () => {
     const displayServices = [...defaultServices, ...dynamicServices].slice(0, 6);
 
     return (
-        <section className="w-full relative z-10 -mt-20 pb-8">
+        <section className="w-full relative z-10 pb-8">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="flex justify-center w-full">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl w-full">

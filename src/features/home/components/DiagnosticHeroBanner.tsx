@@ -7,9 +7,10 @@ import { Button } from "~/components/ui/button";
 export const DiagnosticHeroBanner = () => {
     return (
         <section className="container mx-auto px-4 md:px-8 py-12">
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white shadow-2xl shadow-emerald-500/20 group">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 text-white shadow-2xl shadow-emerald-900/40 group border border-ramadan-gold/20">
                 {/* Decorative background elements */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl animate-pulse" />
+                <div className="absolute inset-0 bg-islamic-pattern opacity-[0.05] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-ramadan-gold/10 rounded-full -mr-48 -mt-48 blur-3xl animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/20 rounded-full -ml-32 -mb-32 blur-2xl" />
 
                 <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 md:p-14 items-center">
