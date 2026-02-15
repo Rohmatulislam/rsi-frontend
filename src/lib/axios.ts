@@ -3,14 +3,14 @@ import { LOCAL_STORAGE_BETTER_AUTH_TOKEN_KEY } from "~/features/auth/constants/l
 
 // Function to resolve baseURL dynamically
 const getBaseURL = () => {
-  const envURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2002/api';
+  const envURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2005/api';
 
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
     // If accessing via an IP address (not localhost), use the same IP for the API
     const isIP = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname);
     if (isIP && hostname !== "127.0.0.1") {
-      return `http://${hostname}:2002/api/`;
+      return `http://${hostname}:2005/api/`;
     }
   }
   return envURL.endsWith('/') ? envURL : `${envURL}/`;
