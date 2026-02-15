@@ -3,8 +3,9 @@
 import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { useCreateSchedule, CreateScheduleDto } from "~/features/admin/api/schedules/createSchedule";
 import { useDeleteSchedule } from "~/features/admin/api/schedules/deleteSchedule";
+import { useSyncDoctors } from "~/features/admin/api/syncDoctors";
 import { useState } from "react";
-import { Search, Clock, CalendarDays, Plus, Trash2, X, Save } from "lucide-react";
+import { Search, Clock, CalendarDays, Plus, Trash2, X, Save, RefreshCw } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 export default function AdminSchedulesPage() {
@@ -14,6 +15,7 @@ export default function AdminSchedulesPage() {
 
     const { mutate: createSchedule, isPending: isCreating } = useCreateSchedule();
     const { mutate: deleteSchedule, isPending: isDeleting } = useDeleteSchedule();
+    const { mutate: syncDoctors, isPending: isSyncing } = useSyncDoctors();
 
     const [search, setSearch] = useState("");
     const [addingToDocId, setAddingToDocId] = useState<string | null>(null);
@@ -65,6 +67,12 @@ export default function AdminSchedulesPage() {
         }
     };
 
+    const handleSync = () => {
+        if (confirm("Sinkronisasi jadwal dengan Khanza sekarang? (Akan mengirim notifikasi perubahan jika ada)")) {
+            syncDoctors();
+        }
+    };
+
     if (isLoading) return <div>Loading...</div>;
 
     return (
@@ -74,6 +82,15 @@ export default function AdminSchedulesPage() {
                     <h1 className="text-2xl font-bold text-slate-900">Jadwal Dokter</h1>
                     <p className="text-slate-500">Lihat dan kelola jadwal praktek dokter</p>
                 </div>
+                <Button
+                    onClick={handleSync}
+                    disabled={isSyncing}
+                    variant="outline"
+                    className="gap-2 border-primary text-primary hover:bg-primary/5"
+                >
+                    <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                    {isSyncing ? 'Sedang Sinkronisasi...' : 'Sinkronisasi Jadwal'}
+                </Button>
             </div>
 
             <div className="relative max-w-md">
@@ -106,12 +123,19 @@ export default function AdminSchedulesPage() {
                                         .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
                                         .map((sched, idx) => {
                                             const nextDate = getNextDate(sched.dayOfWeek);
+                                            // Find poli name from scheduleDetails if available
+                                            const poliDetail = doc.scheduleDetails?.find(d => d.kd_poli === sched.kd_poli);
+                                            const poliName = poliDetail?.nm_poli || sched.kd_poli || 'Umum';
+
                                             return (
                                                 <div key={sched.id || idx} className="flex items-center justify-between text-sm gap-3 group bg-slate-50 p-3 rounded-lg border border-slate-100/60 hover:border-slate-200 transition-colors">
                                                     <div className="flex flex-col gap-1.5">
                                                         <div className="font-semibold text-slate-700 flex items-center gap-2 text-sm">
                                                             <CalendarDays className="w-3.5 h-3.5 text-primary" />
                                                             <span>{days[sched.dayOfWeek]}, {formatDate(nextDate)}</span>
+                                                            <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tight">
+                                                                {poliName.replace('Poliklinik ', '').replace('Kandungan ', '')}
+                                                            </span>
                                                         </div>
                                                         <div className="flex items-center gap-2 text-slate-500 text-xs ml-5">
                                                             <div className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded">

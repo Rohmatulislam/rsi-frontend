@@ -355,12 +355,13 @@ export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: 
     // Build payload based on patient type
     const payload: any = {
       doctorId: doctor?.id || null,
-      poliId: formData.poliId, // Include the selected poli
+      poliId: formData.poliId,
       bookingDate: formData.date,
-      bookingTime: formData.time, // Include the selected time
+      bookingTime: formData.time,
       patientType: formData.patientType,
       paymentType: formData.paymentType,
-      createdByUserId: user?.id || null, // Track user yang membuat booking
+      // Priority: 1. User from hook arg (session), 2. Local storage or context if available
+      createdByUserId: user?.id || null,
       serviceItemId: formData.serviceItemId,
       serviceItemName: formData.serviceItemName,
     };
@@ -424,24 +425,48 @@ export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: 
       },
       onError: (error: any) => {
         toast.dismiss(loadingToast); // Remove loading toast
-        const errorMessage = error?.response?.data?.message ||
-          error?.response?.data?.error ||
-          error?.message ||
-          "Gagal membuat janji temu. Mohon coba kembali.";
+
+        // Extract meaningful message, avoid "Request failed with status code 400"
+        let errorMessage = "Gagal membuat janji temu. Mohon coba kembali.";
+
+        if (error?.response?.data?.message) {
+          // If message is array (class-validator), join them
+          if (Array.isArray(error.response.data.message)) {
+            errorMessage = error.response.data.message.join(', ');
+          } else {
+            errorMessage = error.response.data.message;
+          }
+        } else if (error?.response?.data?.error && typeof error.response.data.error === 'string') {
+          errorMessage = error.response.data.error;
+        }
 
         // More specific error handling
-        if (error?.response?.status === 429) {
+        if (errorMessage.toLowerCase().includes('sudah terdaftar') || errorMessage.toLowerCase().includes('already exists')) {
+          toast.error("Booking Gagal: Duplikasi", {
+            duration: 6000,
+            description: errorMessage
+          });
+        } else if (error?.response?.status === 429) {
           toast.error("Terlalu banyak permintaan. Mohon tunggu sebentar sebelum mencoba kembali.", {
             duration: 5000,
           });
         } else if (error?.response?.status === 400) {
-          toast.error(errorMessage, {
-            duration: 5000,
-          });
+          // Only show specific message if it exists and isn't the generic axios error
+          if (!errorMessage.includes('status code')) {
+            toast.error("Data Tidak Valid", {
+              duration: 5000,
+              description: errorMessage
+            });
+          } else {
+            toast.error("Gagal Memproses Booking", {
+              duration: 5000,
+              description: "Mohon periksa kembali data yang Anda masukkan."
+            });
+          }
         } else {
-          toast.error(errorMessage, {
+          toast.error("Terjadi Kesalahan", {
             duration: 7000,
-            description: "Pastikan data yang Anda masukkan sudah benar dan lengkap."
+            description: "Silakan coba lagi beberapa saat lagi."
           });
         }
         console.error('Booking error:', error);

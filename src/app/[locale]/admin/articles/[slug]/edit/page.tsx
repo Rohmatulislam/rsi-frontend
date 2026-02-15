@@ -18,17 +18,6 @@ export default function EditArticlePage({ params }: { params: Promise<{ slug: st
     const { data: article, isLoading } = useGetArticleBySlug({ slug: originalSlug });
     const updateArticle = useUpdateArticle();
 
-    console.log('>>> [EditArticlePage] Rendered with originalSlug:', originalSlug);
-
-    useEffect(() => {
-        if (originalSlug) {
-            // alert(`DEBUG: Edit Page Mounted. Slug: ${originalSlug}`);
-            console.log(`DEBUG: Edit Page Mounted. Slug: ${originalSlug}`);
-        } else {
-            alert("DEBUG: Slug is MISSING from params!");
-        }
-    }, [originalSlug]);
-
     const [formData, setFormData] = useState({
         title: "",
         slug: "",

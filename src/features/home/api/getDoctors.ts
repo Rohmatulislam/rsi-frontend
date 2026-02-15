@@ -41,6 +41,7 @@ export type DoctorDto = {
         dayOfWeek: number;
         startTime: string;
         endTime: string;
+        kd_poli?: string | null;
     }[];
     categories: {
         name: string;

@@ -71,7 +71,7 @@ export const AppointmentBookingModal = ({
     resetForm,
     handleSubmit,
     loading
-  } = useAppointmentForm(doctor, user?.id, serviceItem, initialPoliId);
+  } = useAppointmentForm(doctor, user, serviceItem, initialPoliId);
 
   const handleNext = async () => {
     // Validation before moving to next step

@@ -38,7 +38,7 @@ export default function AdminArticlesPage() {
 
     const handleEdit = (article: ArticleDto) => {
         if (!article.slug) {
-            alert("DATA KORUP: Artikel ini tidak memiliki slug. Mohon hapus artikel ini dan buat baru.");
+            alert("Error: Artikel ini data-nya tidak lengkap (missing slug). Mohon hapus dan buat baru.");
             return;
         }
         setCurrentArticle(article);
@@ -47,7 +47,6 @@ export default function AdminArticlesPage() {
 
     const handleSave = (data: CreateArticleDto | UpdateArticleDto, isEdit: boolean) => {
         if (isEdit && currentArticle) {
-            console.log(`>>> [AdminArticlesPage] Saving Edit. Slug: '${currentArticle.slug}'`);
             if (!currentArticle.slug) {
                 alert("Critical Error: Original slug is missing!");
                 return;

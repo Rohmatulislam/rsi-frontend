@@ -9,6 +9,7 @@ interface Schedule {
   startTime: string;
   endTime: string;
   isActive?: boolean;
+  nm_poli?: string; // Nama poli untuk ditampilkan di jadwal
 }
 
 interface ScheduleSectionProps {
@@ -171,11 +172,12 @@ export const ScheduleSection = ({ schedules, fallbackSchedules = [] }: ScheduleS
                   key={idx}
                   className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className={`h-14 w-14 flex flex-col items-center justify-center rounded-xl ${
-                    schedule.isActive ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' : 'bg-slate-100 dark:bg-slate-700'
-                  }`}>
+                  <div className={`h-16 w-16 flex flex-col items-center justify-center rounded-xl ${schedule.isActive ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' : 'bg-slate-100 dark:bg-slate-700'} shrink-0`}>
                     <span className="text-xs uppercase text-muted-foreground font-medium">{displayAbbr}</span>
                     <span className="text-[10px] font-bold">{hasSpecificDate && schedule.date ? displayDay : ''}</span>
+                    {schedule.nm_poli && (
+                      <span className="text-[9px] text-center leading-tight text-blue-600 dark:text-blue-300 mt-0.5 px-0.5">{schedule.nm_poli.replace('Poliklinik ', '')}</span>
+                    )}
                   </div>
 
                   <div className="flex-1">
@@ -189,11 +191,10 @@ export const ScheduleSection = ({ schedules, fallbackSchedules = [] }: ScheduleS
                       </div>
                       <Badge
                         variant="secondary"
-                        className={`text-xs px-2 py-1 ${
-                          schedule.isActive !== undefined ?
+                        className={`text-xs px-2 py-1 ${schedule.isActive !== undefined ?
                           (schedule.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300')
                           : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                        }`}
+                          }`}
                       >
                         {schedule.isActive !== undefined ?
                           (schedule.isActive ? 'Tersedia' : 'Tertutup')

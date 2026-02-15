@@ -8,7 +8,6 @@ export const updateArticle = async ({ slug, data }: { slug: string; data: Update
         throw new Error(`Invalid article slug for update: ${slug}`);
     }
     const url = `articles/${slug}`;
-    console.log(`>>> [admin/updateArticle] PATCH URL: ${url} (slug: '${slug}')`);
     return axiosInstance.patch<ArticleDto>(url, data).then((res) => res.data);
 };
 
