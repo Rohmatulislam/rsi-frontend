@@ -7,7 +7,7 @@ export const POLI_KEYWORDS_REGEX = /(poliklinik|poli|klinik|eksekutif|ekskutif|e
 /**
  * Normalizes a poliklinik name by removing noise and standardizing "Eksekutif"
  */
-export function normalizePoliName(name: string): string {
+export function normalizePoliName(name: string | undefined | null): string {
     if (!name) return '';
 
     let normalized = name.replace(POLI_KEYWORDS_REGEX, (match) => {
@@ -24,7 +24,7 @@ export function normalizePoliName(name: string): string {
 /**
  * Checks if a name indicates executive service
  */
-export function isExecutiveName(name: string): boolean {
+export function isExecutiveName(name: string | undefined | null): boolean {
     if (!name) return false;
     const lower = name.toLowerCase();
     return lower.includes('eksekutif') ||
@@ -35,7 +35,7 @@ export function isExecutiveName(name: string): boolean {
 /**
  * Formats name for display, standardizing "Eksekutif"
  */
-export function formatDisplayPoliName(name: string): string {
+export function formatDisplayPoliName(name: string | undefined | null): string {
     if (!name) return '';
     return name.replace(/(eksekutif|ekskutif|executive)/gi, 'Eksekutif').trim();
 }

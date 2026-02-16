@@ -148,7 +148,7 @@ export const PoliDetailPage = ({ id }: PoliDetailPageProps) => {
                                         Live Antrian
                                     </h3>
                                 </div>
-                                <QueueInfoCard poliId={id} poliName={item.name} />
+                                <QueueInfoCard poliId={id} poliName={formatDisplayPoliName(item.name)} />
                             </div>
                         </div>
                     </div>
@@ -288,11 +288,11 @@ const QueueInfoCard = ({ poliId, poliName }: { poliId: string, poliName: string 
         if (lastCalledQueue.current !== queue.current) {
             lastCalledQueue.current = queue.current;
 
-            // Normalize poli name (remove 'Poli' prefix if exists for better speech)
-            const spokenPoliName = poliName.replace(/^Poli\s+/i, '');
+            // Normalize poli name using standard utility
+            const normalizedPoli = normalizePoliName(poliName);
 
             // Format text to speech
-            const textToSpeak = `Nomor Antrean... ${queue.current.split('').join(' ')}... Silakan masuk ke Poli ${spokenPoliName}`;
+            const textToSpeak = `Nomor Antrean... ${queue.current.split('').join(' ')}... Silakan masuk ke Poli ${normalizedPoli}`;
 
             if ('speechSynthesis' in window) {
                 // Cancel previous speech if any

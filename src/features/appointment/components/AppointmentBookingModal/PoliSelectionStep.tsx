@@ -4,6 +4,7 @@ import { AppointmentFormData } from "~/features/appointment/services/appointment
 import { useGetActivePoli } from "~/features/doctor/api/getActivePoli";
 import Image from "next/image";
 import { Stethoscope } from "lucide-react";
+import { formatDisplayPoliName } from "~/lib/utils/naming";
 
 interface PoliSelectionStepProps {
   formData: AppointmentFormData;
@@ -26,11 +27,11 @@ export const PoliSelectionStep = ({
   const filteredPolis = !doctor
     ? activePolis
     : activePolis?.filter((poli: any) =>
-      doctorCategoryNames.length === 0 ||
-      doctorCategoryNames.some((catName: string) =>
-        poli.nm_poli.toLowerCase().includes(catName.toLowerCase()) ||
-        catName.toLowerCase().includes(poli.nm_poli.toLowerCase())
-      )
+      poli && (doctorCategoryNames.length === 0 ||
+        doctorCategoryNames.some((catName: string) =>
+          catName && poli.nm_poli?.toLowerCase().includes(catName.toLowerCase()) ||
+          (catName && poli.nm_poli && catName.toLowerCase().includes(poli.nm_poli.toLowerCase()))
+        ))
     ) || [];
 
   if (isLoading) {
@@ -141,25 +142,15 @@ export const PoliSelectionStep = ({
                   : 'text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary'
                   }`}
                 onClick={() => {
-                  console.log('Poli dipilih:', {
-                    id: poli.kd_poli,
-                    name: poli.nm_poli,
-                    full_poli: poli
-                  });
-
+                  if (!poli) return;
                   setFormData({
                     ...formData,
-                    poliId: poli.kd_poli, // gunakan kode poli dari SIMRS
-                    poliName: poli.nm_poli
-                  });
-
-                  console.log('formData setelah pemilihan:', {
                     poliId: poli.kd_poli,
                     poliName: poli.nm_poli
                   });
                 }}
               >
-                {poli.nm_poli}
+                {formatDisplayPoliName(poli?.nm_poli)}
               </button>
             ))}
           </div>
@@ -176,7 +167,7 @@ export const PoliSelectionStep = ({
         {formData.poliId && (
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
             <p className="font-medium text-blue-900 dark:text-blue-100">
-              Anda memilih: {formData.poliName}
+              Anda memilih: {formatDisplayPoliName(formData.poliName)}
             </p>
             <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
               ID Poliklinik: {formData.poliId}

@@ -43,8 +43,8 @@ export const DoctorCard = ({
 }) => {
   // Group schedule details by poli name for display, filtering out schedules with 00:00:00-00:00:00
   const filteredScheduleDetails = doctor.scheduleDetails?.filter(schedule =>
-    schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
-  );
+    schedule && schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+  ) || [];
 
   // Determine relevant poli context (useful if navigated from Poli Detail)
   // If scheduleDetails is present, we likely have a poli context
@@ -58,7 +58,8 @@ export const DoctorCard = ({
 
   const isToday = (primarySchedule as any)?.is_today;
 
-  const groupedSchedules = filteredScheduleDetails?.reduce((acc, schedule) => {
+  const groupedSchedules = filteredScheduleDetails.reduce((acc, schedule) => {
+    if (!schedule) return acc;
     const poliName = schedule.nm_poli || `Poli ${doctor.specialization || 'Umum'}`;
     if (!acc[poliName]) {
       acc[poliName] = [];
@@ -105,14 +106,14 @@ export const DoctorCard = ({
   if (!hideSchedule && doctor.schedules && doctor.schedules.length > 0) {
     // Ambil jadwal pertama yang bukan jam 00:00:00 dari array schedules
     const validSchedules = doctor.schedules.filter(schedule =>
-      schedule.startTime !== '00:00:00' && schedule.endTime !== '00:00:00'
+      schedule && schedule.startTime !== '00:00:00' && schedule.endTime !== '00:00:00'
     );
 
     if (validSchedules.length > 0) {
       const schedule = validSchedules[0];
-      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek];
+      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek] || 'Jadwal';
       const nextDate = getNextDateForDay(schedule.dayOfWeek);
-      nearestSchedule = `${hari}, ${nextDate} (${schedule.startTime})`;
+      nearestSchedule = `${hari}, ${nextDate} (${schedule.startTime || '--:--'})`;
     }
   }
 

@@ -8,6 +8,7 @@
     "start": "next start --hostname 0.0.0.0",
     "prod-local": "npm run build && npm run start",
     "lint": "eslint",
+    "test:e2e": "playwright test",
     "build:pages": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

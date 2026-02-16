@@ -1,6 +1,7 @@
 import { Clock, Calendar } from "lucide-react";
 import { DoctorDto } from "~/features/home/api/getDoctors";
 import { cn } from "~/lib/utils";
+import { formatDisplayPoliName } from "~/lib/utils/naming";
 
 interface DoctorScheduleByPoliProps {
   doctor: DoctorDto;
@@ -55,11 +56,12 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
 
   // Filter out schedules with 00:00:00-00:00:00 and group by poli name
   const filteredScheduleDetails = doctor.scheduleDetails?.filter(schedule =>
-    schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
-  );
+    schedule && schedule.jam_mulai !== '00:00:00' && schedule.jam_selesai !== '00:00:00'
+  ) || [];
 
-  const groupedSchedules = filteredScheduleDetails?.reduce((acc, schedule) => {
-    const poliName = schedule.nm_poli || `Poli ${doctor.specialization || 'Umum'}`;
+  const groupedSchedules = filteredScheduleDetails.reduce((acc, schedule) => {
+    if (!schedule) return acc;
+    const poliName = formatDisplayPoliName(schedule.nm_poli || `Poli ${doctor.specialization || 'Umum'}`);
     if (!acc[poliName]) {
       acc[poliName] = [];
     }
@@ -90,7 +92,8 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
 
           <div className="space-y-2">
             {schedules.map((schedule, index) => {
-              const dayName = hariMapping[schedule.hari_kerja] || schedule.hari_kerja;
+              if (!schedule) return null;
+              const dayName = hariMapping[schedule.hari_kerja] || schedule.hari_kerja || 'Jadwal';
 
               // Dapatkan tanggal dan status hari ini
               const dayMap: Record<string, number> = {
