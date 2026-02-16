@@ -18,12 +18,6 @@ export const PartnershipSection = () => {
 
     return (
         <section className="py-24 relative overflow-hidden">
-            <div className="container mx-auto px-4 mb-16 text-center">
-                <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-[0.2em] uppercase">
-                    Kemitraan Kami
-                </h2>
-                <div className="w-24 h-1.5 bg-ramadan-gold mx-auto mt-6 rounded-full" />
-            </div>
 
             <div className="relative flex overflow-x-hidden group">
                 <div className="flex animate-marquee whitespace-nowrap py-4">

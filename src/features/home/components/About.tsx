@@ -46,8 +46,7 @@ export const About = () => {
   const displayFeatures = features.length > 0 ? features : defaultFeatures;
 
   return (
-    <section className="w-full container mx-auto px-4 space-y-16 md:py-24">
-      <h2 className="text-3xl font-bold text-center">{t("title")}</h2>
+    <section className="w-full container mx-auto px-4 space-y-16">
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Image */}

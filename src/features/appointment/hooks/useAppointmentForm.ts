@@ -69,21 +69,33 @@ export const useAppointmentForm = (doctor: any, user?: any, serviceItem?: { id: 
 
   // NEW: Auto-fill for New Patient using User Profile data
   useEffect(() => {
-    // Only auto-fill if user is logged in AND it's a new paitent type
-    // AND the form fields for these are still empty (to avoid overwriting manual changes or drafts)
-    if (user && formData.patientType === 'new' && !formData.nik && !formData.fullName) {
-      console.log('✨ [AUTO-FILL] Populating form with user profile data');
-
-      setFormData(prev => ({
-        ...prev,
-        nik: (user as any).nik || prev.nik,
-        fullName: user.name || prev.fullName,
-        phone: (user as any).phoneNumber || (user as any).phone || prev.phone,
-        email: user.email || prev.email,
-        address: (user as any).address || prev.address,
-        birthDate: (user as any).birthDate || prev.birthDate,
-        gender: (user as any).gender || prev.gender,
-      }));
+    // Only auto-fill if user is logged in
+    if (user) {
+      // 1. If user has noRM, prioritize 'old' patient type and fill mrNumber
+      if (user.noRM && !formData.mrNumber) {
+        console.log('✨ [AUTO-FILL] User has No. RM, setting patientType to old');
+        setFormData(prev => ({
+          ...prev,
+          patientType: 'old',
+          mrNumber: user.noRM,
+        }));
+        // Auto-search for the patient data to fill other fields
+        searchPatient(user.noRM);
+      }
+      // 2. If it's a new patient type or no noRM found, fill personal data
+      else if (formData.patientType === 'new' && !formData.nik && !formData.fullName) {
+        console.log('✨ [AUTO-FILL] Populating new patient form with user profile data');
+        setFormData(prev => ({
+          ...prev,
+          nik: user.profile?.nik || user.nik || prev.nik,
+          fullName: user.name || prev.fullName,
+          phone: user.profile?.phone || user.phoneNumber || prev.phone,
+          email: user.email || prev.email,
+          address: user.profile?.address || prev.address,
+          birthDate: user.profile?.birthDate || prev.birthDate,
+          gender: user.profile?.gender || prev.gender,
+        }));
+      }
     }
   }, [user, formData.patientType]);
 

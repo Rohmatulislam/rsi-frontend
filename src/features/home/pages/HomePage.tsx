@@ -10,6 +10,19 @@ import { RamadanDecorativeElements } from "../components/RamadanDecorativeElemen
 import { RamadanImsakiyahWidget } from "../components/RamadanImsakiyahWidget";
 import Link from "next/link";
 
+const SectionHeading = ({ title, subtitle, center }: { title: string; subtitle: string; center?: boolean }) => (
+  <div className={`mb-12 space-y-4 ${center ? 'text-center' : ''}`}>
+    <h2 className={`text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-4 ${center ? 'justify-center' : ''}`}>
+      {!center && <div className="h-10 w-2 bg-ramadan-gold rounded-full" />}
+      {title}
+      {center && <div className="h-2 w-16 bg-ramadan-gold rounded-full" />}
+    </h2>
+    <p className={`text-lg text-muted-foreground font-medium max-w-2xl ${center ? 'mx-auto' : ''}`}>
+      {subtitle}
+    </p>
+  </div>
+);
+
 const HomePage = () => {
   return (
     <div className="relative min-h-screen bg-background selection:bg-ramadan-gold selection:text-white">
@@ -29,22 +42,34 @@ const HomePage = () => {
         <DiagnosticHeroBanner />
       </div>
 
-      <div className="space-y-20 py-20 bg-islamic-pattern/5">
-        <section className="relative container mx-auto px-4">
+      <div className="space-y-0 py-20">
+        {/* About Section */}
+        <section className="relative container mx-auto px-4 py-20">
+          <SectionHeading title="Tentang Kami" subtitle="Melayani dengan hati, berlandaskan nilai-nilai Islami" />
           <About />
         </section>
 
-        <section className="bg-slate-50/80 py-20 border-y border-ramadan-gold/10 relative overflow-hidden">
+        {/* Doctors Section */}
+        <section className="bg-slate-50/80 py-24 border-y border-ramadan-gold/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
-          <RecommendedDoctorsSection />
+          <div className="container mx-auto">
+            <RecommendedDoctorsSection />
+          </div>
         </section>
 
-        <section className="relative container mx-auto px-4">
+        {/* Articles Section */}
+        <section className="relative container mx-auto px-4 py-24">
+          <SectionHeading title="Artikel Kesehatan" subtitle="Tips dan informasi kesehatan terkini selama bulan Ramadan" />
           <ArticlesSection />
         </section>
 
-        <section className="bg-white py-20 border-t border-slate-100">
-          <PartnershipSection />
+        {/* Partnership Section */}
+        <section className="bg-white py-24 border-t border-slate-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-islamic-pattern opacity-[0.02] pointer-events-none" />
+          <div className="container mx-auto px-4">
+            <SectionHeading title="Kemitraan & Asuransi" subtitle="Kami bekerjasama dengan berbagai mitra terpercaya untuk kemudahan Anda" center />
+            <PartnershipSection />
+          </div>
         </section>
       </div>
     </div>

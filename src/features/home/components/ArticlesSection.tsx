@@ -51,13 +51,6 @@ export const ArticlesSection = () => {
                             viewport={{ once: true }}
                             className="relative z-10"
                         >
-                            <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-8 leading-tight">
-                                {t("latest_articles")}
-                                <span className="text-ramadan-gold ml-2">.</span>
-                            </h2>
-                            <p className="text-slate-600 dark:text-slate-400 text-lg mb-8 leading-relaxed font-medium">
-                                Temukan informasi kesehatan terpilih untuk menjaga kebugaran selama bulan Ramadan dan seterusnya.
-                            </p>
                             <Link
                                 href="/artikel"
                                 className="inline-flex items-center gap-3 bg-ramadan-gold/10 text-ramadan-gold px-6 py-3 rounded-2xl font-black text-sm group mb-10 hover:bg-ramadan-gold hover:text-white transition-all duration-500 shadow-xl shadow-ramadan-gold/10"

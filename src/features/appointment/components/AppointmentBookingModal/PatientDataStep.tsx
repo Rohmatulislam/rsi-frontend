@@ -1,11 +1,14 @@
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
 import { Textarea } from "~/components/ui/textarea";
 import { AppointmentFormData, PatientSearchState } from "../../services/appointmentService";
 import Image from "next/image";
-import { Stethoscope, Calendar, Clock, MapPin, Wallet, ClipboardCheck, CheckCircle2, AlertCircle } from "lucide-react";
+import { Stethoscope, Calendar, Clock, MapPin, Wallet, ClipboardCheck, CheckCircle2, AlertCircle, User, Phone, ShieldCheck, ChevronRight, ChevronLeft } from "lucide-react";
 import { useGetPaymentMethods } from "~/features/doctor/api/getPaymentMethods";
+import { useState } from "react";
 
 interface PatientDataStepProps {
   formData: AppointmentFormData;
@@ -24,6 +27,7 @@ export const PatientDataStep = ({
   searchPatient,
   doctor
 }: PatientDataStepProps) => {
+  const [subStep, setSubStep] = useState(1);
   // Fetch payment methods from Khanza
   const { data: paymentMethods, isLoading: isLoadingPayments } = useGetPaymentMethods();
 
@@ -239,144 +243,226 @@ export const PatientDataStep = ({
           </div>
         </div>
       ) : (
-        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-          <div className="space-y-2">
-            <Label>NIK <span className="text-red-500">*</span></Label>
-            <Input
-              placeholder="16 digit NIK"
-              value={formData.nik}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
-                if (value.length <= 16) {
-                  setFormData({ ...formData, nik: value });
-                }
-              }}
-              onBlur={() => {
-                if (formData.nik && formData.nik.length === 16 && !patientSearch.found && !patientSearch.loading) {
-                  searchPatient(formData.nik);
-                }
-              }}
-              className="rounded-xl"
-              maxLength={16}
-            />
-            {formData.nik && formData.nik.length !== 16 && (
-              <p className="text-xs text-red-500">NIK harus 16 digit angka</p>
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
+          {/* Sub-step indicator */}
+          <div className="flex items-center justify-between mb-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${subStep >= i ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
+                  {i === 1 && <User className="h-4 w-4" />}
+                  {i === 2 && <Phone className="h-4 w-4" />}
+                  {i === 3 && <ShieldCheck className="h-4 w-4" />}
+                </div>
+                {i < 3 && <div className={`h-1 w-8 sm:w-16 rounded-full ${subStep > i ? 'bg-primary' : 'bg-muted'}`} />}
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10">
+            <h3 className="text-sm font-bold text-primary mb-4 flex items-center gap-2 italic">
+              {subStep === 1 && "Langkah 1: Identitas Dasar"}
+              {subStep === 2 && "Langkah 2: Kontak & Alamat"}
+              {subStep === 3 && "Langkah 3: Data Administrasi"}
+            </h3>
+
+            {subStep === 1 && (
+              <div className="space-y-4 animate-in slide-in-from-right-2 duration-300">
+                <div className="space-y-2">
+                  <Label>NIK <span className="text-red-500">*</span></Label>
+                  <Input
+                    placeholder="16 digit NIK"
+                    value={formData.nik}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      if (value.length <= 16) {
+                        setFormData({ ...formData, nik: value });
+                      }
+                    }}
+                    onBlur={() => {
+                      if (formData.nik && formData.nik.length === 16 && !patientSearch.found && !patientSearch.loading) {
+                        searchPatient(formData.nik);
+                      }
+                    }}
+                    className="rounded-xl h-11"
+                    maxLength={16}
+                  />
+                  {formData.nik && formData.nik.length !== 16 && (
+                    <p className="text-[10px] text-red-500 font-medium">NIK harus 16 digit angka</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>Nama Lengkap <span className="text-red-500">*</span></Label>
+                  <Input
+                    placeholder="Sesuai KTP"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="rounded-xl h-11"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Tanggal Lahir <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                      className="rounded-xl h-11"
+                      max={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Jenis Kelamin <span className="text-red-500">*</span></Label>
+                    <Select value={formData.gender} onValueChange={(val: 'L' | 'P' | '') => setFormData({ ...formData, gender: val })}>
+                      <SelectTrigger className="rounded-xl h-11">
+                        <SelectValue placeholder="Pilih" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="L">Laki-laki</SelectItem>
+                        <SelectItem value="P">Perempuan</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
             )}
-          </div>
-          <div className="space-y-2">
-            <Label>Nama Lengkap <span className="text-red-500">*</span></Label>
-            <Input
-              placeholder="Sesuai KTP"
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              className="rounded-xl"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Tanggal Lahir <span className="text-red-500">*</span></Label>
-              <Input
-                type="date"
-                value={formData.birthDate}
-                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                className="rounded-xl"
-                max={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Jenis Kelamin <span className="text-red-500">*</span></Label>
-              <Select value={formData.gender} onValueChange={(val: 'L' | 'P' | '') => setFormData({ ...formData, gender: val })}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Pilih" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="L">Laki-laki</SelectItem>
-                  <SelectItem value="P">Perempuan</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Agama <span className="text-red-500">*</span></Label>
-            <Select
-              value={formData.religion}
-              onValueChange={(val: string) => setFormData({ ...formData, religion: val })}
-            >
-              <SelectTrigger className="rounded-xl">
-                <SelectValue placeholder="Pilih agama" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ISLAM">Islam</SelectItem>
-                <SelectItem value="KRISTEN">Kristen</SelectItem>
-                <SelectItem value="KATOLIK">Katolik</SelectItem>
-                <SelectItem value="HINDU">Hindu</SelectItem>
-                <SelectItem value="BUDDHA">Buddha</SelectItem>
-                <SelectItem value="KONGHUCU">Konghucu</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>No. Telepon <span className="text-red-500">*</span></Label>
-            <Input
-              placeholder="08xxxxxxxxxx"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="rounded-xl"
-              type="tel"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Email (Opsional)</Label>
-            <Input
-              placeholder="email@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="rounded-xl"
-              type="email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Alamat (Opsional)</Label>
-            <Input
-              placeholder="Alamat lengkap"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="rounded-xl"
-            />
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Penanggung Jawab <span className="text-red-500">*</span></Label>
-              <Input
-                placeholder="Nama penanggung jawab"
-                value={formData.penanggungJawab}
-                onChange={(e) => setFormData({ ...formData, penanggungJawab: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Hubungan <span className="text-red-500">*</span></Label>
-              <Select
-                value={formData.hubunganPenanggungJawab}
-                onValueChange={(val: string) => setFormData({ ...formData, hubunganPenanggungJawab: val })}
-              >
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Pilih hubungan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DIRI SENDIRI">Diri Sendiri</SelectItem>
-                  <SelectItem value="ORANG TUA">Orang Tua</SelectItem>
-                  <SelectItem value="SUAMI">Suami</SelectItem>
-                  <SelectItem value="ISTRI">Istri</SelectItem>
-                  <SelectItem value="ANAK">Anak</SelectItem>
-                  <SelectItem value="SAUDARA">Saudara</SelectItem>
-                  <SelectItem value="LAINNYA">Lainnya</SelectItem>
-                </SelectContent>
-              </Select>
+            {subStep === 2 && (
+              <div className="space-y-4 animate-in slide-in-from-right-2 duration-300">
+                <div className="space-y-2">
+                  <Label>Agama <span className="text-red-500">*</span></Label>
+                  <Select
+                    value={formData.religion}
+                    onValueChange={(val: string) => setFormData({ ...formData, religion: val })}
+                  >
+                    <SelectTrigger className="rounded-xl h-11">
+                      <SelectValue placeholder="Pilih agama" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ISLAM">Islam</SelectItem>
+                      <SelectItem value="KRISTEN">Kristen</SelectItem>
+                      <SelectItem value="KATOLIK">Katolik</SelectItem>
+                      <SelectItem value="HINDU">Hindu</SelectItem>
+                      <SelectItem value="BUDDHA">Buddha</SelectItem>
+                      <SelectItem value="KONGHUCU">Konghucu</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>No. Telepon <span className="text-red-500">*</span></Label>
+                  <Input
+                    placeholder="08xxxxxxxxxx"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="rounded-xl h-11"
+                    type="tel"
+                  />
+                  {formData.phone && formData.phone.length < 10 && (
+                    <p className="text-[10px] text-red-500 font-medium">Minimal 10 digit</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>Email (Opsional)</Label>
+                  <Input
+                    placeholder="email@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="rounded-xl h-11"
+                    type="email"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Alamat (Opsional)</Label>
+                  <Input
+                    placeholder="Alamat lengkap"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="rounded-xl h-11"
+                  />
+                </div>
+              </div>
+            )}
+
+            {subStep === 3 && (
+              <div className="space-y-4 animate-in slide-in-from-right-2 duration-300">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Penanggung Jawab <span className="text-red-500">*</span></Label>
+                    <Input
+                      placeholder="Nama"
+                      value={formData.penanggungJawab}
+                      onChange={(e) => setFormData({ ...formData, penanggungJawab: e.target.value })}
+                      className="rounded-xl h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Hubungan <span className="text-red-500">*</span></Label>
+                    <Select
+                      value={formData.hubunganPenanggungJawab}
+                      onValueChange={(val: string) => setFormData({ ...formData, hubunganPenanggungJawab: val })}
+                    >
+                      <SelectTrigger className="rounded-xl h-11">
+                        <SelectValue placeholder="Hubungan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DIRI SENDIRI">Diri Sendiri</SelectItem>
+                        <SelectItem value="ORANG TUA">Orang Tua</SelectItem>
+                        <SelectItem value="SUAMI">Suami</SelectItem>
+                        <SelectItem value="ISTRI">Istri</SelectItem>
+                        <SelectItem value="ANAK">Anak</SelectItem>
+                        <SelectItem value="SAUDARA">Saudara</SelectItem>
+                        <SelectItem value="LAINNYA">Lainnya</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-200 text-[11px] text-amber-800 dark:text-amber-200 italic">
+                  Data penanggung jawab diperlukan untuk keperluan administrasi rumah sakit dan keadaan darurat.
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-4 mt-2 border-t border-primary/10">
+              {subStep > 1 ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSubStep(subStep - 1)}
+                  className="text-primary hover:bg-primary/10"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Kembali
+                </Button>
+              ) : <div />}
+
+              {subStep < 3 ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    if (subStep === 1) {
+                      if (!formData.nik || formData.nik.length !== 16 || !formData.fullName || !formData.birthDate || !formData.gender) {
+                        toast.error("Lengkapi identitas wajib di Langkah 1");
+                        return;
+                      }
+                    }
+                    if (subStep === 2) {
+                      if (!formData.religion || !formData.phone || formData.phone.length < 10) {
+                        toast.error("Lengkapi kontak wajib di Langkah 2");
+                        return;
+                      }
+                    }
+                    setSubStep(subStep + 1);
+                  }}
+                  className="bg-primary text-white shadow-sm"
+                >
+                  Lanjut <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              ) : (
+                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase">
+                  <CheckCircle2 className="h-4 w-4" /> Data Lengkap
+                </div>
+              )}
             </div>
           </div>
-
         </div>
       )}
 
@@ -385,7 +471,7 @@ export const PatientDataStep = ({
         <Textarea
           placeholder="Jelaskan keluhan Anda secara singkat (minimal 10 karakter)"
           value={formData.keluhan}
-          onChange={(e) => setFormData({ ...formData, keluhan: e.target.value })}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, keluhan: e.target.value })}
           className="rounded-xl min-h-[100px]"
           required
         />

@@ -19,7 +19,9 @@ import {
     CalendarDays,
     ArrowRight,
     History as HistoryIcon,
-    MessageCircle
+    MessageCircle,
+    FlaskConical,
+    Star
 } from "lucide-react";
 import { useMyPatients } from "../api/getMyPatients";
 import { useCancelAppointment } from "../api/cancelAppointment";
@@ -38,6 +40,7 @@ import {
 import Link from "next/link";
 import { QRCodeSVG } from 'qrcode.react';
 import { RescheduleModal } from "./RescheduleModal";
+import { RatingFeedbackModal } from "./RatingFeedbackModal";
 
 export const MyPatientsComponent = () => {
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -50,6 +53,10 @@ export const MyPatientsComponent = () => {
         appointmentId: string;
         doctorName: string;
         currentDate: string;
+    } | null>(null);
+    const [feedbackData, setFeedbackData] = useState<{
+        appointmentId: string;
+        doctorName: string;
     } | null>(null);
 
     const handleShareWhatsApp = (appointment: any, patientName: string) => {
@@ -117,6 +124,13 @@ export const MyPatientsComponent = () => {
                 bgClass: "bg-blue-100 dark:bg-blue-900/30",
                 textClass: "text-blue-700 dark:text-blue-300",
                 borderClass: "border-blue-300 dark:border-blue-700"
+            },
+            in_progress: {
+                label: "Sedang Dilayani",
+                icon: Activity,
+                bgClass: "bg-amber-100 dark:bg-amber-900/30",
+                textClass: "text-amber-700 dark:text-amber-300",
+                borderClass: "border-amber-300 dark:border-amber-700"
             },
             cancelled: {
                 label: "Dibatalkan",
@@ -495,11 +509,40 @@ export const MyPatientsComponent = () => {
                                                             </>
                                                         )}
                                                         {activeTab === 'past' && (
-                                                            <Button variant="outline" size="sm" className="h-9 px-3" asChild>
-                                                                <Link href={`/doctors/${appointment.doctor.id || ''}`}>
-                                                                    Booking Ulang
-                                                                </Link>
-                                                            </Button>
+                                                            <div className="flex gap-2">
+                                                                <Button variant="outline" size="sm" className="h-9 px-3" asChild>
+                                                                    <Link href={`/doctors/${appointment.doctor.id || ''}`}>
+                                                                        Booking Ulang
+                                                                    </Link>
+                                                                </Button>
+                                                                {appointment.status === 'completed' && (
+                                                                    <>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            className="h-9 px-3 border-primary text-primary hover:bg-primary/5"
+                                                                            asChild
+                                                                        >
+                                                                            <Link href="/profile?tab=health-history&sub=lab">
+                                                                                <FlaskConical className="h-4 w-4 mr-2" />
+                                                                                Lihat Hasil Lab
+                                                                            </Link>
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="h-9 px-3 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                                                            onClick={() => setFeedbackData({
+                                                                                appointmentId: appointment.id,
+                                                                                doctorName: appointment.doctor.name
+                                                                            })}
+                                                                        >
+                                                                            <Star className="h-4 w-4 mr-1.5" />
+                                                                            Beri Feedback
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </div>
@@ -522,6 +565,20 @@ export const MyPatientsComponent = () => {
                     doctorName={rescheduleData.doctorName}
                     currentDate={rescheduleData.currentDate}
                     onSuccess={() => refetch()}
+                />
+            )}
+
+            {/* Feedback Modal */}
+            {feedbackData && (
+                <RatingFeedbackModal
+                    isOpen={!!feedbackData}
+                    onClose={() => setFeedbackData(null)}
+                    appointmentId={feedbackData.appointmentId}
+                    doctorName={feedbackData.doctorName}
+                    onSuccess={() => {
+                        // Optional: refetch to update UI if rating is tracked
+                        refetch();
+                    }}
                 />
             )}
         </div>
