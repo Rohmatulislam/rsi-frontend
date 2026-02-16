@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Radio } from "lucide-react";
 import { useRadioTests } from "../api/getRadioTests";
@@ -31,6 +31,10 @@ export const RadioCatalog = ({ onSelect, selectedTests: externalSelected = [], h
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [selectedGuarantor, setSelectedGuarantor] = useState<string>("A09"); // Default to UMUM
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const { data: tests, isLoading: testsLoading } = useRadioTests({ kd_pj: selectedGuarantor });
     const { data: categories, isLoading: categoriesLoading } = useRadioCategories({ kd_pj: selectedGuarantor });
@@ -97,7 +101,7 @@ export const RadioCatalog = ({ onSelect, selectedTests: externalSelected = [], h
 
             {/* Tests Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {testsLoading ? (
+                {testsLoading || !isMounted ? (
                     Array(6).fill(0).map((_, i) => (
                         <Card key={i} className="overflow-hidden">
                             <CardHeader className="p-4">

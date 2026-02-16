@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TestTube, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { useLabTests } from "../api/getLabTests";
@@ -22,6 +22,10 @@ export interface LabCatalogProps {
 export const LabCatalog = ({ hideSummary }: LabCatalogProps) => {
     const { items: basketItems, removeItem: removeFromBasket, addItem: addToBasket, hasItem } = useDiagnosticBasket();
     const [selectedGuarantor, setSelectedGuarantor] = useState<string>("A09"); // Default to UMUM
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const [expandedTests, setExpandedTests] = useState<Record<string, boolean>>({});
     const [viewingTemplateId, setViewingTemplateId] = useState<number | null>(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -114,7 +118,7 @@ export const LabCatalog = ({ hideSummary }: LabCatalogProps) => {
         setExpandedTests({});
     };
 
-    if (testsLoading || catsLoading || guarsLoading) {
+    if (testsLoading || catsLoading || guarsLoading || !isMounted) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="md:col-span-1 space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ServiceHero, ServiceSection, ServiceCTA } from "~/features/services";
 import {
     Loader2, ArrowRight,
@@ -26,6 +26,11 @@ export const MCUPage = () => {
     const { addItem, hasItem, removeItem } = useDiagnosticBasket();
     const { data: service, isLoading: serviceLoading } = useGetServiceBySlug({ slug: 'mcu' });
     const { data: mcuPackages, isLoading: mcuLoading } = useGetMcuPackages();
+
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const [activeStep, setActiveStep] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -121,7 +126,7 @@ export const MCUPage = () => {
         setSearchQuery("");
     };
 
-    if (serviceLoading) {
+    if (serviceLoading || !isMounted) {
         return <MCUPageSkeleton />;
     }
 

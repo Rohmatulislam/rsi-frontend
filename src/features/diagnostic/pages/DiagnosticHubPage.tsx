@@ -32,6 +32,11 @@ export const DiagnosticHubPage = () => {
     const initialTab = searchParams.get("tab") || "mcu";
     const [activeTab, setActiveTab] = useState(initialTab);
     const { items, removeItem, getTotalPrice, getItemCount } = useDiagnosticBasket();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         const tab = searchParams.get("tab");
@@ -39,6 +44,10 @@ export const DiagnosticHubPage = () => {
             setActiveTab(tab);
         }
     }, [searchParams]);
+
+    if (!isMounted) {
+        return <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 animate-pulse" />;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
