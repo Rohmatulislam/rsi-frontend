@@ -5,6 +5,7 @@ import { useGetDoctorsList } from "~/features/doctor/api/getDoctorsList";
 import { Stethoscope, Search, Filter, Clock, Calendar, ArrowUpDown } from "lucide-react";
 import { ServiceHero } from "~/features/services";
 import { useDoctorFilters } from "~/features/doctor/hooks/useDoctorFilters";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const DoctorListPage = () => {
     const { data: allDoctors, isLoading } = useGetDoctorsList({
@@ -172,18 +173,33 @@ export const DoctorListPage = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {filteredAndSortedDoctors && filteredAndSortedDoctors.length > 0 ? (
-                            filteredAndSortedDoctors.map((doctor) => (
-                                <DoctorCard key={doctor.id} doctor={doctor} />
-                            ))
-                        ) : (
-                            <div className="col-span-full text-center py-20">
-                                <p className="text-muted-foreground text-lg">Dokter tidak ditemukan</p>
-                                <p className="text-muted-foreground text-sm mt-2">
-                                    Coba ubah filter atau kata kunci pencarian
-                                </p>
-                            </div>
-                        )}
+                        <AnimatePresence mode="popLayout">
+                            {filteredAndSortedDoctors && filteredAndSortedDoctors.length > 0 ? (
+                                filteredAndSortedDoctors.map((doctor) => (
+                                    <motion.div
+                                        key={doctor.id}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <DoctorCard doctor={doctor} />
+                                    </motion.div>
+                                ))
+                            ) : (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="col-span-full text-center py-20"
+                                >
+                                    <p className="text-muted-foreground text-lg">Dokter tidak ditemukan</p>
+                                    <p className="text-muted-foreground text-sm mt-2">
+                                        Coba ubah filter atau kata kunci pencarian
+                                    </p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 )}
             </div>

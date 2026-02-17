@@ -13,11 +13,13 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { Star, Send, CheckCircle2, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { useCreateRating } from "~/features/doctor/api/createRating";
 
 interface RatingFeedbackModalProps {
     isOpen: boolean;
     onClose: () => void;
     appointmentId: string;
+    doctorId: string;
     doctorName: string;
     onSuccess?: () => void;
 }
@@ -26,6 +28,7 @@ export const RatingFeedbackModal = ({
     isOpen,
     onClose,
     appointmentId,
+    doctorId,
     doctorName,
     onSuccess
 }: RatingFeedbackModalProps) => {
@@ -33,7 +36,27 @@ export const RatingFeedbackModal = ({
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
+
+    const createRatingMutation = useCreateRating({
+        mutationConfig: {
+            onSuccess: () => {
+                setIsSubmitted(true);
+                if (onSuccess) onSuccess();
+
+                setTimeout(() => {
+                    onClose();
+                    setIsSubmitted(false);
+                    setRating(0);
+                    setComment("");
+                }, 3000);
+            },
+            onError: (error: any) => {
+                toast.error(error?.response?.data?.message || "Gagal mengirim feedback");
+            }
+        }
+    });
+
+    const loading = createRatingMutation.isPending;
 
     const handleSubmit = async () => {
         if (rating === 0) {
@@ -41,24 +64,13 @@ export const RatingFeedbackModal = ({
             return;
         }
 
-        setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        console.log("Feedback Submitted:", { appointmentId, rating, comment });
-
-        setIsSubmitted(true);
-        setLoading(false);
-
-        if (onSuccess) onSuccess();
-
-        setTimeout(() => {
-            onClose();
-            // Reset state for next time
-            setIsSubmitted(false);
-            setRating(0);
-            setComment("");
-        }, 3000);
+        createRatingMutation.mutate({
+            data: {
+                doctorId,
+                rating,
+                comment: comment.trim() || undefined,
+            }
+        });
     };
 
     return (
@@ -88,8 +100,8 @@ export const RatingFeedbackModal = ({
                                     >
                                         <Star
                                             className={`h-10 w-10 ${(hover || rating) >= star
-                                                    ? 'fill-amber-400 text-amber-400'
-                                                    : 'text-muted-foreground'
+                                                ? 'fill-amber-400 text-amber-400'
+                                                : 'text-muted-foreground'
                                                 }`}
                                         />
                                     </button>

@@ -14,6 +14,8 @@ import { DoctorScheduleByPoli } from "~/components/shared/DoctorScheduleByPoli";
 import { Breadcrumb } from "~/components/shared/Breadcrumb";
 import { DoctorDetailSkeleton } from "~/components/shared/PageSkeletons";
 import { QueueStatusCard } from "~/features/appointment/components/QueueStatusCard";
+import { DoctorRatingList } from "../components/DoctorRatingList";
+import { Star } from "lucide-react";
 
 const DoctorDetailPage = () => {
     const params = useParams();
@@ -107,6 +109,17 @@ const DoctorDetailPage = () => {
                                         <Stethoscope className="h-5 w-5" />
                                         {doctor.specialization || "Dokter Umum"}
                                     </p>
+
+                                    {/* Rating Badge */}
+                                    {doctor.averageRating !== undefined && doctor.averageRating > 0 && (
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-100 dark:border-amber-900/50">
+                                                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                                                <span className="text-sm font-black text-amber-700 dark:text-amber-400">{doctor.averageRating.toFixed(1)}</span>
+                                            </div>
+                                            <span className="text-sm text-muted-foreground font-medium">({doctor.totalReviews} Ulasan)</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="prose prose-slate dark:prose-invert max-w-none">
@@ -134,6 +147,11 @@ const DoctorDetailPage = () => {
 
                         {/* Schedules Section Based on Polyclinic */}
                         <DoctorScheduleByPoli doctor={doctor} />
+
+                        {/* Ratings & Reviews Section */}
+                        <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
+                            <DoctorRatingList doctorId={doctor.id} />
+                        </div>
                     </div>
 
                     {/* Right Column: Sticky Booking Card */}

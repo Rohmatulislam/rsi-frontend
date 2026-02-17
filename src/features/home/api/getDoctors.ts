@@ -55,6 +55,8 @@ export type DoctorDto = {
         kuota: number | null;
         consultation_fee?: number;
     }[];
+    averageRating?: number;
+    totalReviews?: number;
 };
 
 type GetDoctorsResponse = DoctorDto[];

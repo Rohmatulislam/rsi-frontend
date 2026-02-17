@@ -19,10 +19,12 @@ export const HealthHistoryPage = () => {
         queryFn: getProfile,
     });
 
-    const { data: healthRecords = [] } = useQuery<HealthRecord[]>({
+    const { data: rawHealthRecords } = useQuery<HealthRecord[]>({
         queryKey: ["healthHistory"],
         queryFn: getHealthHistory,
     });
+
+    const healthRecords = Array.isArray(rawHealthRecords) ? rawHealthRecords : [];
 
     const [activeTab, setActiveTab] = useState("history");
 

@@ -56,6 +56,7 @@ export const MyPatientsComponent = () => {
     } | null>(null);
     const [feedbackData, setFeedbackData] = useState<{
         appointmentId: string;
+        doctorId: string;
         doctorName: string;
     } | null>(null);
 
@@ -534,6 +535,7 @@ export const MyPatientsComponent = () => {
                                                                             className="h-9 px-3 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                                                                             onClick={() => setFeedbackData({
                                                                                 appointmentId: appointment.id,
+                                                                                doctorId: appointment.doctor.id || '',
                                                                                 doctorName: appointment.doctor.name
                                                                             })}
                                                                         >
@@ -574,6 +576,7 @@ export const MyPatientsComponent = () => {
                     isOpen={!!feedbackData}
                     onClose={() => setFeedbackData(null)}
                     appointmentId={feedbackData.appointmentId}
+                    doctorId={feedbackData.doctorId}
                     doctorName={feedbackData.doctorName}
                     onSuccess={() => {
                         // Optional: refetch to update UI if rating is tracked

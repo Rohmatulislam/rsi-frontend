@@ -44,6 +44,7 @@ import { useLocale } from "next-intl";
 import { useRouter, usePathname as useIntlPathname } from "~/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState as useMountedState } from "react";
+import { SearchCommand } from "./SearchCommand";
 
 // Mobile Navigation Helper Components
 const MobileNavSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
@@ -95,6 +96,18 @@ export const Navbar = () => {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
   const toggleLanguage = (newLocale: "id" | "en") => {
@@ -225,88 +238,27 @@ export const Navbar = () => {
 
       {/* Right side - Auth & Mobile Menu */}
       <div className="flex items-center gap-2 md:gap-4">
-        {/* Search Input - Desktop only */}
-        {/* <InputGroup className="w-80 hidden lg:flex">
-          <InputGroupAddon>
-            <Search className="text-primary" />
-          </InputGroupAddon>
-          <InputGroupInput placeholder="Cari Dokter" />
-        </InputGroup> */}
+        {/* Search Input - Desktop only (Trigger) */}
+        <div className="hidden lg:flex relative">
+          <Button
+            variant="outline"
+            className="w-64 justify-start text-muted-foreground font-normal relative"
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            {t("search_placeholder")}
+            <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </Button>
+        </div>
 
         <Button size="icon" variant="ghost" className="lg:hidden" onClick={() => setSearchOpen(true)}>
           <Search className="h-5 w-5" />
         </Button>
 
         {/* Search Dialog */}
-        <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-          <CommandInput placeholder={t("search_placeholder")} />
-          <CommandList>
-            <CommandEmpty>{t("no_results")}</CommandEmpty>
-
-            <CommandGroup heading={t("services")}>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rawat-inap'; }}>
-                {t("inpatient")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rawat-jalan'; }}>
-                {t("outpatient")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/farmasi'; }}>
-                {t("pharmacy")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=lab'; }}>
-                {t("lab")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=radio'; }}>
-                {t("radiology")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/rehabilitasi-medik'; }}>
-                {t("rehab")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub?tab=mcu'; }}>
-                {t("mcu")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan/diagnostic-hub'; }} className="font-bold text-primary">
-                {t("diagnostic_hub")} (MCU, Lab, Radio)
-              </CommandItem>
-            </CommandGroup>
-
-            <CommandGroup heading={t("featured_services")}>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/bedah-minimal-invasif'; }}>
-                {t("surgery")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/eswl'; }}>
-                {t("eswl")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/persalinan-syari'; }}>
-                {t("birth")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/layanan-unggulan/executive'; }}>
-                {t("executive")}
-              </CommandItem>
-            </CommandGroup>
-
-            <CommandGroup heading={t("info_center")}>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/tentang-kami'; }}>
-                {t("about")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/artikel'; }}>
-                {t("news")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/igd'; }}>
-                {t("igd")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/lokasi'; }}>
-                {t("location")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/kontak'; }}>
-                {t("contact")}
-              </CommandItem>
-              <CommandItem onSelect={() => { setSearchOpen(false); window.location.href = '/faq'; }}>
-                {t("faq")}
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </CommandDialog>
+        <SearchCommand open={searchOpen} onOpenChange={setSearchOpen} />
 
         {/* Shopping Cart */}
         {/* <Button size="icon" variant="ghost">
