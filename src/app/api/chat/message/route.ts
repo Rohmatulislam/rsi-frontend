@@ -33,16 +33,20 @@ export async function POST(request: NextRequest) {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Chat API: Backend error response:', errorText);
-            throw new Error(`Backend responded with status: ${response.status}`);
+            throw new Error(`Backend responded with status: ${response.status} - ${errorText.substring(0, 100)}`);
         }
 
         const data = await response.json();
         console.log('Chat API: Backend response data:', data);
         return NextResponse.json(data);
     } catch (error: any) {
-        console.error('Chat API error:', error);
+        console.error('Chat API error DETAILS:', {
+            message: error.message,
+            stack: error.stack,
+            cause: error.cause
+        });
         return NextResponse.json(
-            { response: 'Maaf, sistem sedang sibuk. Silakan coba lagi nanti atau hubungi Customer Service kami di 087865733233.' },
+            { response: `Maaf, sistem sedang sibuk (Error: ${error.message}). Silakan coba lagi nanti atau hubungi Customer Service kami di 087865733233.` },
             { status: 500 }
         );
     }
