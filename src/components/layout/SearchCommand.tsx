@@ -47,17 +47,17 @@ export const SearchCommand = ({ open, onOpenChange }: SearchCommandProps) => {
                 {query.length === 0 && (
                     <>
                         <CommandGroup heading="Akses Cepat">
-                            <CommandItem onSelect={() => handleSelect('/layanan/rawat-jalan')}>
-                                <MapPin className="mr-2 h-4 w-4" />
-                                <span>Poli Rawat Jalan</span>
+                            <CommandItem onSelect={() => handleSelect('/layanan/rawat-jalan')} className="group">
+                                <MapPin className="mr-2 h-4 w-4 text-muted-foreground group-data-[selected=true]:text-accent-foreground" />
+                                <span className="group-data-[selected=true]:text-accent-foreground">Poli Rawat Jalan</span>
                             </CommandItem>
-                            <CommandItem onSelect={() => handleSelect('/layanan/rawat-inap')}>
-                                <MapPin className="mr-2 h-4 w-4" />
-                                <span>Layanan Rawat Inap</span>
+                            <CommandItem onSelect={() => handleSelect('/layanan/rawat-inap')} className="group">
+                                <MapPin className="mr-2 h-4 w-4 text-muted-foreground group-data-[selected=true]:text-accent-foreground" />
+                                <span className="group-data-[selected=true]:text-accent-foreground">Layanan Rawat Inap</span>
                             </CommandItem>
-                            <CommandItem onSelect={() => handleSelect('/artikel')}>
-                                <FileText className="mr-2 h-4 w-4" />
-                                <span>Berita & Artikel</span>
+                            <CommandItem onSelect={() => handleSelect('/artikel')} className="group">
+                                <FileText className="mr-2 h-4 w-4 text-muted-foreground group-data-[selected=true]:text-accent-foreground" />
+                                <span className="group-data-[selected=true]:text-accent-foreground">Berita & Artikel</span>
                             </CommandItem>
                         </CommandGroup>
                     </>
@@ -69,38 +69,38 @@ export const SearchCommand = ({ open, onOpenChange }: SearchCommandProps) => {
                             <CommandItem
                                 key={`${result.type}-${result.id}`}
                                 onSelect={() => handleSelect(result.url)}
-                                className="flex items-center gap-3 p-2 cursor-pointer"
+                                className="flex items-center gap-3 p-2 cursor-pointer group"
                             >
                                 <div className="flex-shrink-0">
                                     {result.type === "doctor" ? (
-                                        <Avatar className="h-9 w-9">
+                                        <Avatar className="h-9 w-9 border border-border group-data-[selected=true]:border-accent-foreground/20">
                                             <AvatarImage src={result.image} />
                                             <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
                                         </Avatar>
                                     ) : result.type === "article" ? (
-                                        <div className="h-9 w-9 bg-accent rounded-md flex items-center justify-center overflow-hidden">
+                                        <div className="h-9 w-9 bg-accent/10 group-data-[selected=true]:bg-accent-foreground/10 rounded-md flex items-center justify-center overflow-hidden transition-colors">
                                             {result.image ? (
                                                 <img src={result.image} alt="" className="h-full w-full object-cover" />
                                             ) : (
-                                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                                <FileText className="h-4 w-4 text-muted-foreground group-data-[selected=true]:text-accent-foreground" />
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
-                                            <Search className="h-4 w-4 text-primary" />
+                                        <div className="h-9 w-9 bg-primary/10 group-data-[selected=true]:bg-accent-foreground/10 rounded-full flex items-center justify-center transition-colors">
+                                            <Search className="h-4 w-4 text-primary group-data-[selected=true]:text-accent-foreground" />
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex flex-col flex-1 min-w-0">
-                                    <span className="font-medium truncate">{result.title}</span>
+                                    <span className="font-medium truncate group-data-[selected=true]:text-accent-foreground">{result.title}</span>
                                     {result.subtitle && (
-                                        <span className="text-xs text-muted-foreground truncate">{result.subtitle}</span>
+                                        <span className="text-xs text-muted-foreground group-data-[selected=true]:text-accent-foreground/80 truncate">{result.subtitle}</span>
                                     )}
                                 </div>
-                                <Badge variant="outline" className="text-[10px] uppercase ml-auto">
+                                <Badge variant="outline" className="text-[10px] uppercase ml-auto border-border group-data-[selected=true]:border-accent-foreground group-data-[selected=true]:text-accent-foreground group-data-[selected=true]:bg-transparent">
                                     {result.type === 'doctor' ? 'Dokter' : result.type === 'service' ? 'Layanan' : 'Artikel'}
                                 </Badge>
-                                <ChevronRight className="h-4 w-4 text-muted-foreground ml-1" />
+                                <ChevronRight className="h-4 w-4 text-muted-foreground group-data-[selected=true]:text-accent-foreground/50 ml-1" />
                             </CommandItem>
                         ))}
                     </CommandGroup>

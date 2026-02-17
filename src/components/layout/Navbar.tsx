@@ -242,12 +242,12 @@ export const Navbar = () => {
         <div className="hidden lg:flex relative">
           <Button
             variant="outline"
-            className="w-64 justify-start text-muted-foreground font-normal relative"
+            className="w-72 justify-start text-foreground/80 font-normal relative bg-muted/40 hover:bg-muted/60 border-muted-foreground/10 transition-all duration-200 pl-10 h-10 rounded-full"
             onClick={() => setSearchOpen(true)}
           >
-            <Search className="mr-2 h-4 w-4" />
+            <Search className="absolute left-3.5 h-4 w-4 opacity-50" />
             {t("search_placeholder")}
-            <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+            <kbd className="pointer-events-none absolute right-2 top-2 hidden h-6 select-none items-center gap-1 rounded border border-muted-foreground/20 bg-background px-2 font-mono text-[10px] font-medium opacity-100 sm:flex">
               <span className="text-xs">⌘</span>K
             </kbd>
           </Button>
