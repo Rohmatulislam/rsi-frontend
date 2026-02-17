@@ -13,6 +13,7 @@ import {
     TrendingUp,
     Users,
     Clock,
+    Star,
 } from "lucide-react";
 import {
     LineChart,
@@ -114,8 +115,8 @@ export default function AdminDashboardPage() {
 
             {/* Stats Cards */}
             {statsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[...Array(4)].map((_, i) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    {[...Array(5)].map((_, i) => (
                         <Skeleton key={i} className="h-28 rounded-lg" />
                     ))}
                 </div>
@@ -144,6 +145,12 @@ export default function AdminDashboardPage() {
                         value={stats?.cancelledBookings || 0}
                         icon={XCircle}
                         color="red"
+                    />
+                    <StatsCard
+                        title="Review Pending"
+                        value={stats?.pendingReviews || 0}
+                        icon={Star}
+                        color="purple"
                     />
                 </div>
             )}
@@ -248,7 +255,18 @@ export default function AdminDashboardPage() {
                                         )}
                                         <div className="flex-1 min-w-0">
                                             <p className="font-semibold text-sm truncate">{doctor.doctorName}</p>
-                                            <p className="text-xs text-muted-foreground truncate">{doctor.specialty}</p>
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
+                                                <span className="truncate">{doctor.specialty}</span>
+                                                {doctor.averageRating > 0 && (
+                                                    <>
+                                                        <span className="mx-1">•</span>
+                                                        <span className="flex items-center gap-0.5 text-amber-500 font-medium">
+                                                            <Star className="w-3 h-3 fill-current" />
+                                                            {Number(doctor.averageRating).toFixed(1)}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                         <Badge variant="secondary">{doctor.bookingCount} booking</Badge>
                                     </div>

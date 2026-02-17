@@ -9,6 +9,7 @@ interface DashboardStats {
     todayBookings: number;
     weekBookings: number;
     monthBookings: number;
+    pendingReviews: number;
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {

@@ -6,6 +6,7 @@ export interface TopDoctor {
     doctorName: string;
     specialty: string;
     bookingCount: number;
+    averageRating: number;
     imageUrl?: string;
 }
 
