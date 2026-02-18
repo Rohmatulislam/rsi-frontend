@@ -11,8 +11,15 @@ export interface RadiologyHistory {
 }
 
 export const getRadiologyHistory = async (noRM: string): Promise<RadiologyHistory[]> => {
-    const res = await axiosInstance.get(`radiology/history/${noRM}`);
-    return res.data;
+    console.log('Fetching radiology history for RM:', noRM);
+    try {
+        const res = await axiosInstance.get(`radiology/history/${noRM}`);
+        console.log('Radiology history response:', res.data);
+        return res.data;
+    } catch (error) {
+        console.error('Error fetching radiology history:', error);
+        throw error;
+    }
 };
 
 export const getRadiologyResultDetails = async (noRawat: string, tgl: string, jam: string): Promise<string | null> => {
@@ -21,6 +28,6 @@ export const getRadiologyResultDetails = async (noRawat: string, tgl: string, ja
 };
 
 export const getRadiologyResultPdfUrl = (noRawat: string, tgl: string, jam: string, noRM: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2005/api';
     return `${baseUrl}/radiology/download-pdf/${noRawat}/${tgl}/${jam}?noRM=${noRM}`;
 };
