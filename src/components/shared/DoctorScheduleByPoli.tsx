@@ -45,6 +45,12 @@ const getNextDateForDay = (dayOfWeekIndex: number): { date: string, isToday: boo
   };
 };
 
+// Helper to format time (remove seconds if present)
+const formatTime = (time: string) => {
+  if (!time) return '';
+  return time.split(':').slice(0, 2).join(':');
+};
+
 export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
   if (!doctor.scheduleDetails || doctor.scheduleDetails.length === 0) {
     return (
@@ -125,13 +131,26 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
                     <div className="text-xs text-slate-500 dark:text-slate-400 ml-6 mt-1 font-medium">
                       {nextDate}
                     </div>
+                    {/* Status / Note Display */}
+                    {((schedule as any).status === 'RESCHEDULE' || (schedule as any).status === 'LEAVE' || (schedule as any).note) && (
+                      <div className="ml-6 mt-1">
+                        <span className={cn(
+                          "text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-1",
+                          (schedule as any).status === 'LEAVE' ? "bg-red-100 text-red-700" :
+                            (schedule as any).status === 'RESCHEDULE' ? "bg-amber-100 text-amber-700" :
+                              "bg-blue-100 text-blue-700"
+                        )}>
+                          {(schedule as any).note}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <Clock className={cn("h-4 w-4", isToday ? "text-primary" : "text-slate-500")} />
                       <span className={cn("text-sm font-mono font-bold", isToday ? "text-primary" : "text-slate-600 dark:text-slate-300")}>
-                        {schedule.jam_mulai} - {schedule.jam_selesai}
+                        {formatTime(schedule.jam_mulai)} - {formatTime(schedule.jam_selesai)}
                       </span>
                     </div>
 
@@ -149,7 +168,8 @@ export const DoctorScheduleByPoli = ({ doctor }: DoctorScheduleByPoliProps) => {
             })}
           </div>
         </div>
-      ))}
-    </div>
+      ))
+      }
+    </div >
   );
 };

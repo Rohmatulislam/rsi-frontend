@@ -32,6 +32,12 @@ export interface DoctorCardProps {
   review_count?: number | null;
 }
 
+// Helper to format time (remove seconds if present)
+const formatTime = (time: string) => {
+  if (!time) return '';
+  return time.split(':').slice(0, 2).join(':');
+};
+
 export const DoctorCard = ({
   doctor,
   hideExecutiveBadge = false,
@@ -122,7 +128,7 @@ export const DoctorCard = ({
       const schedule = sortedSchedules[0];
       const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek] || 'Jadwal';
       const nextDate = getNextDateForDay(schedule.dayOfWeek);
-      nearestSchedule = `${hari}, ${nextDate} (${schedule.startTime || '--:--'})`;
+      nearestSchedule = `${hari}, ${nextDate} (${formatTime(schedule.startTime) || '--:--'} - ${formatTime(schedule.endTime) || '--:--'})`;
     }
   }
 

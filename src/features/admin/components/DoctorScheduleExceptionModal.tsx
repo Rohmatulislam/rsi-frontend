@@ -27,6 +27,7 @@ export const DoctorScheduleExceptionModal = ({ isOpen, onClose, doctor }: Doctor
     const [note, setNote] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
+    const [kdPoli, setKdPoli] = useState("");
 
     const handleCreate = () => {
         if (!doctor || !date || (type === 'RESCHEDULE' && (!startTime || !endTime))) return;
@@ -37,13 +38,15 @@ export const DoctorScheduleExceptionModal = ({ isOpen, onClose, doctor }: Doctor
             type,
             note,
             startTime,
-            endTime
+            endTime,
+            kd_poli: kdPoli || undefined
         }, {
             onSuccess: () => {
                 setDate("");
                 setNote("");
                 setStartTime("");
                 setEndTime("");
+                setKdPoli("");
                 // Optional: show toast
             }
         });
@@ -106,6 +109,31 @@ export const DoctorScheduleExceptionModal = ({ isOpen, onClose, doctor }: Doctor
                         )}
 
                         <div className="space-y-2">
+                            <Label>Poli Spesifik (Opsional)</Label>
+                            <Select value={kdPoli || 'ALL'} onValueChange={(v) => {
+                                setKdPoli(v === 'ALL' ? '' : v);
+                            }}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Semua Poli (Global)" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ALL">Semua Poli (Global)</SelectItem>
+                                    {/* Deduplicate Polis by kd_poli */}
+                                    {Array.from(new Map(
+                                        (doctor.scheduleDetails || doctor.schedules || []).map((s: any) => [s.kd_poli, s])
+                                    ).values()).map((sch: any, idx: number) => (
+                                        <SelectItem key={`${sch.kd_poli || sch.id}-${idx}`} value={sch.kd_poli || ''}>
+                                            {sch.nm_poli || 'Poli'}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-[10px] text-slate-400">
+                                Pilih jika perubahan jadwal hanya untuk poli tertentu.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
                             <Label>Catatan (Alasan)</Label>
                             <Textarea
                                 placeholder="Contoh: Cuti Tahunan, Seminar, Sakit"
@@ -157,6 +185,11 @@ export const DoctorScheduleExceptionModal = ({ isOpen, onClose, doctor }: Doctor
                                                     }`}>
                                                     {ex.type === 'LEAVE' ? 'LIBUR' : 'RESCHEDULE'}
                                                 </span>
+                                                {ex.kd_poli && (
+                                                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                        {ex.kd_poli}
+                                                    </span>
+                                                )}
                                             </div>
                                             {ex.note && (
                                                 <p className="text-sm text-slate-500 flex items-start gap-1">

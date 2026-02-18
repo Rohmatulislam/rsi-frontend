@@ -58,6 +58,7 @@ export interface DoctorScheduleException {
   startTime?: string;
   endTime?: string;
   note?: string;
+  kd_poli?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -70,4 +71,5 @@ export interface CreateDoctorScheduleExceptionDto {
   startTime?: string;
   endTime?: string;
   note?: string;
+  kd_poli?: string;
 }
