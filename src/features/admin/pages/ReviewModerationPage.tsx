@@ -67,7 +67,7 @@ export const ReviewModerationPage = () => {
                 </div>
             </div>
 
-            <Tabs defaultValue="PENDING" onValueChange={setStatusTab} className="w-full">
+            <Tabs value={statusTab} onValueChange={setStatusTab} className="w-full">
                 <div className="flex items-center justify-between mb-4">
                     <TabsList className="bg-muted/50 p-1 rounded-xl">
                         <TabsTrigger value="PENDING" className="rounded-lg font-bold data-[state=active]:shadow-sm">
