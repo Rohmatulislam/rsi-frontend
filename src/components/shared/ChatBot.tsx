@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, Bot, User, Loader2, Minus } from "lucide-react";
+import { useParams } from "next/navigation";
+import { MessageCircle, X, Send, Bot, User, Loader2, Minus, RefreshCw, History, AlertTriangle, Phone, ThumbsUp, ThumbsDown, Calendar, MessageSquare } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +13,10 @@ interface Message {
     content: string;
     timestamp: Date;
     isTyping?: boolean;
+    isEmergency?: boolean;
+    messageId?: string;
+    rating?: number;
+    action?: { type: string; payload: any };
 }
 
 // Typing effect component
@@ -35,6 +40,8 @@ const TypingText = ({ text, onComplete }: { text: string; onComplete?: () => voi
 };
 
 export const ChatBot = () => {
+    const params = useParams();
+    const locale = params?.locale || 'id';
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [input, setInput] = useState("");
@@ -47,6 +54,49 @@ export const ChatBot = () => {
         },
     ]);
     const [isLoading, setIsLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const [savedSessions, setSavedSessions] = useState<string[]>([]);
+    const [showHistory, setShowHistory] = useState(false);
+
+    // Initialize/Load Session
+    useEffect(() => {
+        let storedId = localStorage.getItem("siti_session_id");
+        if (!storedId) {
+            storedId = crypto.randomUUID();
+            localStorage.setItem("siti_session_id", storedId);
+        }
+        setSessionId(storedId);
+        void loadChatHistory(storedId);
+
+        // Load saved session IDs from localStorage
+        const storedSessions = localStorage.getItem("siti_all_sessions");
+        if (storedSessions) {
+            setSavedSessions(JSON.parse(storedSessions));
+        } else {
+            setSavedSessions([storedId]);
+            localStorage.setItem("siti_all_sessions", JSON.stringify([storedId]));
+        }
+    }, []);
+
+    const loadChatHistory = async (sid: string) => {
+        try {
+            const res = await fetch(`/api/chat/history?sessionId=${sid}`);
+            if (res.ok) {
+                const history = await res.json();
+                if (history && history.length > 0) {
+                    const mapped: Message[] = history.map((m: any) => ({
+                        role: m.role === "model" ? "bot" : "user",
+                        content: m.content,
+                        timestamp: new Date(m.createdAt),
+                        isTyping: false
+                    }));
+                    setMessages(mapped);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load history:", err);
+        }
+    };
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -62,11 +112,12 @@ export const ChatBot = () => {
     };
 
     const handleSend = async () => {
-        if (!input.trim() || isLoading) return;
+        const messageToSend = input.trim();
+        if (!messageToSend || isLoading) return;
 
         const userMsg: Message = {
             role: "user",
-            content: input,
+            content: messageToSend,
             timestamp: new Date(),
             isTyping: false,
         };
@@ -79,15 +130,22 @@ export const ChatBot = () => {
             const response = await fetch("/api/chat/message", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: input })
+                body: JSON.stringify({
+                    message: messageToSend,
+                    sessionId: sessionId
+                })
             });
             const data = await response.json();
+            const result = data.response;
 
             const botMsg: Message = {
                 role: "bot",
-                content: data.response,
+                content: typeof result === "string" ? result : result.text,
                 timestamp: new Date(),
-                isTyping: true, // Enable typing effect
+                isTyping: true,
+                isEmergency: result?.isEmergency,
+                messageId: result?.messageId,
+                action: result?.action
             };
             setMessages((prev) => [...prev, botMsg]);
         } catch (error) {
@@ -101,6 +159,55 @@ export const ChatBot = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleNewChat = () => {
+        const newSid = crypto.randomUUID();
+        localStorage.setItem("siti_session_id", newSid);
+
+        const updatedSessions = [newSid, ...savedSessions];
+        setSavedSessions(updatedSessions);
+        localStorage.setItem("siti_all_sessions", JSON.stringify(updatedSessions));
+
+        setSessionId(newSid);
+        setMessages([
+            {
+                role: "bot",
+                content: "Halo! Saya Siti, Asisten Virtual RSI. Ada yang bisa saya bantu?",
+                timestamp: new Date(),
+                isTyping: false,
+            }
+        ]);
+        setShowHistory(false);
+    };
+
+    const handleRate = async (idx: number, rating: number) => {
+        const msg = messages[idx];
+        if (!msg.messageId || msg.rating) return;
+
+        // Update local state
+        setMessages(prev => prev.map((m, i) => i === idx ? { ...m, rating } : m));
+
+        try {
+            await fetch("/api/chat/rate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    messageId: msg.messageId,
+                    rating
+                })
+            });
+        } catch (err) {
+            console.error("Failed to submit rating:", err);
+        }
+    };
+
+    const switchSession = (sid: string) => {
+        localStorage.setItem("siti_session_id", sid);
+        setSessionId(sid);
+        setMessages([]); // Clear while loading
+        void loadChatHistory(sid);
+        setShowHistory(false);
     };
 
     return (
@@ -128,6 +235,12 @@ export const ChatBot = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} title="Riwayat Chat" className="h-8 w-8 text-white hover:bg-white/10">
+                                    <History className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={handleNewChat} title="Mulai Percakapan Baru" className="h-8 w-8 text-white hover:bg-white/10">
+                                    <RefreshCw className="h-4 w-4" />
+                                </Button>
                                 <Button variant="ghost" size="icon" onClick={() => setIsMinimized(!isMinimized)} className="h-8 w-8 text-white hover:bg-white/10">
                                     <Minus className="h-4 w-4" />
                                 </Button>
@@ -172,6 +285,80 @@ export const ChatBot = () => {
                                                 )}>
                                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
+
+                                                {/* SOS Button for Emergency */}
+                                                {msg.isEmergency && (
+                                                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl flex flex-col gap-2 animate-in fade-in zoom-in">
+                                                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-xs uppercase">
+                                                            <AlertTriangle className="h-4 w-4" />
+                                                            Kondisi Darurat!
+                                                        </div>
+                                                        <Button
+                                                            variant="destructive"
+                                                            className="w-full bg-red-600 hover:bg-red-700 text-white gap-2 font-bold h-10 text-xs shadow-lg"
+                                                            onClick={() => window.open('tel:0370631885', '_self')}
+                                                        >
+                                                            <Phone className="h-4 w-4" />
+                                                            HUBUNGI IGD (0370) 631885
+                                                        </Button>
+                                                    </div>
+                                                )}
+
+                                                {/* Human Handover (WhatsApp) */}
+                                                {msg.role === "bot" && !msg.isTyping && (msg.content.toLowerCase().includes("maaf") || msg.content.toLowerCase().includes("tidak tahu") || msg.content.toLowerCase().includes("staf") || msg.content.toLowerCase().includes("manusia") || msg.isEmergency) && (
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full mt-2 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/10 gap-2 text-[10px] h-8 shadow-sm"
+                                                        onClick={() => window.open('https://wa.me/6281234567890?text=Halo%20RSI,%20saya%20butuh%20bantuan%20staf%20terkait%20layanan.', '_blank')}
+                                                    >
+                                                        <MessageSquare className="h-3 w-3" />
+                                                        HUBUNGI STAF VIA WHATSAPP
+                                                    </Button>
+                                                )}
+
+                                                {/* Contextual Action: Direct Booking */}
+                                                {msg.role === "bot" && !msg.isTyping && msg.action?.type === 'BOOK_POLI' && (
+                                                    <div className="mt-2 p-2 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-lg animate-in fade-in slide-in-from-bottom-2">
+                                                        <p className="text-[10px] text-muted-foreground mb-2 text-center font-medium">Saran Tindakan:</p>
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full bg-primary hover:bg-primary/90 text-white gap-2 text-[11px] h-9 shadow-md"
+                                                            onClick={() => window.location.href = `/${locale}/doctors?specialty=${encodeURIComponent(msg.action?.payload)}`}
+                                                        >
+                                                            <Calendar className="h-4 w-4" />
+                                                            DAFTAR {msg.action?.payload.toUpperCase()}
+                                                        </Button>
+                                                    </div>
+                                                )}
+
+                                                {/* Bot Feedback Rating */}
+                                                {msg.role === "bot" && !msg.isTyping && msg.messageId && (
+                                                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                                        <span className="text-[9px] text-muted-foreground uppercase font-semibold">Rating:</span>
+                                                        <button
+                                                            disabled={!!msg.rating}
+                                                            onClick={() => handleRate(idx, 1)}
+                                                            className={cn(
+                                                                "p-1 rounded transition-colors hover:bg-slate-100 dark:hover:bg-slate-700",
+                                                                msg.rating === 1 ? "text-green-600" : "text-muted-foreground opacity-50"
+                                                            )}
+                                                            title="Jawaban Membantu"
+                                                        >
+                                                            <ThumbsUp className="h-3 w-3" />
+                                                        </button>
+                                                        <button
+                                                            disabled={!!msg.rating}
+                                                            onClick={() => handleRate(idx, -1)}
+                                                            className={cn(
+                                                                "p-1 rounded transition-colors hover:bg-slate-100 dark:hover:bg-slate-700",
+                                                                msg.rating === -1 ? "text-red-600" : "text-muted-foreground opacity-50"
+                                                            )}
+                                                            title="Jawaban Tidak Akurat"
+                                                        >
+                                                            <ThumbsDown className="h-3 w-3" />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -231,6 +418,52 @@ export const ChatBot = () => {
                                         Powered by RSI Care AI
                                     </p>
                                 </div>
+
+                                {/* History Overlay */}
+                                <AnimatePresence>
+                                    {showHistory && (
+                                        <motion.div
+                                            initial={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exit={{ x: "100%" }}
+                                            className="absolute inset-0 bg-white dark:bg-slate-900 border-l z-50 flex flex-col pt-14"
+                                        >
+                                            <div className="p-4 border-b flex justify-between items-center">
+                                                <h4 className="font-bold text-sm">Riwayat Chat</h4>
+                                                <Button variant="ghost" size="icon" onClick={() => setShowHistory(false)} className="h-8 w-8">
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto p-2">
+                                                {savedSessions.length === 0 ? (
+                                                    <p className="text-center text-xs text-muted-foreground mt-4">Belum ada riwayat.</p>
+                                                ) : (
+                                                    <div className="space-y-1">
+                                                        {savedSessions.map((sid, i) => (
+                                                            <button
+                                                                key={sid}
+                                                                onClick={() => switchSession(sid)}
+                                                                className={cn(
+                                                                    "w-full text-left p-3 rounded-xl text-xs transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2",
+                                                                    sessionId === sid ? "bg-primary/10 text-primary font-medium" : "text-slate-600 dark:text-slate-400"
+                                                                )}
+                                                            >
+                                                                <MessageCircle className="h-3 w-3 shrink-0" />
+                                                                <span className="truncate">Percakapan {savedSessions.length - i}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-4 border-t">
+                                                <Button variant="outline" className="w-full text-xs gap-2" onClick={handleNewChat}>
+                                                    <RefreshCw className="h-3 w-3" />
+                                                    Mulai Baru
+                                                </Button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </>
                         )}
                     </motion.div>

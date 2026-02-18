@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
     useGetAdminUsers,
     useUpdateAdminUserRole,
@@ -19,10 +19,15 @@ import {
     Phone,
     Calendar,
     CheckCircle2,
-    XCircle
+    XCircle,
+    Users,
+    UserCheck,
+    UserMinus,
+    Stethoscope
 } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
 import {
     Select,
     SelectContent,
@@ -50,12 +55,19 @@ import { Badge } from "~/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 const ROLE_OPTIONS = [
-    { value: "ADMIN", label: "Administrator", color: "bg-red-100 text-red-700 hover:bg-red-200" },
+    { value: "ADMIN", label: "Administrator", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
     { value: "DOCTOR", label: "Dokter", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
     { value: "NURSE", label: "Perawat", color: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" },
     { value: "STAFF", label: "Staff", color: "bg-slate-100 text-slate-700 hover:bg-slate-200" },
-    { value: "PATIENT", label: "Pasien", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
+    { value: "PATIENT", label: "Pasien", color: "bg-amber-100 text-amber-700 hover:bg-amber-200" },
 ];
+
+const toTitleCase = (str: string) => {
+    if (!str) return "";
+    return str.toLowerCase().split(' ').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+};
 
 export default function AdminUsersPage() {
     const { data: users, isLoading } = useGetAdminUsers();
@@ -69,6 +81,17 @@ export default function AdminUsersPage() {
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
+
+    const metrics = useMemo(() => {
+        if (!users) return null;
+        return {
+            total: users.length,
+            verified: users.filter(u => u.emailVerified).length,
+            unverified: users.filter(u => !u.emailVerified).length,
+            doctors: users.filter(u => u.role?.toUpperCase() === "DOCTOR").length,
+            admins: users.filter(u => u.role?.toUpperCase() === "ADMIN").length,
+        };
+    }, [users]);
 
     const handleRoleChange = (userId: string, newRole: string) => {
         updateRoleMutation.mutate({ id: userId, role: newRole });
@@ -101,12 +124,62 @@ export default function AdminUsersPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search by name or email..."
-                        className="pl-10 h-11 rounded-xl border-slate-200"
+                        className="pl-10 h-11 rounded-xl border-slate-200 bg-white"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
             </div>
+
+            {/* Metrics Dashboard */}
+            {metrics && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <Card className="border-none shadow-sm bg-indigo-50/50">
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <div className="p-2.5 bg-indigo-100 text-indigo-600 rounded-xl">
+                                <Users className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Total User</p>
+                                <p className="text-2xl font-bold text-indigo-900">{metrics.total}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-sm bg-emerald-50/50">
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <div className="p-2.5 bg-emerald-100 text-emerald-600 rounded-xl">
+                                <UserCheck className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Terverifikasi</p>
+                                <p className="text-2xl font-bold text-emerald-900">{metrics.verified}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-sm bg-rose-50/50">
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <div className="p-2.5 bg-rose-100 text-rose-600 rounded-xl">
+                                <UserMinus className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-rose-600 uppercase tracking-wider">Belum Verif</p>
+                                <p className="text-2xl font-bold text-rose-900">{metrics.unverified}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-sm bg-blue-50/50">
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <div className="p-2.5 bg-blue-100 text-blue-600 rounded-xl">
+                                <Stethoscope className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Total Dokter</p>
+                                <p className="text-2xl font-bold text-blue-900">{metrics.doctors}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -125,16 +198,18 @@ export default function AdminUsersPage() {
                                 <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
-                                            <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                                            <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-1 ring-slate-100">
                                                 <AvatarImage src={user.image || undefined} />
-                                                <AvatarFallback className="bg-slate-100 text-slate-600">
+                                                <AvatarFallback className="bg-slate-100 text-slate-600 font-bold">
                                                     {user.name.charAt(0).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex flex-col">
-                                                <span className="font-semibold text-slate-900">{user.name}</span>
-                                                <span className="text-xs text-slate-500 flex items-center gap-1">
-                                                    <Mail className="h-3 w-3" /> {user.email}
+                                                <span className="font-bold text-slate-900 leading-tight">
+                                                    {toTitleCase(user.name)}
+                                                </span>
+                                                <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                                    <Mail className="h-2.5 w-2.5" /> {user.email}
                                                 </span>
                                             </div>
                                         </div>
@@ -163,17 +238,17 @@ export default function AdminUsersPage() {
                                     </td>
                                     <td className="p-4">
                                         <Select
-                                            defaultValue={user.role}
+                                            defaultValue={user.role?.toUpperCase()}
                                             onValueChange={(value) => handleRoleChange(user.id, value)}
                                             disabled={updateRoleMutation.isPending && updateRoleMutation.variables?.id === user.id}
                                         >
-                                            <SelectTrigger className={`w-36 h-8 text-xs font-semibold rounded-full border-none shadow-none ${ROLE_OPTIONS.find(r => r.value === user.role)?.color || "bg-slate-100"
+                                            <SelectTrigger className={`w-36 h-7 text-[10px] uppercase font-bold rounded-full border-none shadow-none ${ROLE_OPTIONS.find(r => r.value === user.role?.toUpperCase())?.color || "bg-slate-100"
                                                 }`}>
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="rounded-xl border-slate-100">
                                                 {ROLE_OPTIONS.map((option) => (
-                                                    <SelectItem key={option.value} value={option.value} className="text-xs font-medium">
+                                                    <SelectItem key={option.value} value={option.value} className="text-[11px] font-bold">
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}

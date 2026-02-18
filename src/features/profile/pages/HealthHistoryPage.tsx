@@ -10,8 +10,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getHealthHistory, HealthRecord } from "../api/getHealthHistory";
 import { getProfile } from "../api/getProfile";
 import { LabResultsList } from "../components/LabResultsList";
+import { RadiologyResultsList } from "../components/RadiologyResultsList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Activity, FlaskConical } from "lucide-react";
+import { Activity, FlaskConical, Radio } from "lucide-react";
 
 export const HealthHistoryPage = () => {
     const { data: profile } = useQuery({
@@ -46,14 +47,18 @@ export const HealthHistoryPage = () => {
                     </div>
 
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                        <TabsList className="bg-white border p-1 rounded-xl h-auto">
-                            <TabsTrigger value="history" className="rounded-lg py-2.5">
+                        <TabsList className="bg-white border p-1 rounded-xl h-auto flex-wrap">
+                            <TabsTrigger value="history" className="rounded-lg py-2.5 flex-1">
                                 <Activity className="h-4 w-4 mr-2" />
                                 Diagnosis & Kunjungan
                             </TabsTrigger>
-                            <TabsTrigger value="lab" className="rounded-lg py-2.5">
+                            <TabsTrigger value="lab" className="rounded-lg py-2.5 flex-1">
                                 <FlaskConical className="h-4 w-4 mr-2" />
-                                Hasil Laboratorium & MCU
+                                Laboratorium
+                            </TabsTrigger>
+                            <TabsTrigger value="radiology" className="rounded-lg py-2.5 flex-1">
+                                <Radio className="h-4 w-4 mr-2" />
+                                Radiologi
                             </TabsTrigger>
                         </TabsList>
 
@@ -98,6 +103,10 @@ export const HealthHistoryPage = () => {
 
                         <TabsContent value="lab">
                             <LabResultsList noRM={noRM} />
+                        </TabsContent>
+
+                        <TabsContent value="radiology">
+                            <RadiologyResultsList noRM={noRM} />
                         </TabsContent>
                     </Tabs>
 
