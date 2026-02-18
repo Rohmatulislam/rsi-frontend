@@ -87,7 +87,7 @@ export const DoctorCard = ({
 
     // Hitung selisih hari
     let daysToAdd = dayOfWeek - currentDay;
-    if (daysToAdd <= 0) {
+    if (daysToAdd < 0) {
       daysToAdd += 7; // Jika hari ini atau kemarin, cari minggu depan
     }
 
@@ -110,7 +110,16 @@ export const DoctorCard = ({
     );
 
     if (validSchedules.length > 0) {
-      const schedule = validSchedules[0];
+      const today = new Date();
+      const currentDay = today.getDay();
+
+      const sortedSchedules = [...validSchedules].sort((a, b) => {
+        const diffA = (a.dayOfWeek - currentDay + 7) % 7;
+        const diffB = (b.dayOfWeek - currentDay + 7) % 7;
+        return diffA - diffB;
+      });
+
+      const schedule = sortedSchedules[0];
       const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][schedule.dayOfWeek] || 'Jadwal';
       const nextDate = getNextDateForDay(schedule.dayOfWeek);
       nearestSchedule = `${hari}, ${nextDate} (${schedule.startTime || '--:--'})`;
