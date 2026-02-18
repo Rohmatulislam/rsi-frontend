@@ -361,7 +361,7 @@ export const PatientDataStep = ({
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label>Email (Opsional)</Label>
+                  <Label>Email <span className="text-red-500">*</span></Label>
                   <Input
                     placeholder="email@example.com"
                     value={formData.email}
@@ -371,7 +371,7 @@ export const PatientDataStep = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Alamat (Opsional)</Label>
+                  <Label>Alamat Lengkap <span className="text-red-500">*</span></Label>
                   <Input
                     placeholder="Alamat lengkap"
                     value={formData.address}
@@ -445,8 +445,8 @@ export const PatientDataStep = ({
                       }
                     }
                     if (subStep === 2) {
-                      if (!formData.religion || !formData.phone || formData.phone.length < 10) {
-                        toast.error("Lengkapi kontak wajib di Langkah 2");
+                      if (!formData.religion || !formData.phone || formData.phone.length < 10 || !formData.email || !formData.address) {
+                        toast.error("Lengkapi kontak, email, dan alamat wajib di Langkah 2");
                         return;
                       }
                     }
