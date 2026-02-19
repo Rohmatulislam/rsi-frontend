@@ -8,7 +8,9 @@ export interface HealthRecord {
     notes?: string;
 }
 
-export const getHealthHistory = async (): Promise<HealthRecord[]> => {
+export const getHealthHistory = async (noRM?: string): Promise<HealthRecord[]> => {
+    // TODO: Implement actual fetching using noRM
+    console.log("Fetching health history for:", noRM);
     const res = await axiosInstance.get("users/me/health-history");
     return res.data;
 };

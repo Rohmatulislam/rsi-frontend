@@ -27,6 +27,7 @@ export const updateProfile = async (data: {
     name?: string;
     phone?: string;
     image?: string;
+    nik?: string;
 }): Promise<UserProfile> => {
     const res = await axiosInstance.patch("users/me", data);
     return res.data;

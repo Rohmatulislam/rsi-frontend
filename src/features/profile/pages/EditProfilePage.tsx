@@ -18,16 +18,25 @@ export const EditProfilePage = () => {
     const { user, isLoading: authLoading } = useAuth();
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
+    const [nik, setNik] = useState("");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
-        if (user?.name) setName(user.name);
+        if (user) {
+            setName(user.name || "");
+            // @ts-ignore
+            if (user.profile?.phone) setPhone(user.profile.phone);
+            // @ts-ignore
+            if (user.profile?.nik) setNik(user.profile.nik);
+        }
     }, [user]);
 
     const updateMutation = useMutation({
         mutationFn: updateProfile,
         onSuccess: () => {
             toast.success("Profil berhasil diperbarui");
+            // Force reload to update session data
+            window.location.href = "/profil";
         },
         onError: () => {
             toast.error("Gagal memperbarui profil");
@@ -54,6 +63,7 @@ export const EditProfilePage = () => {
         updateMutation.mutate({
             name: name || undefined,
             phone: phone || undefined,
+            nik: nik || undefined,
             image: imagePreview || undefined,
         });
     };
@@ -138,6 +148,19 @@ export const EditProfilePage = () => {
                                     </p>
                                 </div>
 
+                                <div className="space-y-2">
+                                    <Label htmlFor="nik">NIK (Nomor Induk Kependudukan)</Label>
+                                    <Input
+                                        id="nik"
+                                        value={nik}
+                                        onChange={(e) => setNik(e.target.value)}
+                                        placeholder="Masukkan 16 digit NIK Anda (Sesuai KTP/Data RS)"
+                                        maxLength={16}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        NIK digunakan untuk menyambungkan akun dengan data Rekam Medis.
+                                    </p>
+                                </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="phone">Nomor Telepon</Label>
                                     <Input

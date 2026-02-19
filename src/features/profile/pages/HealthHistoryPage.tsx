@@ -9,10 +9,14 @@ import { ProtectedRoute } from "~/features/auth/components/ProtectedRoute";
 import { useQuery } from "@tanstack/react-query";
 import { getHealthHistory, HealthRecord } from "../api/getHealthHistory";
 import { getProfile } from "../api/getProfile";
+import { getLinkedPatients } from "../api/getLinkedPatients";
 import { LabResultsList } from "../components/LabResultsList";
 import { RadiologyResultsList } from "../components/RadiologyResultsList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Label } from "~/components/ui/label";
 import { Activity, FlaskConical, Radio } from "lucide-react";
+import { useEffect } from "react";
 
 export const HealthHistoryPage = () => {
     const { data: profile } = useQuery({
@@ -20,30 +24,85 @@ export const HealthHistoryPage = () => {
         queryFn: getProfile,
     });
 
-    const { data: rawHealthRecords } = useQuery<HealthRecord[]>({
-        queryKey: ["healthHistory"],
-        queryFn: getHealthHistory,
+    const { data: linkedPatients = [] } = useQuery({
+        queryKey: ["linkedPatients"],
+        queryFn: getLinkedPatients,
+    });
+
+    const [selectedNoRM, setSelectedNoRM] = useState<string>("");
+    const [activeTab, setActiveTab] = useState("history");
+
+    // Initialize selectedNoRM when patients are loaded
+    useEffect(() => {
+        if (linkedPatients.length > 0 && !selectedNoRM) {
+            // Default to first item (which is "Diri Sendiri" if available, or most recent)
+            setSelectedNoRM(linkedPatients[0].noRM);
+        } else if (linkedPatients.length === 0 && (profile as any)?.noRM && !selectedNoRM) {
+            // If no linked patients but profile has RM, use it
+            setSelectedNoRM((profile as any).noRM);
+        }
+    }, [linkedPatients, profile, selectedNoRM]);
+
+    // Use selectedNoRM directly
+    const currentNoRM = selectedNoRM || (profile as any)?.noRM;
+
+    // Effect to refetch when noRM changes
+    const { data: rawHealthRecords, isFetching } = useQuery<HealthRecord[]>({
+        queryKey: ["healthHistory", currentNoRM],
+        queryFn: () => getHealthHistory(currentNoRM || ""),
+        enabled: !!currentNoRM,
     });
 
     const healthRecords = Array.isArray(rawHealthRecords) ? rawHealthRecords : [];
 
-    const [activeTab, setActiveTab] = useState("history");
-
-    const noRM = (profile as any)?.noRM;
+    // ... (rest of component) ...
 
     return (
         <ProtectedRoute>
             <div className="min-h-screen bg-slate-50 pt-20 pb-12">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <div className="mb-8">
+                        {/* Header & Back Button */}
                         <Button variant="ghost" asChild className="mb-4">
                             <Link href="/profil">
+                                <ArrowLeft className="h-4 w-4 mr-2" />
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 Kembali ke Profil
                             </Link>
                         </Button>
-                        <h1 className="text-3xl font-bold text-slate-900">Riwayat Kesehatan</h1>
-                        <p className="text-muted-foreground">Catatan medis dan riwayat kunjungan Anda</p>
+
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h1 className="text-3xl font-bold text-slate-900">Riwayat Kesehatan</h1>
+                                <p className="text-muted-foreground">Catatan medis dan riwayat kunjungan</p>
+                            </div>
+
+                            {/* Patient Selector */}
+                            <div className="w-full md:w-72">
+                                <Label className="text-xs mb-1.5 block text-muted-foreground">Pilih Pasien (Terkait)</Label>
+                                <Select value={selectedNoRM} onValueChange={setSelectedNoRM}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Pasien" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {linkedPatients.length > 0 ? (
+                                            linkedPatients.map((patient) => (
+                                                <SelectItem key={patient.noRM} value={patient.noRM}>
+                                                    <div className="flex flex-col text-left">
+                                                        <span className="font-medium">{patient.name}</span>
+                                                        <span className="text-xs text-muted-foreground">{patient.type}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))
+                                        ) : (
+                                            <SelectItem value={(profile as any)?.noRM || "unknown"}>
+                                                Diri Sendiri ({profile?.name})
+                                            </SelectItem>
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                     </div>
 
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -102,11 +161,11 @@ export const HealthHistoryPage = () => {
                         </TabsContent>
 
                         <TabsContent value="lab">
-                            <LabResultsList noRM={noRM} />
+                            <LabResultsList noRM={currentNoRM} />
                         </TabsContent>
 
                         <TabsContent value="radiology">
-                            <RadiologyResultsList noRM={noRM} />
+                            <RadiologyResultsList noRM={currentNoRM} />
                         </TabsContent>
                     </Tabs>
 

@@ -21,6 +21,7 @@ export interface LabResultDetail {
 }
 
 export const getLabHistory = async (noRM: string): Promise<LabHistory[]> => {
+    console.log("Fetching Lab History for RM:", noRM);
     const res = await axiosInstance.get(`lab/history/${noRM}`);
     return res.data;
 };

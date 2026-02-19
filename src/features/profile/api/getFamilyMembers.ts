@@ -8,6 +8,7 @@ export interface FamilyMember {
     birthDate?: string;
     gender?: string;
     phone?: string;
+    noRM?: string | null;
 }
 
 export const getFamilyMembers = async (): Promise<FamilyMember[]> => {
