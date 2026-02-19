@@ -5,7 +5,8 @@ import { useSyncDoctors } from "~/features/admin/api/syncDoctors";
 import { useUpdateDoctor } from "~/features/admin/api/updateDoctor";
 import { useDeleteDoctor } from "~/features/admin/api/deleteDoctor";
 import { useCreateDoctor } from "~/features/admin/api/createDoctor";
-import { RefreshCw, Search, Edit2, Trash2, Plus } from "lucide-react";
+import { useBroadcastReminders } from "~/features/admin/api/broadcastReminders";
+import { RefreshCw, Search, Edit2, Trash2, Plus, Bell } from "lucide-react";
 import { useState } from "react";
 import { DoctorDto } from "~/features/home/api/getDoctors";
 import { DoctorModal } from "~/features/admin/components/DoctorModal";
@@ -26,6 +27,7 @@ export default function AdminDoctorsPage() {
     const { mutate: updateDoctor, isPending: isUpdating } = useUpdateDoctor();
     const { mutate: deleteDoctor, isPending: isDeleting } = useDeleteDoctor();
     const { mutate: createDoctor, isPending: isCreating } = useCreateDoctor();
+    const { mutate: broadcastReminders, isPending: isBroadcasting } = useBroadcastReminders();
 
     const [search, setSearch] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,6 +153,16 @@ export default function AdminDoctorsPage() {
                     >
                         <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
                         <span>{isSyncing ? "Syncing..." : "Sync from SIMRS"}</span>
+                    </Button>
+                    <Button
+                        onClick={() => broadcastReminders()}
+                        disabled={isBroadcasting}
+                        variant="outline"
+                        className="flex items-center gap-2 border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800"
+                        title="Kirim Peringatan Jadwal ke Pasien (WA)"
+                    >
+                        <Bell className={`w-4 h-4 ${isBroadcasting ? "animate-swing" : ""}`} />
+                        <span>{isBroadcasting ? "Sending..." : "Broadcast WA"}</span>
                     </Button>
                 </div>
             </div>
