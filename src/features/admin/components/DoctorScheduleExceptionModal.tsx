@@ -187,7 +187,7 @@ export const DoctorScheduleExceptionModal = ({ isOpen, onClose, doctor }: Doctor
                                                 </span>
                                                 {ex.kd_poli && (
                                                     <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                                                        {ex.kd_poli}
+                                                        {((doctor as any)?.scheduleDetails || []).find((s: any) => s.kd_poli === ex.kd_poli)?.nm_poli || ex.kd_poli}
                                                     </span>
                                                 )}
                                             </div>
